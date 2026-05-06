@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ===================================================================== -->
+<!-- item_search_result.xml - Arama sonucu öğesi                            -->
+<!-- Takım veya lig arama sonucu olarak gösterilir                         -->
+<!-- ===================================================================== -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/searchResultContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="@dimen/padding_md"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <!-- İkon (takım veya lig) -->
+    <TextView
+        android:id="@+id/tvSearchIcon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:background="@drawable/shape_search_icon_bg" />
+
+    <!-- Sonuç bilgileri -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="@dimen/margin_md">
+
+        <!-- Ana metin (takım/lig adı) -->
+        <TextView
+            android:id="@+id/tvSearchResultName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_body"
+            android:textColor="?android:attr/textColorPrimary"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- Alt metin (tür bilgisi) -->
+        <TextView
+            android:id="@+id/tvSearchResultType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_caption"
+            android:textColor="?android:attr/textColorSecondary" />
+
+    </LinearLayout>
+
+    <!-- İleri oku -->
+    <ImageView
+        android:layout_width="@dimen/icon_sm"
+        android:layout_height="@dimen/icon_sm"
+        android:src="@android:drawable/ic_media_play"
+        android:alpha="0.3"
+        android:contentDescription="@string/match_details" />
+
+</LinearLayout>

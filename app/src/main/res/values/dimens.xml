@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ========================================= -->
+    <!-- Boyut Sabitleri (Dimensions)               -->
+    <!-- ========================================= -->
+
+    <!-- Genel Kenar Boşlukları -->
+    <dimen name="margin_xs">4dp</dimen>
+    <dimen name="margin_sm">8dp</dimen>
+    <dimen name="margin_md">16dp</dimen>
+    <dimen name="margin_lg">24dp</dimen>
+    <dimen name="margin_xl">32dp</dimen>
+
+    <!-- Genel Padding Değerleri -->
+    <dimen name="padding_xs">4dp</dimen>
+    <dimen name="padding_sm">8dp</dimen>
+    <dimen name="padding_md">12dp</dimen>
+    <dimen name="padding_lg">16dp</dimen>
+    <dimen name="padding_xl">24dp</dimen>
+
+    <!-- Köşe Yuvarlatma (Radius) -->
+    <dimen name="radius_sm">8dp</dimen>
+    <dimen name="radius_md">12dp</dimen>
+    <dimen name="radius_lg">16dp</dimen>
+    <dimen name="radius_xl">24dp</dimen>
+    <dimen name="radius_circle">50dp</dimen>
+
+    <!-- Yazı Boyutları -->
+    <dimen name="text_caption">11sp</dimen>
+    <dimen name="text_body_small">12sp</dimen>
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_subtitle">16sp</dimen>
+    <dimen name="text_title">20sp</dimen>
+    <dimen name="text_headline">24sp</dimen>
+    <dimen name="text_score">28sp</dimen>
+
+    <!-- Date Picker Boyutları -->
+    <dimen name="date_item_width">56dp</dimen>
+    <dimen name="date_item_height">72dp</dimen>
+    <dimen name="date_picker_height">88dp</dimen>
+
+    <!-- Maç Kartı Boyutları -->
+    <dimen name="match_card_height">80dp</dimen>
+    <dimen name="team_logo_size">32dp</dimen>
+    <dimen name="league_header_height">40dp</dimen>
+
+    <!-- Bottom Navigation -->
+    <dimen name="bottom_nav_height">56dp</dimen>
+
+    <!-- Toolbar -->
+    <dimen name="toolbar_height">56dp</dimen>
+
+    <!-- Carousel Toggle -->
+    <dimen name="carousel_toggle_height">40dp</dimen>
+
+    <!-- Elevation -->
+    <dimen name="elevation_sm">2dp</dimen>
+    <dimen name="elevation_md">4dp</dimen>
+    <dimen name="elevation_lg">8dp</dimen>
+
+    <!-- İkon boyutları -->
+    <dimen name="icon_sm">16dp</dimen>
+    <dimen name="icon_md">24dp</dimen>
+    <dimen name="icon_lg">32dp</dimen>
+</resources>

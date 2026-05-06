@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ===================================================================== -->
+<!-- item_match.xml - Maç satırı öğesi                                     -->
+<!-- Her maç için: Saat/Durum + Ev Sahibi + Skor + Deplasman              -->
+<!-- Canlı maçlarda kırmızı nabız animasyonu gösterilir                    -->
+<!-- ===================================================================== -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardMatch"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/margin_sm"
+    android:layout_marginEnd="@dimen/margin_sm"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    app:cardCornerRadius="@dimen/radius_sm"
+    app:cardElevation="@dimen/elevation_sm"
+    app:cardBackgroundColor="?attr/colorSurface"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/padding_md"
+        android:paddingEnd="@dimen/padding_md"
+        android:paddingTop="@dimen/padding_md"
+        android:paddingBottom="@dimen/padding_md">
+
+        <!-- ====================================== -->
+        <!-- Sol: Maç saati veya canlı göstergesi   -->
+        <!-- ====================================== -->
+        <LinearLayout
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Canlı maç göstergesi (kırmızı nokta) -->
+            <View
+                android:id="@+id/viewLiveIndicator"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/shape_live_dot"
+                android:visibility="gone" />
+
+            <!-- Maç saati veya dakikası -->
+            <TextView
+                android:id="@+id/tvMatchTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_body_small"
+                android:textColor="?android:attr/textColorSecondary"
+                android:gravity="center" />
+
+            <!-- Maç durumu (CANLI, Bitti, vs.) -->
+            <TextView
+                android:id="@+id/tvMatchStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_caption"
+                android:textColor="@color/live_red"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- ====================================== -->
+        <!-- Orta: Takım adları ve skor             -->
+        <!-- ====================================== -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/padding_sm"
+            android:paddingEnd="@dimen/padding_sm">
+
+            <!-- Ev sahibi satırı -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="4dp">
+
+                <!-- Ev sahibi kırmızı kart göstergesi -->
+                <View
+                    android:id="@+id/viewHomeRedCard"
+                    android:layout_width="4dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@color/red_card"
+                    android:visibility="gone" />
+
+                <!-- Ev sahibi takım adı -->
+                <TextView
+                    android:id="@+id/tvHomeName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="@dimen/text_body"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <!-- Ev sahibi skoru -->
+                <TextView
+                    android:id="@+id/tvHomeScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_subtitle"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textStyle="bold"
+                    android:minWidth="24dp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <!-- Deplasman satırı -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="4dp">
+
+                <!-- Deplasman kırmızı kart göstergesi -->
+                <View
+                    android:id="@+id/viewAwayRedCard"
+                    android:layout_width="4dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@color/red_card"
+                    android:visibility="gone" />
+
+                <!-- Deplasman takım adı -->
+                <TextView
+                    android:id="@+id/tvAwayName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="@dimen/text_body"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <!-- Deplasman skoru -->
+                <TextView
+                    android:id="@+id/tvAwayScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_subtitle"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textStyle="bold"
+                    android:minWidth="24dp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ====================================== -->
+        <!-- Sağ: İleri ok ikonu                    -->
+        <!-- ====================================== -->
+        <ImageView
+            android:layout_width="@dimen/icon_sm"
+            android:layout_height="@dimen/icon_sm"
+            android:src="@android:drawable/ic_media_play"
+            android:alpha="0.3"
+            android:contentDescription="@string/match_details"
+            app:tint="?android:attr/textColorSecondary" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

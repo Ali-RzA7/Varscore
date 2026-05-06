@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ===================================================================== -->
+<!-- dialog_search.xml - Arama dialog'u layout'u                            -->
+<!-- Kullanıcı takım veya lig arayabilir                                    -->
+<!-- TextInputLayout + RecyclerView ile arama sonuçları listelenir          -->
+<!-- ===================================================================== -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface"
+    android:padding="@dimen/padding_lg">
+
+    <!-- Arama Giriş Alanı -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:hintEnabled="false"
+        app:boxCornerRadiusTopStart="@dimen/radius_xl"
+        app:boxCornerRadiusTopEnd="@dimen/radius_xl"
+        app:boxCornerRadiusBottomStart="@dimen/radius_xl"
+        app:boxCornerRadiusBottomEnd="@dimen/radius_xl"
+        app:boxBackgroundMode="outline"
+        app:startIconDrawable="@android:drawable/ic_menu_search"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/search_hint"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:maxLines="1" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Arama Sonuçları Listesi -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSearchResults"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/margin_md"
+        android:clipToPadding="false" />
+
+    <!-- Sonuç Bulunamadı Mesajı -->
+    <TextView
+        android:id="@+id/tvNoResults"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/search_no_results"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="@dimen/text_subtitle"
+        android:visibility="gone" />
+
+</LinearLayout>

@@ -7,7 +7,7 @@ Kullanıcılar:
 - Anlık skorları takip edebilecek    
 - İstedikleri durumda yapay zeka tahmini yapabilecek.(groq api)  
 
-Modüler ve kullanıcı odaklı bir yapı hedeflenmektedir.
+Modüler ve kullanıcı odaklı bir yapı hedeflenmektedir. uı ux iyi olmalı.
 
 ---
 
@@ -51,7 +51,7 @@ material desing kullan
 
 ### Canlı Skor ve Bildirim
 - WebSocket veya FCM ile gerçek zamanlı skor, (apiden gelecek veriler.)
-- Bildirim türleri:
+- Bildirim türleri (apiden ne geliyorsa):
   - Maç başlangıcı  
   - Gol  
   - Kırmızı kart  

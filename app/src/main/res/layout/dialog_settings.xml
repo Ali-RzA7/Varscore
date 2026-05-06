@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ===================================================================== -->
+<!-- dialog_settings.xml - Ayarlar dialog'u layout'u                        -->
+<!-- Koyu tema switch'i + Dil seçimi radio butonları                        -->
+<!-- ===================================================================== -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_xl">
+
+    <!-- Başlık -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings"
+        android:textSize="@dimen/text_title"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/margin_lg" />
+
+    <!-- Ayırıcı çizgi -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_light"
+        android:layout_marginBottom="@dimen/margin_md" />
+
+    <!-- Koyu Tema Toggle -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="@dimen/padding_sm"
+        android:paddingBottom="@dimen/padding_sm">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dark_mode"
+            android:textSize="@dimen/text_subtitle"
+            android:textColor="?android:attr/textColorPrimary"
+            android:drawablePadding="@dimen/padding_md" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchDarkMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <!-- Ayırıcı çizgi -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_light"
+        android:layout_marginTop="@dimen/margin_sm"
+        android:layout_marginBottom="@dimen/margin_md" />
+
+    <!-- Dil Seçimi -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/language"
+        android:textSize="@dimen/text_subtitle"
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_marginBottom="@dimen/margin_sm" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupLanguage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/radioTurkish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/language_turkish"
+            android:textSize="@dimen/text_body"
+            android:padding="@dimen/padding_sm" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/radioEnglish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/language_english"
+            android:textSize="@dimen/text_body"
+            android:padding="@dimen/padding_sm" />
+
+    </RadioGroup>
+
+</LinearLayout>

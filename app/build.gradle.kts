@@ -1,16 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
-    id("com.android.application")
     id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.example.var"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.var"
@@ -20,6 +15,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // API anahtarı local.properties dosyasından güvenli şekilde okunacak
+        buildConfigField("String", "API_KEY", "\"${project.findProperty("ISPORTS_API_KEY") ?: ""}\"")
     }
 
     buildTypes {
@@ -35,14 +33,44 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
 }
 
 dependencies {
+    // AndroidX Core & AppCompat
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+
+    // Retrofit & OkHttp - Ağ işlemleri için
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // Gson - JSON dönüşümleri için
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // Glide - Görsel yükleme için
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    // SharedPreferences
+    implementation("androidx.preference:preference:1.2.1")
+
+    // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
-    implementation("com.google.firebase:firebase-analytics")
 }

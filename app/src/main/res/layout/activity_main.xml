@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ===================================================================== -->
+<!-- activity_main.xml - Ana sayfa layout dosyası                           -->
+<!-- Yapı: Toolbar (üst) + Content Area (ortada) + BottomNavigationView    -->
+<!-- CoordinatorLayout ile Material Design davranışları desteklenir         -->
+<!-- ===================================================================== -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.MainActivity">
+
+    <!-- FrameLayout: Fragment container - Ana içerik alanı -->
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/bottom_nav_height" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

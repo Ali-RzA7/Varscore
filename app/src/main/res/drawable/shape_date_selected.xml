@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Seçili tarih arka planı - Yuvarlak altın sarısı -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/secondary" />
+    <corners android:radius="@dimen/radius_md" />
+</shape>

@@ -1,3 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">var</string>
+    <!-- ========================================= -->
+    <!-- Uygulama Metin Kaynakları (Varsayılan: TR) -->
+    <!-- ========================================= -->
+
+    <!-- Uygulama Adı -->
+    <string name="app_name">VarScore</string>
+
+    <!-- Ana Sayfa -->
+    <string name="home_title">Ana Sayfa</string>
+    <string name="live_matches">Canlı Maçlar</string>
+    <string name="all_matches">Tüm Maçlar</string>
+    <string name="today">Bugün</string>
+    <string name="yesterday">Dün</string>
+    <string name="tomorrow">Yarın</string>
+
+    <!-- Tarih Seçici -->
+    <string name="select_date">Tarih Seçin</string>
+
+    <!-- Maç Durumları -->
+    <string name="status_not_started">Başlamadı</string>
+    <string name="status_first_half">İlk Yarı</string>
+    <string name="status_half_time">Devre Arası</string>
+    <string name="status_second_half">İkinci Yarı</string>
+    <string name="status_extra_time">Uzatma</string>
+    <string name="status_penalties">Penaltılar</string>
+    <string name="status_finished">Bitti</string>
+    <string name="status_cancelled">İptal</string>
+    <string name="status_postponed">Ertelendi</string>
+    <string name="status_interrupted">Yarıda Kesildi</string>
+    <string name="status_tbd">Belirsiz</string>
+    <string name="status_live">CANLI</string>
+
+    <!-- Arama -->
+    <string name="search_hint">Takım veya lig ara…</string>
+    <string name="search_no_results">Sonuç bulunamadı</string>
+    <string name="search_teams">Takımlar</string>
+    <string name="search_leagues">Ligler</string>
+
+    <!-- Ayarlar -->
+    <string name="settings">Ayarlar</string>
+    <string name="dark_mode">Koyu Tema</string>
+    <string name="language">Dil</string>
+    <string name="language_turkish">Türkçe</string>
+    <string name="language_english">English</string>
+    <string name="notifications">Bildirimler</string>
+    <string name="about">Hakkında</string>
+
+    <!-- Genel -->
+    <string name="loading">Yükleniyor…</string>
+    <string name="error_loading">Veriler yüklenirken hata oluştu</string>
+    <string name="retry">Tekrar Dene</string>
+    <string name="no_matches">Bu tarihte maç bulunamadı</string>
+    <string name="no_live_matches">Şu anda canlı maç yok</string>
+    <string name="pull_to_refresh">Yenilemek için çekin</string>
+
+    <!-- Maç Detayı -->
+    <string name="match_details">Maç Detayları</string>
+    <string name="half_time_score">İlk Yarı</string>
+    <string name="full_time_score">Maç Sonucu</string>
+    <string name="corners">Kornerler</string>
+    <string name="yellow_cards">Sarı Kartlar</string>
+    <string name="red_cards">Kırmızı Kartlar</string>
+    <string name="lineup">Kadro</string>
+    <string name="view_lineup">Kadroları Gör</string>
+
+    <!-- Gün İsimleri (Kısa) -->
+    <string name="day_mon">Pzt</string>
+    <string name="day_tue">Sal</string>
+    <string name="day_wed">Çar</string>
+    <string name="day_thu">Per</string>
+    <string name="day_fri">Cum</string>
+    <string name="day_sat">Cmt</string>
+    <string name="day_sun">Paz</string>
+
+    <!-- Ay İsimleri (Kısa) -->
+    <string name="month_jan">Oca</string>
+    <string name="month_feb">Şub</string>
+    <string name="month_mar">Mar</string>
+    <string name="month_apr">Nis</string>
+    <string name="month_may">May</string>
+    <string name="month_jun">Haz</string>
+    <string name="month_jul">Tem</string>
+    <string name="month_aug">Ağu</string>
+    <string name="month_sep">Eyl</string>
+    <string name="month_oct">Eki</string>
+    <string name="month_nov">Kas</string>
+    <string name="month_dec">Ara</string>
+
+    <!-- İstatistikler -->
+    <string name="home">Ev Sahibi</string>
+    <string name="away">Deplasman</string>
+    <string name="vs">vs</string>
 </resources>
