@@ -1,13 +1,12 @@
 package com.example.var.data.model;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 
 /**
  * MatchModel - API'den gelen maç verisini temsil eden veri sınıfı.
- * iSportsAPI /schedule ve /livescores endpoint'lerinden dönen
- * JSON verilerini Java nesnesine dönüştürmek için kullanılır.
  */
-public class MatchModel {
+public class MatchModel implements Serializable {
 
     // ===== Maç Kimliği =====
     @SerializedName("matchId")

@@ -21,6 +21,7 @@ import com.example.var.ui.adapter.DatePickerAdapter;
 import com.example.var.ui.adapter.MatchAdapter;
 import com.example.var.ui.dialog.SearchDialogFragment;
 import com.example.var.ui.dialog.SettingsDialogFragment;
+import com.example.var.ui.fragment.MatchDetailFragment;
 import com.example.var.util.DateUtils;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -91,7 +92,6 @@ public class HomeFragment extends Fragment implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Repository'yi başlat
         repository = new MatchRepository(API_KEY);
         pollingHandler = new Handler(Looper.getMainLooper());
         selectedDate = Calendar.getInstance();
@@ -451,10 +451,17 @@ public class HomeFragment extends Fragment implements
     /** MatchAdapter callback: Maça tıklandığında detay bilgi göster */
     @Override
     public void onMatchClick(MatchModel match) {
-        // Maç detay snackbar'ı (ileride detay sayfasına yönlendirme)
-        Snackbar.make(binding.getRoot(),
-                match.getHomeName() + " vs " + match.getAwayName(),
-                Snackbar.LENGTH_SHORT).show();
+        MatchDetailFragment detailFragment = MatchDetailFragment.newInstance(match);
+        getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                )
+                .replace(R.id.fragmentContainer, detailFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     // ================================================================

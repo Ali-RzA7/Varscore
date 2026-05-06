@@ -1,8 +1,11 @@
 package com.example.var.data.remote;
 
 import com.example.var.data.model.ApiResponse;
+import com.example.var.data.model.EventModel;
 import com.example.var.data.model.LeagueModel;
+import com.example.var.data.model.LineupModel;
 import com.example.var.data.model.MatchModel;
+import com.example.var.data.model.StatModel;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -100,6 +103,65 @@ public interface FootballApiService {
     @GET("livescores/changes")
     Call<ApiResponse<MatchModel>> getLiveScoreChanges(
             @Query("api_key") String apiKey
+    );
+
+    /**
+     * Maç olaylarını (gol, kart, oyuncu değişikliği) getirir.
+     *
+     * @param apiKey  API anahtarı
+     * @param matchId Maç kimliği
+     * @return Olay listesi
+     */
+    @GET("analysis/event")
+    Call<ApiResponse<EventModel>> getEvents(
+            @Query("api_key") String apiKey,
+            @Query("matchId") String matchId
+    );
+
+    /**
+     * Maç istatistiklerini (şut, korner, topla oynama vb.) getirir.
+     * Python kodundaki /stats endpoint'ini kullanır.
+     *
+     * @param apiKey  API anahtarı
+     * @param matchId Maç kimliği (isteğe bağlı)
+     * @return İstatistik listesi içeren yanıt
+     */
+    @GET("stats")
+    Call<ApiResponse<com.example.var.data.model.MatchStatsResponse>> getStats(
+            @Query("api_key") String apiKey,
+            @Query("matchId") String matchId
+    );
+
+    /**
+     * Maç analiz verilerini (H2H, Form, Gol Zamanlaması vb.) getirir.
+     *
+     * @param apiKey  API anahtarı
+     * @param matchId Maç kimliği
+     * @return Analiz verilerini içeren yanıt
+     */
+    @GET("analysis")
+    Call<com.example.var.data.model.AnalysisResponse> getAnalysis(
+            @Query("api_key") String apiKey,
+            @Query("matchId") String matchId
+    );
+
+    @GET("analysis/statistics")
+    Call<ApiResponse<com.example.var.data.model.StatModel>> getStatistics(
+            @Query("api_key") String apiKey,
+            @Query("matchId") String matchId
+    );
+
+    /**
+     * Maç kadrolarını getirir.
+     *
+     * @param apiKey  API anahtarı
+     * @param matchId Maç kimliği
+     * @return Kadro bilgisi
+     */
+    @GET("analysis/lineup")
+    Call<ApiResponse<LineupModel>> getLineup(
+            @Query("api_key") String apiKey,
+            @Query("matchId") String matchId
     );
 
     /**

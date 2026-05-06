@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Maç Bilgi Kartı (Hakem, Stadyum vb.) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Maç Bilgileri"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Hakem -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_myplaces" app:tint="?android:attr/textColorSecondary" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" Hakem: " android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+                    <TextView android:id="@+id/tvReferee" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textColor="?android:attr/textColorPrimary" android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Stadyum -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+                    <ImageView android:layout_width="16dp" android:layout_height="16dp" android:src="@android:drawable/ic_menu_compass" app:tint="?android:attr/textColorSecondary" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" Stadyum: " android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+                    <TextView android:id="@+id/tvVenue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textColor="?android:attr/textColorPrimary" android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Skor Detayları -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_divider_horizontal">
+
+                    <!-- İlk Yarı -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="İlk Yarı Skoru" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+                        <TextView android:id="@+id/tvHalfScore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 - 0" android:textColor="?android:attr/textColorPrimary" android:textStyle="bold" android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Penaltılar (Varsa) -->
+                    <LinearLayout
+                        android:id="@+id/llPenalties"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp"
+                        android:visibility="gone">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Penaltılar" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+                        <TextView android:id="@+id/tvPenScore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 - 0" android:textColor="@color/secondary" android:textStyle="bold" android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Uzatma Süresi -->
+                    <LinearLayout
+                        android:id="@+id/llInjuryTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp"
+                        android:visibility="gone">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Uzatma Süresi" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+                        <TextView android:id="@+id/tvInjuryTimeValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="+0 dk" android:textColor="?android:attr/textColorPrimary" android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- VAR Olayı -->
+                    <LinearLayout
+                        android:id="@+id/llVar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:visibility="gone">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="VAR Olayı" android:textColor="?android:attr/textColorSecondary" android:textSize="12sp" />
+                        <TextView android:id="@+id/tvVarValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="-" android:textColor="?android:attr/textColorPrimary" android:textSize="12sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Olay Akışı (Timeline) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Olaylar"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="4dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvEvents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never" />
+
+        <TextView
+            android:id="@+id/tvEmptyEvents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="24dp"
+            android:text="Maç henüz başlamadı veya olay bulunamadı."
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
