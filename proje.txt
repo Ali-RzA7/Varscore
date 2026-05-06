@@ -1,0 +1,184 @@
+# PROJE GEREKSİNİM DOKÜMANI (PRD)
+
+## 1. Proje Genel Bakış
+Bu proje, Android SDK kullanılarak geliştirilecek, futbol  canlı skor, istatistik ve yapay zeka destekli maç tahmin uygulamasıdır.  
+veriler api den gelecek.
+Kullanıcılar:
+- Anlık skorları takip edebilecek    
+- İstedikleri durumda yapay zeka tahmini yapabilecek.(groq api)  
+
+Modüler ve kullanıcı odaklı bir yapı hedeflenmektedir.
+
+---
+
+## 2. Teknik ve Akademik Gereksinimler (BM443 Zorunlulukları)
+
+### Platform
+- Sadece **Android SDK** kullanılacaktır.
+
+### API Desteği
+- API seviye: **33 - 36**
+- Minimum ve hedef SDK versiyonları raporda belirtilecektir.
+
+### Tema ve UI Bileşenleri
+- **AppCompat** kullanılacaktır.
+- **Light / Dark Mode** desteği olacak.
+- Kullanılacak bileşenler:
+  - FloatingActionButton  
+  - MaterialButton  
+  - TextInputLayout  
+  - SnackBar  
+  - Loading / Progress Indicator  
+material desing kullan
+### Dil Desteği
+- En az 2 dil:
+  - Türkçe (zorunlu)
+  - İngilizce
+
+### Kaynak Yönetimi
+- Tüm sabitler `res` klasöründe tutulacaktır:
+  - strings.xml  
+  - colors.xml  
+  - dimens.xml  
+
+---
+
+## 3. Uygulamanın Temel Özellikleri
+
+### Modüler Giriş Sistemi
+- Kullanıcı uygulamayı açınca direkt ana sayfaya girer.
+- Yapay zeka özellikleri için giriş zorunludur.
+
+### Canlı Skor ve Bildirim
+- WebSocket veya FCM ile gerçek zamanlı skor, (apiden gelecek veriler.)
+- Bildirim türleri:
+  - Maç başlangıcı  
+  - Gol  
+  - Kırmızı kart  
+  - Devre arası  
+  - Maç sonu  
+  - Maç hatırlatma, ( 1 saat öncesinden bir bildirim.)
+  - kadrolar açıklandığında bildirim
+  - ilk yarı bittiğinde, sonucu
+  - Vara gidildi bildirimi.   
+  - Penaltı
+
+
+### Spoiler Modu
+- Seçilen maçların skorları gizlenebilir,
+- Bildirimler geçici olarak susturulabilir
+
+### Detaylı İstatistik ve Analiz
+- Puan durumu
+- Fikstür
+- İç/Dış saha performansı
+- Metrikler:
+  - xG  
+  - xGOT  
+  - Topa sahip olma  
+  - Şut  
+  - Pas isabeti  
+- H2H (Head to Head)
+
+### Yapay Zeka Tahmin Modülü
+- groq api
+- API üzerinden tahmin çekilir
+- Sadece giriş yapan kullanıcılar erişebilir
+- grqa maçla ileili tüm detaylar promoptta gönderliip tahmin yapılması istenecek.
+
+
+### Veritabanı (Database)
+
+- Room Database / DataStore / SharedPreferences
+- Saklanan veriler:
+  - Spoiler ayarları  
+  - Tema ayarları  
+  - Favori takımlar  
+
+---
+
+## 5. Veri Katmanı ve Modeller
+
+### MatchModel
+| Alan        | Tip    |
+|------------|--------|
+| matchId    | Int    |
+| homeTeam   | String |
+| awayTeam   | String |
+| homeScore  | Int    |
+| awayScore  | Int    |
+| xG_home    | Float  |
+| status     | String |
+
+---
+
+### PlayerModel
+| Alan         | Tip    |
+|--------------|--------|
+| playerId     | Int    |
+| name         | String |
+| careerStats  | List   |
+| currentForm  | Float  |
+
+---
+
+### UserModel
+| Alan              | Tip     |
+|------------------|---------|
+| userId           | String  |
+| isPremium        | Boolean |
+| favoriteTeams    | List    |
+
+---
+
+## 6. İzinler ve Bağımlılıklar
+
+### İzinler
+
+- `INTERNET`
+  - API ve veri çekmek için
+
+- `POST_NOTIFICATIONS`
+  - Bildirim göndermek için (API 33+)
+
+---
+
+### Bağımlılıklar
+
+- **Retrofit / OkHttp**
+  - Ağ işlemleri
+
+- **Coroutines / RxJava**
+  - Asenkron işlemler
+
+- **Room Database**
+  - Lokal veri saklama
+
+- **Glide / Coil**
+  - Görsel yükleme
+
+---
+
+## 7. Raporlama ve Teslim Süreci
+
+- Rapor, dersin **Ödev Şablonu** ile hazırlanacaktır
+- Kapakta bulunması gerekenler:
+  - Ders adı ve kodu  
+  - Proje adı  
+  - Öğrenci isimleri ve numaraları  
+
+### Zorunlu İçerikler
+- UI ekran görüntüleri
+- Launcher icon tasarımı
+- build.gradle dosyası
+- AndroidManifest.xml dosyası
+
+### Teslim
+- PDF formatında yüklenmelidir
+- Yükleme adresi:
+  - akademik.duzce.edu.tr/talhakabakus
+- Son tarih:
+  - Sunumdan **en az 2 gün önce**
+- Ekipten **1 kişinin yüklemesi yeterlidir**
+
+---

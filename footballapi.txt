@@ -1,0 +1,980 @@
+iSportsAPI Entegrasyon Dokümanı: Canlı Skor ve İstatistik Yönetimi
+Bu doküman, mobil uygulamada futbol maçlarının gün bazlı fikstürlerini, detaylı istatistiklerini ve anlık (canlı) skor değişikliklerini iSportsAPI üzerinden çekmek için gereken uçları (endpoint) ve mimari akışları açıklamaktadır.
+
+1. Temel Bağlantı Bilgileri
+Base URL: [http://api.isportsapi.com/sport/football/](http://api.isportsapi.com/sport/football/)
+
+Yetkilendirme: Tüm isteklere api_key parametresi eklenmek zorundadır.
+
+Veri Formatı: JSON
+
+2. Gün Bazlı Filtreleme ve Fikstür Çekme
+Kullanıcının uygulamada takvimden seçtiği bir güne ait maçları (geçmiş, bugün veya gelecek) ve o maçların detaylı istatistiklerini çekmek için kullanılır.
+
+Endpoint: /schedule (Detaylı Fikstür)
+
+HTTP Metodu: GET
+
+Parametreler:
+
+api_key (Zorunlu)
+
+date (İsteğe Bağlı): YYYY-MM-DD formatında (Örn: 2026-05-02). Girilmezse bugünün verisini döndürür. Geçmiş 1 aya kadar sorgulama yapılabilir.
+
+Kullanım Senaryosu:
+Kullanıcı ana sayfada "Dün" sekmesine tıkladığında veya takvimden bir tarih seçtiğinde bu uca istek atılır. Dönen liste uygulamanın arayüzünde (RecyclerView) listelenir.
+
+Örnek JSON Çıktısı (Özet):
+
+JSON
+{
+  "matchId": "123456",
+  "leagueName": "Turkey Super League",
+  "homeName": "Fenerbahce",
+  "awayName": "Galatasaray",
+  "homeScore": 2,
+  "awayScore": 1,
+  "status": -1, 
+  "homeRed": 0,
+  "homeYellow": 3,
+  "homeCorner": 6
+}
+(Not: status: -1 maçın bittiğini gösterir.)
+
+3. İstatistik Yönetimi
+Maç istatistikleri ayrı bir uçtan değil, yukarıda belirtilen /schedule ucundan dönen JSON paketinin içerisinde dâhili olarak gelmektedir.
+
+Mobil arayüzdeki "Maç Detay" sayfasında (UI) gösterilecek anahtar kelimeler şunlardır:
+
+Skorlar: homeScore, awayScore
+
+İlk Yarı Skorları: homeHalfScore, awayHalfScore
+
+Kartlar: homeRed, awayRed, homeYellow, awayYellow
+
+Kornerler: homeCorner, awayCorner
+
+Uzatma Dakikası: injuryTime (Örn: +4 dk)
+
+İlk 11 Durumu: hasLineup (Eğer true ise arayüzde "Kadroları Gör" butonu aktif edilebilir).
+
+4. Canlı Skor Akışı (Live Scores)
+Canlı skor mimarisi, API limitlerini tüketmemek ve performansı artırmak adına iki aşamalı kurgulanmalıdır.
+
+Adım 4.1: Günün Temel Verisini Çekme
+Endpoint: /livescores
+
+Bu uç günde veya uygulama ilk açıldığında sadece 1 kez çağrılır.
+
+Amacı: O gün oynanan/oynanacak tüm maçların matchId ve takım isimlerini (homeName, awayName) çekip mobil cihazın lokal veritabanına (Room) kaydetmektir.
+
+Adım 4.2: Sadece Değişiklikleri Dinleme (Polling)
+Endpoint: /livescores/changes
+
+Çalışma Mantığı: Bu uç, sadece son 20 saniye içinde gol olan, kart çıkan veya durumu değişen maçları döndürür. Değişiklik yoksa boş döner.
+
+Önerilen İstek Sıklığı: Her 10 veya 15 saniyede bir çağrılmalıdır.
+
+Sistem Akışı:
+
+Mobil uygulama 15 saniyede bir /livescores/changes ucuna istek atar.
+
+Fenerbahçe maçında gol olur ve API şu yanıtı döner: {"matchId": "123", "homeScore": 1}.
+
+Uygulama, 123 ID'li maçın takım isimlerini Adım 4.1'de kaydettiği lokal veritabanından bulur.
+
+Ekranda o maça ait satır güncellenir ve "Gol" animasyonu çalıştırılır.
+
+5. Mobil Geliştirme İçin Kritik Uyarılar ve Tavsiyeler (Best Practices)
+Lokal Önbellekleme (Caching): Geçmiş günlerin maç sonuçları (/schedule) bir kez çekildikten sonra SQLite/Room veritabanına kaydedilmelidir. Kullanıcı aynı geçmiş güne tekrar tıkladığında API'ye gitmek yerine veri lokalden hızlıca getirilmelidir. Bu, API limitlerini korur.
+
+Sayfa Odaklı Polling: Canlı skor dinleme (/livescores/changes) işlemi sadece kullanıcı "Canlı" sekmesindeyken çalışmalı, uygulama arka plana atıldığında veya başka sayfaya geçildiğinde istek atma işlemi (Timer/Coroutine) durdurulmalıdır.
+
+Basic vs Schedule Farkı: Kullanıcıya çok sayıda maçın listelendiği genel fikstür ekranlarında ağı yormamak için kart ve korner gibi verilerin olmadığı /schedule/basic ucu kullanılmalıdır. Kullanıcı bir maça tıkladığında detaylı /schedule verisi çekilmelidir.
+
+Güvenlik: api_key parametresi mobil uygulamanın kaynak kodlarına açıkça (hardcoded) yazılmamalıdır. local.properties dosyası veya bir sunucu (Backend) üzerinden güvenli bir şekilde alınmalıdır.
+
+
+
+
+
+api örnek kullanımları(tüm detaylar https://www.isportsapi.com/en/docs.html?id=42 burada bak.):
+
+
+
+Schedule & Results (Basic)
+Update Time: 2026-04-02 05:19Change Log
+
+Introduction
+This API endpoint returns the basic information of the match. If you need more details, please refer to Schedule & Results. You can use it with the Match Modify Record endpoint.
+
+Tips: You have access to all the football Common API endpoints with any valid paid football plans.
+
+Related Plans
+You can use this api by subscribing plans:  Stats,  Live Data,  Odds,  Odds Pro.
+
+Request
+Path: /sport/football/schedule/basic
+Method: GET
+Calls: This interface is limited to 60 second/call;
+Recommend Calls: 12 hour/call
+Parameters: The request path needs at least one parameter (date, leagueId, and matchId ) to retrieve correct response. These three parameters can not be used at the same time.
+Parameter	Value	Required	Description
+date	string	false	yyyy-MM-dd, e.g. 2019-08-01.
+Return the match data of the specified date, the range is GMT+0 0:00-23:59; The historical schedule data is limited to query the past month.
+leagueId	string	false	Returns the schedule result of the specified event; Returns the current season by default.
+season	string	false	Use with leagueId to get the specified season, e.g. 2018-2019
+Return to the current season by default.
+matchId	string	false	Return the specified match data;
+Multiple matches can be requested at the same time, and "matchId" is separated by ",", and a maximum of 100 matches can be queried at a time.
+Response
+Parameter	Value	Description
+matchId	string	
+leagueId	string	
+leagueType	int	1: League
+2: Cup
+leagueName	string	Full name, e.g. Brazil Serie A
+leagueShortName	string	Short name, e.g. BRA D1
+leagueColor	string	
+matchTime	int	Match scheduled time, unix timestamp
+status	int	0: Not started
+1: First half
+2: Half-time break
+3: Second half
+4: Extra time
+5: Penalty
+-1: Finished
+-10: Cancelled
+-11: TBD
+-12: Terminated
+-13: Interrupted
+-14: Postponed
+homeId	string	
+homeName	string	
+awayId	string	
+awayName	string	
+homeScore	int	
+awayScore	int	
+homeHalfScore	int	
+awayHalfScore	int	
+explain	string	Special case description of the match, e.g. Match end up with [0-3], due to (Torpedo-MAZ Minsk) withdraw from the match
+extraExplain	object	Return to Extra time, Penalty kicks, etc.
+kickOff	int	1: Home kickoff
+2: Away kickoff
+minute	int	How many minutes does the match have in regular time?
+homeScore	int	Regular time score, home team
+awayScore	int	Regular time score, away team
+extraTimeStatus	int	1: Normal matches extratime ends, "extraHomeScore/extraAwayScore" includes the regular time score
+2: Special matches (e.g. beach football, indoor football) extratime ends, "extraHomeScore/extraAwayScore" does not include the regular time score
+3: The match in extra time
+extraHomeScore	int	Extra time score, home team
+extraAwayScore	int	Extra time score, away team
+penHomeScore	int	Penalty score, home team
+penAwayScore	int	Penalty score, away team
+twoRoundsHomeScore	int	
+twoRoundsAwayScore	int	
+winner	int	Winner of the match
+1: Home
+2: Away
+neutral	boolean	Is it a neutral venue?
+Example Request
+Java
+Python
+GO
+PHP
+C#
+
+Copy
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class SportDemo {
+  public static void main(String[] args) {
+    // Set url parameter
+    String url = "http://api.isportsapi.com/sport/football/schedule/basic?api_key=<YOUR_API_KEY>&leagueId=1639";
+
+    // Call iSport Api to get data in json format
+    String charset = "UTF-8";
+    String jsonResult = get(url, charset);
+
+        System.out.println(jsonResult);
+  }
+
+  /**
+   * @param url
+   * @param charset
+   * @return return json string
+   */
+  public static String get(String url, String charset) {
+    BufferedReader reader = null;
+    String result = null;
+    StringBuffer sbf = new StringBuffer();
+    String userAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
+    try {
+      URL newUrl = new URL(url);
+      HttpURLConnection connection = (HttpURLConnection)newUrl.openConnection();
+      connection.setRequestMethod("GET");
+      connection.setReadTimeout(30000);
+      connection.setConnectTimeout(30000);
+      connection.setRequestProperty("User-agent", userAgent);
+      connection.connect();
+      InputStream is = connection.getInputStream();
+      reader = new BufferedReader(new InputStreamReader(is, charset));
+      String strRead = null;
+      while ((strRead = reader.readLine()) != null) {
+        sbf.append(strRead);
+        sbf.append("\r\n");
+      }
+      reader.close();
+      result = sbf.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
+}
+Example Response
+http://api.isportsapi.com/sport/football/schedule/basic?api_key=<YOUR_API_KEY>&leagueId=1639
+RunReset
+{
+  "code": 0,
+  "message": "success",
+  "data": [
+    {
+      "matchId": "231035710",
+      "leagueId": "122",
+      "leagueType": 1,
+      "leagueName": "Argentine Division 1",
+      "leagueShortName": "ARG D1",
+      "matchTime": 1564244100,
+      "status": -1,
+      "homeName": "Colon de Santa Fe",
+      "awayName": "Patronato Parana",
+      "homeScore": 0,
+      "awayScore": 1,
+      "explain": "",
+      "extraExplain": {
+        "kickOff": 0,
+        "minute": 0,
+        "homeScore": 0,
+        "awayScore": 0,
+        "extraTimeStatus": 0,
+        "extraHomeScore": 0,
+        "extraAwayScore": 0,
+        "penHomeScore": 0,
+        "penAwayScore": 0,
+        "twoRoundsHomeScore": 0,
+        "twoRoundsAwayScore": 0,
+        "winner": 0
+      },
+      "neutral": false
+    },
+    {
+      "matchId": "121035719",
+      "leagueId": "122",
+      "leagueType": 1,
+      "leagueName": "Argentine Division 1",
+      "leagueShortName": "ARG D1",
+      "matchTime": 1564252200,
+      "status": -1,
+      "homeName": "San Lorenzo",
+      "awayName": "Godoy Cruz Antonio Tomba",
+      "homeScore": 3,
+      "awayScore": 2,
+      "explain": "",
+      "extraExplain": {
+        "kickOff": 0,
+        "minute": 0,
+        "homeScore": 0,
+        "awayScore": 0,
+        "extraTimeStatus": 0,
+        "extraHomeScore": 0,
+        "extraAwayScore": 0,
+        "penHomeScore": 0,
+        "penAwayScore": 0,
+        "twoRoundsHomeScore": 0,
+        "twoRoundsAwayScore": 0,
+        "winner": 0
+      },
+      "neutral": false
+    }
+  ]
+}
+
+
+------------------
+
+
+League & Cup Profile (Basic)
+Update Time: 2026-01-05 09:08
+
+Introduction
+This API endpoint returns the basic information of leagues and cups. If you need more details, please refer to League & Cup Profile. Click here to view 2000+ football leagues & cups.
+
+Tips: You have access to all the football Common API endpoints with any valid paid football plans.
+
+Related Plans
+You can use this api by subscribing plans:  Stats,  Live Data,  Odds,  Odds Pro.
+
+Request
+Path: /sport/football/league/basic
+Method: GET
+Calls: This interface is limited to 1800 second/call;
+Recommend Calls: 1 day/call
+Parameters:
+Parameter	Value	Required	Description
+leagueId	string	false	Get the league information of the specified leagueId.
+Response
+Parameter	Value	Description
+leagueId	string	
+name	string	Full name, e.g. Brazil Serie A
+shortName	string	Short name, e.g. BRA D1
+type	int	1: League
+2: Cup
+subLeagueName	string	The on-going sub league of the league, e.g. Western Paly Off
+Example Request
+Java
+Python
+GO
+PHP
+C#
+
+Copy
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class SportDemo {
+  public static void main(String[] args) {
+    // Set url parameter
+    String url = "http://api.isportsapi.com/sport/football/league/basic?api_key=<YOUR_API_KEY>";
+
+    // Call iSport Api to get data in json format
+    String charset = "UTF-8";
+    String jsonResult = get(url, charset);
+
+        System.out.println(jsonResult);
+  }
+
+  /**
+   * @param url
+   * @param charset
+   * @return return json string
+   */
+  public static String get(String url, String charset) {
+    BufferedReader reader = null;
+    String result = null;
+    StringBuffer sbf = new StringBuffer();
+    String userAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
+    try {
+      URL newUrl = new URL(url);
+      HttpURLConnection connection = (HttpURLConnection)newUrl.openConnection();
+      connection.setRequestMethod("GET");
+      connection.setReadTimeout(30000);
+      connection.setConnectTimeout(30000);
+      connection.setRequestProperty("User-agent", userAgent);
+      connection.connect();
+      InputStream is = connection.getInputStream();
+      reader = new BufferedReader(new InputStreamReader(is, charset));
+      String strRead = null;
+      while ((strRead = reader.readLine()) != null) {
+        sbf.append(strRead);
+        sbf.append("\r\n");
+      }
+      reader.close();
+      result = sbf.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
+}
+Example Response
+http://api.isportsapi.com/sport/football/league/basic?api_key=<YOUR_API_KEY>
+RunReset
+{
+  "code": 0,
+  "message": "success",
+  "data": [
+    {
+      "leagueId": "111",
+      "name": "Ireland Premier Division",
+      "shortName": "IRE PR",
+      "type": 1,
+      "subLeagueName": "League"
+    },
+    {
+      "leagueId": "122",
+      "name": "Argentine Division 1",
+      "shortName": "ARG D1",
+      "type": 1,
+      "subLeagueName": "League"
+    }
+  ]
+}
+
+
+
+
+
+
+
+-------------------------------
+
+List of Countries
+Update Time: 2022-05-30 04:59
+
+Introduction
+This API interface returns a list of all countries and the country ID.
+
+Related Plans
+You can use this api by subscribing plans:  Stats,  Live Data,  Odds,  Odds Pro.
+
+Request
+Path: /sport/football/country
+Method: GET
+Calls: This interface is limited to 1800 second/call;
+Response
+Parameter	Value	Description
+countryId	int	
+country	string	
+Example Request
+Java
+Python
+GO
+PHP
+C#
+
+Copy
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class SportDemo {
+  public static void main(String[] args) {
+    // Set url parameter
+    String url = "http://api.isportsapi.com/sport/football/country?api_key=<YOUR_API_KEY>";
+
+    // Call iSport Api to get data in json format
+    String charset = "UTF-8";
+    String jsonResult = get(url, charset);
+
+        System.out.println(jsonResult);
+  }
+
+  /**
+   * @param url
+   * @param charset
+   * @return return json string
+   */
+  public static String get(String url, String charset) {
+    BufferedReader reader = null;
+    String result = null;
+    StringBuffer sbf = new StringBuffer();
+    String userAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
+    try {
+      URL newUrl = new URL(url);
+      HttpURLConnection connection = (HttpURLConnection)newUrl.openConnection();
+      connection.setRequestMethod("GET");
+      connection.setReadTimeout(30000);
+      connection.setConnectTimeout(30000);
+      connection.setRequestProperty("User-agent", userAgent);
+      connection.connect();
+      InputStream is = connection.getInputStream();
+      reader = new BufferedReader(new InputStreamReader(is, charset));
+      String strRead = null;
+      while ((strRead = reader.readLine()) != null) {
+        sbf.append(strRead);
+        sbf.append("\r\n");
+      }
+      reader.close();
+      result = sbf.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
+}
+Example Response
+http://api.isportsapi.com/sport/football/country?api_key=<YOUR_API_KEY>
+RunReset
+{
+  "code": 0,
+  "message": "success",
+  "data": [
+    {
+      "countryId": 1,
+      "country": "England"
+    },
+    {
+      "countryId": 2,
+      "country": "Italy"
+    },
+    {
+      "countryId": 3,
+      "country": "Spain"
+    }
+  ]
+}
+
+
+
+----------------------
+
+
+Livescores for Today
+Update Time: 2026-04-02 05:22Change Log
+
+Introduction
+This API endpoint returns livescore of football matches for the current day ( GMT +0 00:00-23:59 ). You can use it with the Livescore Changes endpoint.
+
+Related Plans
+You can use this api by subscribing plans:  Live Data.
+
+Request
+Path: /sport/football/livescores
+Method: GET
+Calls: This interface is limited to 10 second/call;
+Recommend Calls: 1 minute/call
+Response
+Parameter	Value	Description
+matchId	string	
+leagueType	int	1: League
+2: Cup
+leagueId	string	
+leagueName	string	Full name, e.g. Brazil Serie A
+leagueShortName	string	Short name, e.g. BRA D1
+leagueColor	string	
+subLeagueId	string	
+subLeagueName	string	The on-going sub league of the league, e.g. Western Paly Off
+matchTime	int	Match scheduled time, unix timestamp
+halfStartTime	int	The opening time of the first half or the second half, unix timestamp.
+
+Match period length in minutes= current time-the start time of the Match (second half + 45 minutes)
+
+state=1：Return to the opening time of the first half;
+state=3：Return to the opening time of the second half.
+There is no opening time for other states.
+status	int	0: Not started
+1: First half
+2: Half-time break
+3: Second half
+4: Extra time
+5: Penalty
+-1: Finished
+-10: Cancelled
+-11: TBD
+-12: Terminated
+-13: Interrupted
+-14: Postponed
+homeId	string	
+homeName	string	
+awayId	string	
+awayName	string	
+homeScore	int	Regular time
+awayScore	int	Regular time
+homeHalfScore	int	First half score, home team
+awayHalfScore	int	First half score, away team
+homeRed	int	home team red card
+awayRed	int	away team red card
+homeYellow	int	home team yellow card
+awayYellow	int	away team yellow card
+homeCorner	int	home team corner
+awayCorner	int	away team corner
+homeRank	string	The ranking of the team in the league, home team
+awayRank	string	The ranking of the team in the league, away team
+season	string	e.g. 2019-2020
+stageId	string	Matches with [Interface Cup Stage Profile] stageId;
+To distinguish the different stages of the cup, the league does not return this data.
+round	string	League round or cup stage, e.g. 10
+group	string	Cup group, e.g. A
+location	string	e.g. Camp Nou
+weather	string	e.g. Clear
+temperature	string	e.g. 14℃～15℃
+explain	string	Special case description of the match, e.g. Match end up with [0-3], due to (Torpedo-MAZ Minsk) withdraw from the match
+extraExplain	object	Return to Extra time, Penalty kicks, etc.
+kickOff	int	1: Home kickoff
+2: Away kickoff
+minute	int	How many minutes does the match have in regular time?
+homeScore	int	Regular time score, home team
+awayScore	int	Regular time score, away team
+extraTimeStatus	int	1: Normal matches extratime ends, "extraHomeScore/extraAwayScore" includes the regular time score
+2: Special matches (e.g. beach football, indoor football) extratime ends, "extraHomeScore/extraAwayScore" does not include the regular time score
+3: The match in extra time
+extraHomeScore	int	Extra time score, home team
+extraAwayScore	int	Extra time score, away team
+penHomeScore	int	Penalty score, home team
+penAwayScore	int	Penalty score, away team
+twoRoundsHomeScore	int	
+twoRoundsAwayScore	int	
+winner	int	Winner of the match
+1: Home
+2: Away
+hasLineup	boolean	Is there Lineup data?
+neutral	boolean	Is it a neutral venue?
+injuryTime	int	Length of injury time in the first and second half.How many minutes the injury time lasts needs to be calculated by the user.
+More than 45 minutes in the first half and more than 90 minutes in the second half will be counted as injury time.
+var	string	VAR events
+updateTime	string	Data update time.
+Example Request
+Java
+Python
+GO
+PHP
+C#
+
+Copy
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class SportDemo {
+  public static void main(String[] args) {
+    // Set url parameter
+    String url = "http://api.isportsapi.com/sport/football/livescores?api_key=<YOUR_API_KEY>";
+
+    // Call iSport Api to get data in json format
+    String charset = "UTF-8";
+    String jsonResult = get(url, charset);
+
+        System.out.println(jsonResult);
+  }
+
+  /**
+   * @param url
+   * @param charset
+   * @return return json string
+   */
+  public static String get(String url, String charset) {
+    BufferedReader reader = null;
+    String result = null;
+    StringBuffer sbf = new StringBuffer();
+    String userAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
+    try {
+      URL newUrl = new URL(url);
+      HttpURLConnection connection = (HttpURLConnection)newUrl.openConnection();
+      connection.setRequestMethod("GET");
+      connection.setReadTimeout(30000);
+      connection.setConnectTimeout(30000);
+      connection.setRequestProperty("User-agent", userAgent);
+      connection.connect();
+      InputStream is = connection.getInputStream();
+      reader = new BufferedReader(new InputStreamReader(is, charset));
+      String strRead = null;
+      while ((strRead = reader.readLine()) != null) {
+        sbf.append(strRead);
+        sbf.append("\r\n");
+      }
+      reader.close();
+      result = sbf.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
+}
+Example Response
+http://api.isportsapi.com/sport/football/livescores?api_key=<YOUR_API_KEY>
+RunReset
+{
+  "code": 0,
+  "message": "success",
+  "data": [
+    {
+      "matchId": "230671322",
+      "leagueType": 2,
+      "leagueId": "149519",
+      "leagueName": "Argentina Torneo B",
+      "leagueShortName": "ARG TB",
+      "leagueColor": "#B1A7A7",
+      "subLeagueId": "",
+      "subLeagueName": "",
+      "matchTime": 1670284800,
+      "halfStartTime": 1670289120,
+      "status": -1,
+      "homeId": "33767",
+      "homeName": "Defensores Salto",
+      "awayId": "59981",
+      "awayName": "Colon Chivilcoy",
+      "homeScore": 3,
+      "awayScore": 3,
+      "homeHalfScore": 2,
+      "awayHalfScore": 1,
+      "homeRed": 0,
+      "awayRed": 0,
+      "homeYellow": 6,
+      "awayYellow": 1,
+      "homeCorner": 5,
+      "awayCorner": 7,
+      "homeRank": "",
+      "awayRank": "",
+      "season": "2022",
+      "stageId": "",
+      "round": "",
+      "group": "",
+      "location": "",
+      "weather": "",
+      "temperature": "",
+      "explain": "",
+      "extraExplain": {
+        "kickOff": 0,
+        "minute": 90,
+        "homeScore": 3,
+        "awayScore": 3,
+        "extraTimeStatus": 0,
+        "extraHomeScore": 0,
+        "extraAwayScore": 0,
+        "penHomeScore": 6,
+        "penAwayScore": 5,
+        "twoRoundsHomeScore": 0,
+        "twoRoundsAwayScore": 0,
+        "winner": 1
+      },
+      "hasLineup": false,
+      "neutral": false,
+      "injuryTime": 0,
+      "updateTime": 1670293299
+    }
+  ]
+}
+
+
+
+
+
+
+-------
+
+Schedule & Results
+Update Time: 2026-04-02 05:23Change Log
+
+Introduction
+• This API endpoint returns the results of a specified date, event or match.
+
+• One of the three parameters "date", "leagueId", and "matchId" is required, and the three parameters cannot be used at the same time.
+
+• You can use it with the Match Modify Record endpoint.
+
+Related Plans
+You can use this api by subscribing plans:  Live Data.
+
+Request
+Path: /sport/football/schedule
+Method: GET
+Calls: This interface is limited to 60 second/call;
+Recommend Calls: 12 hour/call
+Parameters: The request path needs at least one parameter (date, leagueId, and matchId ) to retrieve correct response. These three parameters can not be used at the same time.
+Parameter	Value	Required	Description
+date	string	false	yyyy-mm-dd, e.g. 2019-08-01.
+Return the match data of the specified date, the range is GMT+0 0:00-23:59; The historical schedule data is limited to query the past month.
+leagueId	string	false	Returns the schedule result of the specified event; Returns the current season by default.
+season	string	false	Use with leagueId to get the specified season, e.g.2018-2019.
+Return to the current season by default
+subLeagueId	string	false	Use with leagueId to get the specified sub league.
+stageId	string	false	Use with leagueId to get the specified cup stage.
+matchId	string	false	Multiple matches can be requested at the same time, and "matchId" is separated by ",", and a maximum of 100 matches can be queried at a time.
+Response
+Parameter	Value	Description
+matchId	string	
+leagueType	int	1: League
+2: Cup
+leagueId	string	
+leagueName	string	Full name, e.g. Brazil Serie A
+leagueShortName	string	Short name, e.g. BRA D1
+leagueColor	string	
+subLeagueId	string	
+subLeagueName	string	The on-going sub league of the league, e.g. Western Paly Off
+matchTime	int	Match scheduled time, unix timestamp
+halfStartTime	int	The kick-off time of the first half or the second half, unix timestamp
+status	int	0: Not started
+1: First half
+2: Half-time break
+3: Second half
+4: Extra time
+5: Penalty
+-1: Finished
+-10: Cancelled
+-11: TBD
+-12: Terminated
+-13: Interrupted
+-14: Postponed
+homeId	string	
+homeName	string	
+awayId	string	
+awayName	string	
+homeScore	int	
+awayScore	int	
+homeHalfScore	int	First half score, home team
+awayHalfScore	int	First half score, away team
+homeRed	int	
+awayRed	int	
+homeYellow	int	
+awayYellow	int	
+homeCorner	int	
+awayCorner	int	
+homeRank	string	The ranking of the team in the league, home team
+awayRank	string	The ranking of the team in the league, away team
+season	string	e.g. 2019-2020
+stageId	string	Matches with [Interface Cup Stage Profile] stageId;
+To distinguish the different stages of the cup, the league does not return this data.
+round	string	League round or cup stage, e.g. 10
+group	string	Cup group, e.g. A
+location	string	e.g. Camp Nou
+weather	string	e.g. Clear
+temperature	string	e.g. 14℃～15℃
+explain	string	Special case description of the match, e.g. Match end up with [0-3], due to (Torpedo-MAZ Minsk) withdraw from the match
+extraExplain	object	Return to Extra time, Penalty kicks, etc.
+kickOff	int	1: Home kickoff
+2: Away kickoff
+minute	int	How many minutes does the match have in regular time?
+homeScore	int	Regular time score, home team
+awayScore	int	Regular time score, away team
+extraTimeStatus	int	1: Normal matches extratime ends, "extraHomeScore/extraAwayScore" includes the regular time score
+2: Special matches (e.g. beach football, indoor football) extratime ends, "extraHomeScore/extraAwayScore" does not include the regular time score
+3: The match in extra time
+extraHomeScore	int	Extra time score, home team
+extraAwayScore	int	Extra time score, away team
+penHomeScore	int	Penalty score, home team
+penAwayScore	int	Penalty score, away team
+twoRoundsHomeScore	int	
+twoRoundsAwayScore	int	
+winner	int	Winner of the match
+1: Home
+2: Away
+hasLineup	boolean	Is there Lineup data?
+neutral	boolean	Is it a neutral venue?
+injuryTime	int	Length of injury time in the first and second half.How many minutes the injury time lasts needs to be calculated by the user.
+More than 45 minutes in the first half and more than 90 minutes in the second half will be counted as injury time.
+var	string	VAR events
+updateTime	string	Data update time.
+Example Request
+Java
+Python
+GO
+PHP
+C#
+
+Copy
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class SportDemo {
+  public static void main(String[] args) {
+    // Set url parameter
+    String url = "http://api.isportsapi.com/sport/football/schedule?api_key=<YOUR_API_KEY>&leagueId=1639";
+
+    // Call iSport Api to get data in json format
+    String charset = "UTF-8";
+    String jsonResult = get(url, charset);
+
+        System.out.println(jsonResult);
+  }
+
+  /**
+   * @param url
+   * @param charset
+   * @return return json string
+   */
+  public static String get(String url, String charset) {
+    BufferedReader reader = null;
+    String result = null;
+    StringBuffer sbf = new StringBuffer();
+    String userAgent = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36";
+    try {
+      URL newUrl = new URL(url);
+      HttpURLConnection connection = (HttpURLConnection)newUrl.openConnection();
+      connection.setRequestMethod("GET");
+      connection.setReadTimeout(30000);
+      connection.setConnectTimeout(30000);
+      connection.setRequestProperty("User-agent", userAgent);
+      connection.connect();
+      InputStream is = connection.getInputStream();
+      reader = new BufferedReader(new InputStreamReader(is, charset));
+      String strRead = null;
+      while ((strRead = reader.readLine()) != null) {
+        sbf.append(strRead);
+        sbf.append("\r\n");
+      }
+      reader.close();
+      result = sbf.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
+}
+Example Response
+http://api.isportsapi.com/sport/football/schedule?api_key=<YOUR_API_KEY>&leagueId=1639
+RunReset
+{
+  "code": 0,
+  "message": "success",
+  "data": [
+    {
+      "matchId": "255582229",
+      "leagueType": 1,
+      "leagueId": "171817",
+      "leagueName": "Mexico Liga MX Femenil",
+      "leagueShortName": "Mex MFW",
+      "leagueColor": "#669955",
+      "subLeagueId": "118728",
+      "subLeagueName": "Apertura",
+      "matchTime": 1657313100,
+      "halfStartTime": 1657317067,
+      "status": -1,
+      "homeId": "34142",
+      "homeName": "Club America (w)",
+      "awayId": "34160",
+      "awayName": "Toluca (w)",
+      "homeScore": 2,
+      "awayScore": 1,
+      "homeHalfScore": 2,
+      "awayHalfScore": 1,
+      "homeRed": 0,
+      "awayRed": 0,
+      "homeYellow": 2,
+      "awayYellow": 0,
+      "homeCorner": 4,
+      "awayCorner": 4,
+      "homeRank": "",
+      "awayRank": "",
+      "season": "2022-2023",
+      "round": "1",
+      "group": "",
+      "location": "",
+      "weather": "",
+      "temperature": "",
+      "explain": "",
+      "extraExplain": {
+        "kickOff": 0,
+        "minute": 0,
+        "homeScore": 0,
+        "awayScore": 0,
+        "extraTimeStatus": 0,
+        "extraHomeScore": 0,
+        "extraAwayScore": 0,
+        "penHomeScore": 0,
+        "penAwayScore": 0,
+        "twoRoundsHomeScore": 0,
+        "twoRoundsAwayScore": 0,
+        "winner": 0
+      },
+      "hasLineup": false,
+      "neutral": false,
+      "injuryTime": 0,
+      "updateTime": 1657319953
+    }
+  ]
+}
