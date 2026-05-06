@@ -43,7 +43,7 @@ public class MatchRepository {
      * @return API çağrısı (asenkron)
      */
     public Call<ApiResponse<MatchModel>> getMatchesByDate(String date) {
-        return apiService.getScheduleBasic(apiKey, date);
+        return apiService.getSchedule(apiKey, date);
     }
 
     /**

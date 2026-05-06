@@ -43,6 +43,9 @@ public class RetrofitClient {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .addInterceptor(loggingInterceptor)
+                .addInterceptor(chain -> chain.proceed(chain.request().newBuilder()
+                        .header("User-Agent", "Mozilla/5.0")
+                        .build()))
                 .build();
 
         // Retrofit yapılandırması

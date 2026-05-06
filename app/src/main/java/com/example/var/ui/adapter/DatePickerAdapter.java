@@ -100,7 +100,54 @@ public class DatePickerAdapter extends RecyclerView.Adapter<DatePickerAdapter.Da
      * @return Bugünün pozisyonu (15)
      */
     public int getTodayPosition() {
+        for (int i = 0; i < dates.size(); i++) {
+            if (DateUtils.isToday(dates.get(i))) return i;
+        }
         return 15;
+    }
+
+    /**
+     * Dışarıdan tarih seçimi yapılmasını sağlar (Takvim diyaloğu için).
+     * Eğer tarih listede yoksa, listeyi o tarih merkezli yeniden oluşturur.
+     *
+     * @param calendar Seçilen tarih
+     * @return Seçilen tarihin yeni pozisyonu
+     */
+    public int setSelectedDate(Calendar calendar) {
+        int position = -1;
+        for (int i = 0; i < dates.size(); i++) {
+            if (isSameDay(dates.get(i), calendar)) {
+                position = i;
+                break;
+            }
+        }
+
+        if (position != -1) {
+            // Tarih zaten listede var
+            int oldPos = selectedPosition;
+            selectedPosition = position;
+            notifyItemChanged(oldPos);
+            notifyItemChanged(selectedPosition);
+        } else {
+            // Tarih listede yok, listeyi yeniden oluştur (seçilen tarih ortada olacak şekilde)
+            dates.clear();
+            Calendar startDate = (Calendar) calendar.clone();
+            startDate.add(Calendar.DAY_OF_YEAR, -15);
+            for (int i = 0; i < 30; i++) {
+                Calendar date = (Calendar) startDate.clone();
+                date.add(Calendar.DAY_OF_YEAR, i);
+                dates.add(date);
+            }
+            selectedPosition = 15;
+            notifyDataSetChanged();
+            position = 15;
+        }
+        return position;
+    }
+
+    private boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 
     /**

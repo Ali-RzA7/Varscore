@@ -127,24 +127,36 @@
     <!-- BÖLÜM 3: Horizontal Date Picker - Yatay kaydırılabilir takvim -->
     <!-- RecyclerView ile sonsuz scroll benzeri tarih seçici            -->
     <!-- ============================================================= -->
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/datePickerContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:background="?attr/colorPrimary"
-        android:paddingBottom="@dimen/padding_md">
+        android:paddingBottom="@dimen/padding_sm">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvDatePicker"
             android:layout_width="match_parent"
             android:layout_height="@dimen/date_picker_height"
+            android:layout_toStartOf="@+id/btnOpenCalendar"
             android:clipToPadding="false"
             android:paddingStart="@dimen/padding_sm"
             android:paddingEnd="@dimen/padding_sm"
             android:overScrollMode="never" />
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/btnOpenCalendar"
+            android:layout_width="48dp"
+            android:layout_height="@dimen/date_picker_height"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/padding_sm"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_today"
+            android:contentDescription="@string/select_date"
+            app:tint="@color/white" />
+
+    </RelativeLayout>
 
     <!-- ============================================================= -->
     <!-- BÖLÜM 4: Maç Listesi - SwipeRefreshLayout ile yenileme       -->

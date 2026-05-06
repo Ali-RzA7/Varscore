@@ -6,15 +6,6 @@ import com.google.gson.annotations.SerializedName;
  * MatchModel - API'den gelen maç verisini temsil eden veri sınıfı.
  * iSportsAPI /schedule ve /livescores endpoint'lerinden dönen
  * JSON verilerini Java nesnesine dönüştürmek için kullanılır.
- *
- * API Yanıt Alanları:
- * - matchId: Maçın benzersiz kimliği
- * - leagueId/leagueName: Lig bilgileri
- * - status: Maç durumu (-1: bitti, 0: başlamadı, 1: ilk yarı, vb.)
- * - homeScore/awayScore: Ev sahibi ve deplasman skorları
- * - homeRed/awayRed: Kırmızı kart sayıları
- * - homeYellow/awayYellow: Sarı kart sayıları
- * - homeCorner/awayCorner: Korner sayıları
  */
 public class MatchModel {
 
@@ -46,7 +37,6 @@ public class MatchModel {
     private long halfStartTime;
 
     // ===== Maç Durumu =====
-    /** status: 0=Başlamadı, 1=İlk Yarı, 2=Devre Arası, 3=İkinci Yarı, 4=Uzatma, 5=Penaltı, -1=Bitti */
     @SerializedName("status")
     private int status;
 
@@ -139,36 +129,26 @@ public class MatchModel {
     @SerializedName("injuryTime")
     private int injuryTime;
 
+    @SerializedName("var")
+    private String var;
+
     @SerializedName("updateTime")
     private long updateTime;
 
     // ===== Yardımcı Metotlar =====
 
-    /**
-     * Maçın canlı olup olmadığını kontrol eder.
-     * status 1-5 arası ise maç devam ediyordur.
-     */
     public boolean isLive() {
         return status >= 1 && status <= 5;
     }
 
-    /**
-     * Maçın bitip bitmediğini kontrol eder.
-     */
     public boolean isFinished() {
         return status == -1;
     }
 
-    /**
-     * Maçın henüz başlamamış olduğunu kontrol eder.
-     */
     public boolean isNotStarted() {
         return status == 0;
     }
 
-    /**
-     * Maçın iptal/ertelenmiş/yarıda kesilmiş olup olmadığını kontrol eder.
-     */
     public boolean isCancelled() {
         return status <= -10;
     }
@@ -270,6 +250,9 @@ public class MatchModel {
 
     public String getExplain() { return explain; }
     public void setExplain(String explain) { this.explain = explain; }
+
+    public String getVar() { return var; }
+    public void setVar(String var) { this.var = var; }
 
     public ExtraExplain getExtraExplain() { return extraExplain; }
     public void setExtraExplain(ExtraExplain extraExplain) { this.extraExplain = extraExplain; }

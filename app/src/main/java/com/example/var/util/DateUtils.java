@@ -34,7 +34,7 @@ public class DateUtils {
      * @return "yyyy-MM-dd" formatında tarih string'i
      */
     public static String formatForApi(Calendar calendar) {
-        SimpleDateFormat sdf = new SimpleDateFormat(API_DATE_FORMAT, Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(API_DATE_FORMAT, Locale.US);
         return sdf.format(calendar.getTime());
     }
 
@@ -47,7 +47,7 @@ public class DateUtils {
      */
     public static String formatMatchTime(long timestamp) {
         if (timestamp == 0) return "--:--";
-        SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT, Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT, Locale.US);
         sdf.setTimeZone(TimeZone.getDefault());
         return sdf.format(new Date(timestamp * 1000));
     }
@@ -58,7 +58,7 @@ public class DateUtils {
      * @return "dd MMM" formatında tarih string'i (örn: "06 May")
      */
     public static String formatForDisplay(Calendar calendar) {
-        SimpleDateFormat sdf = new SimpleDateFormat(DISPLAY_DATE_FORMAT, Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat(DISPLAY_DATE_FORMAT, Locale.US);
         return sdf.format(calendar.getTime());
     }
 
@@ -99,7 +99,7 @@ public class DateUtils {
      * @return Gün numarası string (örn: "06", "15")
      */
     public static String getDayNumber(Calendar calendar) {
-        return String.format(Locale.getDefault(), "%02d", calendar.get(Calendar.DAY_OF_MONTH));
+        return String.format(Locale.US, "%02d", calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     /**

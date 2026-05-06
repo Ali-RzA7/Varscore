@@ -209,6 +209,36 @@ public class HomeFragment extends Fragment implements
             layoutManager.scrollToPositionWithOffset(todayPos,
                     binding.rvDatePicker.getWidth() / 2 - 80);
         });
+
+        // Takvim Picker Butonu
+        binding.btnOpenCalendar.setOnClickListener(v -> openCalendarPicker());
+    }
+
+    /**
+     * Custom Calendar Picker diyaloğunu açar.
+     */
+    private void openCalendarPicker() {
+        com.example.var.ui.dialog.CalendarDialogFragment calendarDialog =
+                new com.example.var.ui.dialog.CalendarDialogFragment(selectedDate, this::onDateSelectedFromCalendar);
+        calendarDialog.show(getParentFragmentManager(), "calendar_picker");
+    }
+
+    /**
+     * Takvim diyaloğundan tarih seçildiğinde çağrılır.
+     */
+    private void onDateSelectedFromCalendar(Calendar calendar) {
+        // State güncelle
+        selectedDate = calendar;
+
+        // Yatay slider'ı güncelle ve oraya kaydır
+        int position = datePickerAdapter.setSelectedDate(calendar);
+        if (binding.rvDatePicker.getLayoutManager() instanceof LinearLayoutManager) {
+            ((LinearLayoutManager) binding.rvDatePicker.getLayoutManager())
+                    .scrollToPositionWithOffset(position, binding.rvDatePicker.getWidth() / 2 - 80);
+        }
+
+        // Maçları yükle
+        loadMatchesForDate(calendar);
     }
 
     // ================================================================
