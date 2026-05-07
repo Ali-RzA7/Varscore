@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.var.BuildConfig;
 import com.example.var.data.model.AnalysisResponse;
 import com.example.var.data.model.AnalysisModel;
 import com.example.var.data.repository.MatchRepository;
@@ -51,7 +52,7 @@ public class MatchH2HFragment extends Fragment {
         if (getArguments() != null) {
             matchId = getArguments().getString("match_id");
         }
-        repository = new MatchRepository("BuildConfig.API_KEY");
+        repository = new MatchRepository(BuildConfig.API_KEY);
     }
 
     @Nullable

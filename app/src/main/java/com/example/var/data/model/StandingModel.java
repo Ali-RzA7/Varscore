@@ -24,36 +24,36 @@ public class StandingModel {
     @SerializedName("teamId")
     private String teamId;
 
-    /** Takımın tam adı */
-    @SerializedName("teamName")
+    /** Takımın tam adı ve logosu - leagueInfo.teamInfos'tan manuel set edilir, JSON'da bu field yok */
     private String teamName;
+    private String logoUrl;
 
     /** Oynanan toplam maç sayısı */
-    @SerializedName("played")
+    @SerializedName("totalCount")
     private int played;
 
     /** Kazanılan maç sayısı */
-    @SerializedName("won")
+    @SerializedName("winCount")
     private int won;
 
     /** Beraberlik sayısı */
-    @SerializedName("drawn")
+    @SerializedName("drawCount")
     private int drawn;
 
     /** Kaybedilen maç sayısı */
-    @SerializedName("lost")
+    @SerializedName("loseCount")
     private int lost;
 
     /** Atılan gol sayısı */
-    @SerializedName("goalsFor")
+    @SerializedName("getScore")
     private int goalsFor;
 
     /** Yenilen gol sayısı */
-    @SerializedName("goalsAgainst")
+    @SerializedName("loseScore")
     private int goalsAgainst;
 
     /** Kazanılan toplam puan */
-    @SerializedName("points")
+    @SerializedName("integral")
     private int points;
 
     // ===== Getter Metodları =====
@@ -66,6 +66,10 @@ public class StandingModel {
 
     /** @return Takımın tam adı */
     public String getTeamName() { return teamName; }
+
+    public void setTeamName(String teamName) { this.teamName = teamName; }
+    public String getLogoUrl() { return logoUrl; }
+    public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
 
     /** @return Oynanan toplam maç sayısı */
     public int getPlayed() { return played; }

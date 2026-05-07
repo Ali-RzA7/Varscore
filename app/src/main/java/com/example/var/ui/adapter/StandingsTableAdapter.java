@@ -3,11 +3,13 @@ package com.example.var.ui.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.var.R;
 import com.example.var.data.model.StandingModel;
 
@@ -75,6 +77,7 @@ public class StandingsTableAdapter extends RecyclerView.Adapter<StandingsTableAd
     class StandingViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView tvRank;
+        private final ImageView ivTeamLogo;
         private final TextView tvTeamName;
         private final TextView tvPlayed;
         private final TextView tvWon;
@@ -86,6 +89,7 @@ public class StandingsTableAdapter extends RecyclerView.Adapter<StandingsTableAd
         StandingViewHolder(@NonNull View itemView) {
             super(itemView);
             tvRank = itemView.findViewById(R.id.tvRank);
+            ivTeamLogo = itemView.findViewById(R.id.ivTeamLogo);
             tvTeamName = itemView.findViewById(R.id.tvTeamName);
             tvPlayed = itemView.findViewById(R.id.tvPlayed);
             tvWon = itemView.findViewById(R.id.tvWon);
@@ -104,6 +108,17 @@ public class StandingsTableAdapter extends RecyclerView.Adapter<StandingsTableAd
         void bind(StandingModel standing, int position) {
             // Sıra numarası
             tvRank.setText(String.valueOf(standing.getRank() > 0 ? standing.getRank() : position + 1));
+
+            // Takım logosu
+            if (standing.getLogoUrl() != null && !standing.getLogoUrl().isEmpty()) {
+                Glide.with(itemView.getContext())
+                        .load(standing.getLogoUrl())
+                        .placeholder(R.drawable.ic_standings)
+                        .error(R.drawable.ic_standings)
+                        .into(ivTeamLogo);
+            } else {
+                ivTeamLogo.setImageResource(R.drawable.ic_standings);
+            }
 
             // Takım adı
             tvTeamName.setText(standing.getTeamName() != null ? standing.getTeamName() : "-");

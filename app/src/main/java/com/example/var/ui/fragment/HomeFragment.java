@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.var.BuildConfig;
 import com.example.var.R;
 import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.MatchModel;
@@ -75,9 +76,7 @@ public class HomeFragment extends Fragment implements
     /** Polling aralığı: 15 saniye */
     private static final long POLLING_INTERVAL = 15000;
 
-    // ===== API Anahtarı =====
-    // TODO: Bu anahtarı local.properties veya BuildConfig'den alın
-    private static final String API_KEY = "BuildConfig.API_KEY";
+    private static final String API_KEY = BuildConfig.API_KEY;
 
     @Nullable
     @Override

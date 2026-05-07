@@ -1,6 +1,13 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+}
+
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
 }
 
 android {
@@ -16,10 +23,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // iSportsAPI anahtarı local.properties dosyasından güvenli şekilde okunacak
-        buildConfigField("String", "API_KEY", "\"${project.findProperty("ISPORTS_API_KEY") ?: ""}\"")
-        // Groq AI API anahtarı
-        buildConfigField("String", "GROQ_API_KEY", "\"${project.findProperty("GROQ_API_KEY") ?: ""}\"")
+        buildConfigField("String", "API_KEY", "\"${localProps.getProperty("ISPORTS_API_KEY", "")}\"")
+        buildConfigField("String", "GROQ_API_KEY", "\"${localProps.getProperty("GROQ_API_KEY", "")}\"")
 
     }
 

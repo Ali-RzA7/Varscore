@@ -15,6 +15,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.var.BuildConfig;
 import com.example.var.R;
 import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.MatchModel;
@@ -49,7 +50,7 @@ public class SearchDialogFragment extends DialogFragment
     /** Tüm aranabilir sonuçlar (maçlardan çıkarılan takım ve lig listesi) */
     private final List<SearchResultAdapter.SearchResultItem> allResults = new ArrayList<>();
 
-    private static final String API_KEY = "BuildConfig.API_KEY";
+    private static final String API_KEY = BuildConfig.API_KEY;
 
     @NonNull
     @Override

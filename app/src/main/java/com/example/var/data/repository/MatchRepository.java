@@ -9,6 +9,7 @@ import com.example.var.data.model.LineupModel;
 import com.example.var.data.model.MatchStatsResponse;
 import com.example.var.data.model.MatchModel;
 import com.example.var.data.model.StatModel;
+import com.example.var.data.model.StandingLeagueResponse;
 import com.example.var.data.model.StandingModel;
 import com.example.var.data.remote.FootballApiService;
 import com.example.var.data.remote.RetrofitClient;
@@ -91,7 +92,7 @@ public class MatchRepository {
      *
      * @param leagueId Puan tablosu istenilen ligin ID'si
      */
-    public Call<ApiResponse<StandingModel>> getLeagueTable(String leagueId) {
+    public Call<StandingLeagueResponse> getLeagueTable(String leagueId) {
         return apiService.getLeagueTable(apiKey, leagueId);
     }
 

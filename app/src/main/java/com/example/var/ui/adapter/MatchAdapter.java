@@ -13,12 +13,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.var.R;
 import com.example.var.data.model.MatchModel;
 import com.example.var.util.DateUtils;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,9 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     /** Context referansı */
     private final Context context;
 
+    /** teamId → logo URL haritası (standings'ten elde edilir, null olabilir) */
+    private Map<String, String> teamLogoMap = new HashMap<>();
+
     /**
      * Maç tıklama callback arayüzü.
      */
@@ -69,6 +74,15 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.context = context;
         this.listener = listener;
         this.items = new ArrayList<>();
+    }
+
+    /**
+     * Takım logo haritasını set eder.
+     * @param logoMap teamId → logoUrl haritası
+     */
+    public void setTeamLogoMap(Map<String, String> logoMap) {
+        this.teamLogoMap = logoMap != null ? logoMap : new HashMap<>();
+        notifyDataSetChanged();
     }
 
     /**
@@ -222,6 +236,8 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         private final TextView tvMatchStatus;
         private final View viewHomeRedCard;
         private final View viewAwayRedCard;
+        private final ImageView ivHomeLogo;
+        private final ImageView ivAwayLogo;
         private final TextView tvHomeName;
         private final TextView tvAwayName;
         private final TextView tvHomeScore;
@@ -235,22 +251,22 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             tvMatchStatus = itemView.findViewById(R.id.tvMatchStatus);
             viewHomeRedCard = itemView.findViewById(R.id.viewHomeRedCard);
             viewAwayRedCard = itemView.findViewById(R.id.viewAwayRedCard);
+            ivHomeLogo = itemView.findViewById(R.id.ivHomeLogo);
+            ivAwayLogo = itemView.findViewById(R.id.ivAwayLogo);
             tvHomeName = itemView.findViewById(R.id.tvHomeName);
             tvAwayName = itemView.findViewById(R.id.tvAwayName);
             tvHomeScore = itemView.findViewById(R.id.tvHomeScore);
             tvAwayScore = itemView.findViewById(R.id.tvAwayScore);
         }
 
-        /**
-         * Maç verilerini görünüme bağlar.
-         * Maç durumuna göre (canlı, bitmemiş, bitmiş) farklı görünüm uygulanır.
-         *
-         * @param match Maç modeli
-         */
         void bind(MatchModel match) {
             // Takım adlarını ayarla
             tvHomeName.setText(match.getHomeName());
             tvAwayName.setText(match.getAwayName());
+
+            // Takım logolarını logo haritasından yükle (varsa)
+            loadTeamLogo(ivHomeLogo, match.getHomeId());
+            loadTeamLogo(ivAwayLogo, match.getAwayId());
 
             // === CANLI MAÇ DURUMU ===
             if (match.isLive()) {
@@ -327,6 +343,19 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     listener.onMatchClick(match);
                 }
             });
+        }
+
+        private void loadTeamLogo(ImageView imageView, String teamId) {
+            String logoUrl = teamLogoMap.get(teamId);
+            if (logoUrl != null && !logoUrl.isEmpty()) {
+                imageView.setVisibility(View.VISIBLE);
+                Glide.with(imageView.getContext())
+                        .load(logoUrl)
+                        .override(48, 48)
+                        .into(imageView);
+            } else {
+                imageView.setVisibility(View.GONE);
+            }
         }
 
         /**

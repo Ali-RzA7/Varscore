@@ -22,6 +22,15 @@
         android:textStyle="bold"
         tools:text="1" />
 
+    <!-- Takım logosu -->
+    <ImageView
+        android:id="@+id/ivTeamLogo"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="@dimen/padding_sm"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_standings" />
+
     <!-- Takım adı - kalan alanı doldurur -->
     <TextView
         android:id="@+id/tvTeamName"

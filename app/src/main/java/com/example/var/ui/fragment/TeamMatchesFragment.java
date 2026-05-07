@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.HashMap;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,6 +22,7 @@ import com.example.var.ui.adapter.MatchAdapter;
 import com.example.var.util.FirebaseManager;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -52,6 +55,7 @@ public class TeamMatchesFragment extends Fragment
     private static final String ARG_TEAM_ID = "team_id";
     private static final String ARG_TEAM_NAME = "team_name";
     private static final String ARG_LEAGUE_ID = "league_id";
+    private static final String ARG_LOGO_MAP = "logo_map";
 
     /** ViewBinding referansı */
     private FragmentTeamMatchesBinding binding;
@@ -83,11 +87,17 @@ public class TeamMatchesFragment extends Fragment
      * @return Argümanları yüklenmiş TeamMatchesFragment örneği
      */
     public static TeamMatchesFragment newInstance(String teamId, String teamName, String leagueId) {
+        return newInstance(teamId, teamName, leagueId, null);
+    }
+
+    public static TeamMatchesFragment newInstance(String teamId, String teamName, String leagueId,
+            HashMap<String, String> logoMap) {
         TeamMatchesFragment fragment = new TeamMatchesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_TEAM_ID, teamId);
         args.putString(ARG_TEAM_NAME, teamName);
         args.putString(ARG_LEAGUE_ID, leagueId != null ? leagueId : "");
+        if (logoMap != null) args.putSerializable(ARG_LOGO_MAP, logoMap);
         fragment.setArguments(args);
         return fragment;
     }
@@ -142,8 +152,14 @@ public class TeamMatchesFragment extends Fragment
      * RecyclerView ve MatchAdapter'ı başlatır.
      * Mevcut MatchAdapter yeniden kullanılır (lig bazında gruplama özelliği ile).
      */
+    @SuppressWarnings("unchecked")
     private void setupRecyclerView() {
         matchAdapter = new MatchAdapter(requireContext(), this);
+        if (getArguments() != null) {
+            HashMap<String, String> logoMap = (HashMap<String, String>)
+                    getArguments().getSerializable(ARG_LOGO_MAP);
+            if (logoMap != null) matchAdapter.setTeamLogoMap(logoMap);
+        }
         binding.rvMatches.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvMatches.setAdapter(matchAdapter);
     }
@@ -221,12 +237,20 @@ public class TeamMatchesFragment extends Fragment
     }
 
     /**
-     * iSportsAPI /schedule/basic?teamId endpoint'inden takımın maçlarını çeker.
+     * Takımın maçlarını çeker.
+     * API'de teamId filtresi olmadığı için leagueId ile tüm lig maçları alınır,
+     * client tarafında homeId/awayId == teamId filtresiyle elenir.
      */
     private void loadTeamMatches() {
         showLoading();
 
-        repository.getTeamMatches(teamId).enqueue(new Callback<ApiResponse<MatchModel>>() {
+        // leagueId varsa lig maçlarını çek ve filtrele, yoksa hata göster
+        if (leagueId == null || leagueId.isEmpty()) {
+            showEmpty(getString(R.string.no_matches));
+            return;
+        }
+
+        repository.getLeagueMatches(leagueId).enqueue(new Callback<ApiResponse<MatchModel>>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse<MatchModel>> call,
                     @NonNull Response<ApiResponse<MatchModel>> response) {
@@ -235,9 +259,17 @@ public class TeamMatchesFragment extends Fragment
 
                 if (response.isSuccessful() && response.body() != null
                         && response.body().isSuccess()) {
-                    List<MatchModel> matches = response.body().getData();
-                    if (matches != null && !matches.isEmpty()) {
-                        matchAdapter.setMatches(matches);
+                    List<MatchModel> all = response.body().getData();
+                    List<MatchModel> teamMatches = new ArrayList<>();
+                    if (all != null) {
+                        for (MatchModel m : all) {
+                            if (teamId.equals(m.getHomeId()) || teamId.equals(m.getAwayId())) {
+                                teamMatches.add(m);
+                            }
+                        }
+                    }
+                    if (!teamMatches.isEmpty()) {
+                        matchAdapter.setMatches(teamMatches);
                         showContent();
                     } else {
                         showEmpty(getString(R.string.no_matches));

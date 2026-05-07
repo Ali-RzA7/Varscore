@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.var.BuildConfig;
 import com.example.var.ui.adapter.MatchStatAdapter;
 import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.StatModel;
@@ -52,7 +53,7 @@ public class MatchStatsFragment extends Fragment {
             matchId = getArguments().getString("match_id");
             match = (MatchModel) getArguments().getSerializable("match_data");
         }
-        repository = new MatchRepository("BuildConfig.API_KEY");
+        repository = new MatchRepository(BuildConfig.API_KEY);
     }
 
     @Nullable

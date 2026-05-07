@@ -97,6 +97,15 @@
                     android:background="@color/red_card"
                     android:visibility="gone" />
 
+                <!-- Ev sahibi takım logosu -->
+                <ImageView
+                    android:id="@+id/ivHomeLogo"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="4dp"
+                    android:scaleType="centerInside"
+                    android:visibility="gone" />
+
                 <!-- Ev sahibi takım adı -->
                 <TextView
                     android:id="@+id/tvHomeName"
@@ -136,6 +145,15 @@
                     android:layout_height="16dp"
                     android:layout_marginEnd="6dp"
                     android:background="@color/red_card"
+                    android:visibility="gone" />
+
+                <!-- Deplasman takım logosu -->
+                <ImageView
+                    android:id="@+id/ivAwayLogo"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="4dp"
+                    android:scaleType="centerInside"
                     android:visibility="gone" />
 
                 <!-- Deplasman takım adı -->

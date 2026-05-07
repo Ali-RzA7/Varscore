@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.var.BuildConfig;
 import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.LineupModel;
 import com.example.var.data.repository.MatchRepository;
@@ -42,7 +43,7 @@ public class MatchLineupFragment extends Fragment {
         if (getArguments() != null) {
             matchId = getArguments().getString("match_id");
         }
-        repository = new MatchRepository("BuildConfig.API_KEY");
+        repository = new MatchRepository(BuildConfig.API_KEY);
     }
 
     @Nullable
@@ -65,8 +66,9 @@ public class MatchLineupFragment extends Fragment {
         repository.getLineup(matchId).enqueue(new Callback<ApiResponse<LineupModel>>() {
             @Override
             public void onResponse(Call<ApiResponse<LineupModel>> call, Response<ApiResponse<LineupModel>> response) {
+                if (!isAdded() || binding == null) return;
                 if (response.isSuccessful() && response.body() != null) {
-                    LineupModel lineup = response.body().getData() != null && !response.body().getData().isEmpty() 
+                    LineupModel lineup = response.body().getData() != null && !response.body().getData().isEmpty()
                             ? response.body().getData().get(0) : null;
                     if (lineup != null) {
                         bindLineup(lineup);
@@ -87,6 +89,7 @@ public class MatchLineupFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ApiResponse<LineupModel>> call, Throwable t) {
+                if (!isAdded() || binding == null) return;
                 binding.tvEmptyLineup.setVisibility(View.VISIBLE);
                 binding.cardLineup.setVisibility(View.GONE);
                 binding.llFormation.setVisibility(View.GONE);

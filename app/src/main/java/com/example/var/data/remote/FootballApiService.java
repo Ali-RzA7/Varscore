@@ -5,6 +5,7 @@ import com.example.var.data.model.EventModel;
 import com.example.var.data.model.LeagueModel;
 import com.example.var.data.model.LineupModel;
 import com.example.var.data.model.MatchModel;
+import com.example.var.data.model.StandingLeagueResponse;
 import com.example.var.data.model.StatModel;
 
 import retrofit2.Call;
@@ -185,8 +186,8 @@ public interface FootballApiService {
      * @param leagueId Lig kimliği (zorunlu)
      * @return Puan tablosu listesi
      */
-    @GET("league/table")
-    Call<ApiResponse<com.example.var.data.model.StandingModel>> getLeagueTable(
+    @GET("standing/league")
+    Call<StandingLeagueResponse> getLeagueTable(
             @Query("api_key") String apiKey,
             @Query("leagueId") String leagueId
     );

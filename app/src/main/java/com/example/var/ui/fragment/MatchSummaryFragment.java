@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.var.BuildConfig;
 import com.example.var.ui.adapter.MatchEventAdapter;
 import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.EventModel;
@@ -51,8 +52,7 @@ public class MatchSummaryFragment extends Fragment {
         if (getArguments() != null) {
             matchId = getArguments().getString("match_id");
         }
-        // TODO: Centralize API Key
-        repository = new MatchRepository("BuildConfig.API_KEY");
+        repository = new MatchRepository(BuildConfig.API_KEY);
     }
 
     @Nullable
@@ -88,6 +88,7 @@ public class MatchSummaryFragment extends Fragment {
         repository.getEvents(matchId).enqueue(new Callback<ApiResponse<EventModel>>() {
             @Override
             public void onResponse(Call<ApiResponse<EventModel>> call, Response<ApiResponse<EventModel>> response) {
+                if (!isAdded() || binding == null) return;
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "Events response: " + response.body().getCode() + " - " + response.body().getMessage());
                     List<EventModel> events = response.body().getData();
@@ -107,6 +108,7 @@ public class MatchSummaryFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ApiResponse<EventModel>> call, Throwable t) {
+                if (!isAdded() || binding == null) return;
                 Log.e(TAG, "Events request error: " + t.getMessage());
                 binding.tvEmptyEvents.setVisibility(View.VISIBLE);
             }
@@ -116,17 +118,17 @@ public class MatchSummaryFragment extends Fragment {
         repository.getMatchDetail(matchId).enqueue(new Callback<ApiResponse<MatchModel>>() {
             @Override
             public void onResponse(Call<ApiResponse<MatchModel>> call, Response<ApiResponse<MatchModel>> response) {
+                if (!isAdded() || binding == null) return;
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null && !response.body().getData().isEmpty()) {
                     MatchModel detailedMatch = response.body().getData().get(0);
                     Log.d(TAG, "Detailed match info loaded: " + detailedMatch.getLocation());
                     binding.tvVenue.setText(detailedMatch.getLocation() != null ? detailedMatch.getLocation() : "-");
-                    //binding.tvWeather.setText(detailedMatch.getWeather() != null ? detailedMatch.getWeather() : "-");
-                    
+
                     // İlk Yarı Skoru
                     binding.tvHalfScore.setText(detailedMatch.getHomeHalfScore() + " - " + detailedMatch.getAwayHalfScore());
 
                     // Penaltılar
-                    if (detailedMatch.getExtraExplain() != null && 
+                    if (detailedMatch.getExtraExplain() != null &&
                        (detailedMatch.getExtraExplain().getPenHomeScore() > 0 || detailedMatch.getExtraExplain().getPenAwayScore() > 0)) {
                         binding.llPenalties.setVisibility(View.VISIBLE);
                         binding.tvPenScore.setText(detailedMatch.getExtraExplain().getPenHomeScore() + " - " + detailedMatch.getExtraExplain().getPenAwayScore());
@@ -143,15 +145,16 @@ public class MatchSummaryFragment extends Fragment {
                         binding.llVar.setVisibility(View.VISIBLE);
                         binding.tvVarValue.setText(detailedMatch.getVar());
                     }
-                    
+
                     if (detailedMatch.getExplain() != null && !detailedMatch.getExplain().isEmpty()) {
-                         binding.tvReferee.setText(detailedMatch.getExplain());
+                        binding.tvReferee.setText(detailedMatch.getExplain());
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<MatchModel>> call, Throwable t) {
+                if (!isAdded() || binding == null) return;
                 Log.e(TAG, "Detail request error: " + t.getMessage());
             }
         });

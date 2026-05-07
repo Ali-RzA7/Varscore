@@ -1,6 +1,7 @@
 package com.example.var.ui.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.var.BuildConfig;
 import com.example.var.R;
-import com.example.var.data.model.ApiResponse;
+import com.example.var.data.model.StandingLeagueResponse;
 import com.example.var.data.model.StandingModel;
 import com.example.var.data.repository.MatchRepository;
 import com.example.var.databinding.FragmentLeagueStandingsBinding;
 import com.example.var.ui.adapter.StandingsTableAdapter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -62,6 +67,9 @@ public class LeagueStandingsFragment extends Fragment
 
     /** Toolbar'da gösterilecek lig adı */
     private String leagueName;
+
+    /** Standings'ten elde edilen teamId→logoUrl haritası; TeamMatchesFragment'a aktarılır */
+    private final HashMap<String, String> teamLogoMap = new HashMap<>();
 
     /**
      * Fragment oluşturma fabrika metodu.
@@ -140,30 +148,74 @@ public class LeagueStandingsFragment extends Fragment
     private void loadStandings() {
         showLoading();
 
-        repository.getLeagueTable(leagueId).enqueue(new Callback<ApiResponse<StandingModel>>() {
+        repository.getLeagueTable(leagueId).enqueue(new Callback<StandingLeagueResponse>() {
             @Override
-            public void onResponse(@NonNull Call<ApiResponse<StandingModel>> call,
-                    @NonNull Response<ApiResponse<StandingModel>> response) {
-                if (!isAdded()) return;
+            public void onResponse(@NonNull Call<StandingLeagueResponse> call,
+                    @NonNull Response<StandingLeagueResponse> response) {
+                if (!isAdded() || binding == null) return;
+
+                Log.d("STANDINGS", "HTTP " + response.code() + " leagueId=" + leagueId);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d("STANDINGS", "code=" + response.body().getCode()
+                            + " success=" + response.body().isSuccess());
+                }
 
                 if (response.isSuccessful() && response.body() != null
-                        && response.body().isSuccess()) {
-                    List<StandingModel> standings = response.body().getData();
+                        && response.body().isSuccess()
+                        && response.body().getData() != null) {
+                    StandingLeagueResponse.StandingData data = response.body().getData();
+                    List<StandingModel> standings = data.getTotalStandings();
+
+                    Log.d("STANDINGS", "standings count=" + (standings != null ? standings.size() : "null"));
+
                     if (standings != null && !standings.isEmpty()) {
+                        Log.d("STANDINGS", "sample teamId=" + standings.get(0).getTeamId());
+
+                        // teamInfos is at data level (not inside leagueInfo)
+                        List<StandingLeagueResponse.TeamInfo> teamInfos = data.getTeamInfos();
+                        Log.d("STANDINGS", "teamInfos=" + (teamInfos == null ? "NULL" : teamInfos.size() + " entries"));
+
+                        if (teamInfos != null && !teamInfos.isEmpty()) {
+                            Log.d("STANDINGS", "sample teamInfo: id=" + teamInfos.get(0).getTeamId()
+                                    + " name=" + teamInfos.get(0).getName()
+                                    + " logo=" + teamInfos.get(0).getLogo());
+
+                            Map<String, StandingLeagueResponse.TeamInfo> teamInfoMap = new HashMap<>();
+                            for (StandingLeagueResponse.TeamInfo ti : teamInfos) {
+                                String id = ti.getTeamId();
+                                if (id != null) teamInfoMap.put(id, ti);
+                            }
+                            teamLogoMap.clear();
+                            for (StandingModel s : standings) {
+                                StandingLeagueResponse.TeamInfo ti = teamInfoMap.get(s.getTeamId());
+                                if (ti != null) {
+                                    s.setTeamName(ti.getName());
+                                    s.setLogoUrl(ti.getLogo());
+                                    if (ti.getLogo() != null && !ti.getLogo().isEmpty()) {
+                                        teamLogoMap.put(s.getTeamId(), ti.getLogo());
+                                    }
+                                }
+                            }
+                            Log.d("STANDINGS", "merge done, first name=" + standings.get(0).getTeamName()
+                                    + " logoMap size=" + teamLogoMap.size());
+                        }
                         standingsAdapter.setStandings(standings);
                         showContent();
                     } else {
                         showEmpty(getString(R.string.no_standings));
                     }
                 } else {
+                    Log.d("STANDINGS", "response failed or data null, body=" + response.body());
                     showEmpty(getString(R.string.error_loading));
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<ApiResponse<StandingModel>> call,
+            public void onFailure(@NonNull Call<StandingLeagueResponse> call,
                     @NonNull Throwable t) {
-                if (!isAdded()) return;
+                if (!isAdded() || binding == null) return;
+                Log.e("STANDINGS", "onFailure: " + t.getMessage());
                 showEmpty(getString(R.string.error_loading));
             }
         });
@@ -180,7 +232,8 @@ public class LeagueStandingsFragment extends Fragment
         Fragment target = TeamMatchesFragment.newInstance(
                 standing.getTeamId(),
                 standing.getTeamName(),
-                leagueId   // Lig ID'si, favori kontrolü için gerekli
+                leagueId,
+                teamLogoMap
         );
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
