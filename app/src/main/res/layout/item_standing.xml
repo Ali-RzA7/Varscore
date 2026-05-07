@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- item_standing.xml - Puan tablosu satırı düzeni -->
+<!-- Her satır: sıra | takım adı | O | G | B | M | A | P -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/padding_md">
+
+    <!-- Sıra numarası (1, 2, 3...) -->
+    <TextView
+        android:id="@+id/tvRank"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="@dimen/text_body_small"
+        android:textStyle="bold"
+        tools:text="1" />
+
+    <!-- Takım adı - kalan alanı doldurur -->
+    <TextView
+        android:id="@+id/tvTeamName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingStart="@dimen/padding_sm"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="@dimen/text_body"
+        tools:text="Galatasaray" />
+
+    <!-- Oynanan maç sayısı -->
+    <TextView
+        android:id="@+id/tvPlayed"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="@dimen/text_body_small"
+        tools:text="34" />
+
+    <!-- Galibiyet -->
+    <TextView
+        android:id="@+id/tvWon"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="@dimen/text_body_small"
+        tools:text="25" />
+
+    <!-- Beraberlik -->
+    <TextView
+        android:id="@+id/tvDrawn"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="@dimen/text_body_small"
+        tools:text="5" />
+
+    <!-- Mağlubiyet -->
+    <TextView
+        android:id="@+id/tvLost"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="@dimen/text_body_small"
+        tools:text="4" />
+
+    <!-- Gol farkı -->
+    <TextView
+        android:id="@+id/tvGoalDiff"
+        android:layout_width="36dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="@dimen/text_body_small"
+        tools:text="+42" />
+
+    <!-- Puan - vurgulu renk ile göster -->
+    <TextView
+        android:id="@+id/tvPoints"
+        android:layout_width="36dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/primary"
+        android:textSize="@dimen/text_body"
+        android:textStyle="bold"
+        tools:text="80" />
+
+</LinearLayout>

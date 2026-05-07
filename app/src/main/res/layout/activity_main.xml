@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ===================================================================== -->
-<!-- activity_main.xml - Ana sayfa layout dosyası                           -->
-<!-- Yapı: Toolbar (üst) + Content Area (ortada) + BottomNavigationView    -->
-<!-- CoordinatorLayout ile Material Design davranışları desteklenir         -->
-<!-- ===================================================================== -->
+<!-- activity_main.xml - Ana Activity layout dosyası -->
+<!-- Yapı: Fragment Container (üstte) + BottomNavigationView (altta) -->
+<!-- CoordinatorLayout ile Material Design davranışları desteklenir -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -14,11 +12,26 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.MainActivity">
 
-    <!-- FrameLayout: Fragment container - Ana içerik alanı -->
+    <!-- Fragment Container: Ana içerik alanı -->
+    <!-- BottomNavigationView yüksekliği kadar alt boşluk bırakılır -->
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="@dimen/bottom_nav_height" />
+
+    <!-- Bottom Navigation View: Ana Navigasyon -->
+    <!-- 3 sekme: Maçlar | Puan Durumu | Hesap -->
+    <!-- app:layout_behavior ile CoordinatorLayout tarafından yönetilir -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_nav_height"
+        android:layout_gravity="bottom"
+        android:background="?attr/colorSurface"
+        app:elevation="@dimen/elevation_lg"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

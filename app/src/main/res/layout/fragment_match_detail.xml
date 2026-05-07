@@ -170,4 +170,19 @@
         android:background="?android:attr/colorBackground"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <!-- AI Tahmin FAB: Sadece giriş yapmış kullanıcılara gösterilir -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabAiPrediction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:text="@string/ai_prediction"
+        android:visibility="gone"
+        app:icon="@drawable/ic_ai"
+        app:iconTint="@color/white"
+        app:backgroundTint="@color/primary"
+        app:elevation="@dimen/elevation_lg"
+        tools:visibility="visible" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

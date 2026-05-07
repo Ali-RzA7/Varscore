@@ -21,5 +21,14 @@
         <item name="android:textColorPrimary">@color/text_primary_dark</item>
         <item name="android:textColorSecondary">@color/text_secondary_dark</item>
         <item name="android:textColorHint">@color/text_hint_dark</item>
+        <!-- Material3 uyumluluğu: BottomNavigationView ve diğer bileşenler için -->
+        <item name="colorOnSurface">@color/text_primary_dark</item>
+        <item name="colorSurfaceVariant">@color/surface_elevated_dark</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary_dark</item>
+        <item name="colorOutline">@color/divider_dark</item>
+        <item name="colorPrimaryContainer">@color/primary</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary</item>
+        <item name="colorSecondaryContainer">@color/secondary_dark</item>
+        <item name="colorOnSecondaryContainer">@color/on_secondary</item>
     </style>
 </resources>

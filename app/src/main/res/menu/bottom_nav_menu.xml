@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bottom_nav_menu.xml - Alt navigasyon çubuğu menü öğeleri -->
+<!-- 3 ana sekme: Maçlar, Puan Durumu, Hesap -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Maçlar sekmesi: Ana sayfa, canlı skor ve fikstür -->
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/nav_home" />
+
+    <!-- Puan Durumu sekmesi: Lig tabloları ve takım istatistikleri -->
+    <item
+        android:id="@+id/nav_standings"
+        android:icon="@drawable/ic_standings"
+        android:title="@string/nav_standings" />
+
+    <!-- Hesap sekmesi: Giriş/kayıt veya profil (auth durumuna göre değişir) -->
+    <item
+        android:id="@+id/nav_account"
+        android:icon="@drawable/ic_person"
+        android:title="@string/nav_account" />
+
+</menu>

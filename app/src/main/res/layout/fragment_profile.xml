@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- fragment_profile.xml - Giriş yapmış kullanıcının profil ekranı -->
+<!-- Profil fotoğrafı, kullanıcı bilgileri, favori takımlar/ligler, ayarlar, çıkış -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
+
+    <!-- Üst appbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            app:title="@string/profile"
+            app:titleTextColor="@android:color/white" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Kaydırılabilir içerik -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/padding_xl">
+
+            <!-- Profil başlık kartı: fotoğraf + ad + e-posta -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_md"
+                app:cardCornerRadius="@dimen/radius_lg"
+                app:cardElevation="@dimen/elevation_sm">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_xl">
+
+                    <!-- Profil fotoğrafı (tıklanınca değiştirilebilir) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardPhoto"
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        app:cardCornerRadius="48dp"
+                        app:cardElevation="@dimen/elevation_md"
+                        app:strokeColor="@color/primary"
+                        app:strokeWidth="2dp">
+
+                        <ImageView
+                            android:id="@+id/ivProfilePhoto"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@string/profile"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_person" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Fotoğraf değiştir linki -->
+                    <TextView
+                        android:id="@+id/tvChangePhoto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_sm"
+                        android:padding="@dimen/padding_xs"
+                        android:text="@string/change_photo"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_body_small" />
+
+                    <!-- Kullanıcı adı -->
+                    <TextView
+                        android:id="@+id/tvDisplayName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_md"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="@dimen/text_title"
+                        android:textStyle="bold" />
+
+                    <!-- E-posta -->
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_xs"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="@dimen/text_body" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Ayarlar bölümü -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_lg"
+                android:layout_marginTop="@dimen/margin_md"
+                android:layout_marginBottom="@dimen/margin_xs"
+                android:text="@string/settings"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_body_small"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_md"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_sm">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Tema ayarı -->
+                    <LinearLayout
+                        android:id="@+id/layoutTheme"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/padding_md">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:drawableStart="@drawable/ic_back"
+                            android:drawablePadding="@dimen/padding_md"
+                            android:text="@string/dark_mode"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="@dimen/text_body" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchDarkMode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp"
+                        android:background="?attr/colorOutline" android:layout_marginHorizontal="@dimen/margin_md"/>
+
+                    <!-- Dil ayarı -->
+                    <LinearLayout
+                        android:id="@+id/layoutLanguage"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/padding_md">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/language"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="@dimen/text_body" />
+
+                        <TextView
+                            android:id="@+id/tvCurrentLanguage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="@dimen/text_body" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Favoriler bölümü başlığı -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_lg"
+                android:layout_marginTop="@dimen/margin_lg"
+                android:layout_marginBottom="@dimen/margin_xs"
+                android:text="@string/favorites"
+                android:textColor="@color/primary"
+                android:textSize="@dimen/text_body_small"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/margin_md"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_sm">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_md">
+
+                    <!-- Favori takımlar başlığı -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/favorite_teams"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="@dimen/text_body"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvFavoriteTeams"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_xs"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="@dimen/text_body_small" />
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp"
+                        android:background="?attr/colorOutline" android:layout_marginVertical="@dimen/margin_md"/>
+
+                    <!-- Favori ligler başlığı -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/favorite_leagues"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="@dimen/text_body"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvFavoriteLeagues"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_xs"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="@dimen/text_body_small" />
+
+                    <!-- Favoriler lig açıklaması -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_sm"
+                        app:cardBackgroundColor="@color/live_red_bg"
+                        app:cardCornerRadius="@dimen/radius_sm"
+                        app:strokeWidth="0dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/padding_sm"
+                            android:text="@string/league_favorite_info"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="@dimen/text_caption" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Çıkış Yap butonu -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSignOut"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginHorizontal="@dimen/margin_md"
+                android:layout_marginTop="@dimen/margin_xl"
+                android:text="@string/logout"
+                android:textColor="@color/live_red"
+                app:cornerRadius="@dimen/radius_lg"
+                app:strokeColor="@color/live_red" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

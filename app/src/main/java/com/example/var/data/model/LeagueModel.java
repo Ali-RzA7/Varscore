@@ -29,6 +29,10 @@ public class LeagueModel {
     @SerializedName("subLeagueName")
     private String subLeagueName;
 
+    /** Lig renk kodu (hex, örn: "#1B5E20") — API desteklediğinde dolar */
+    @SerializedName("leagueColor")
+    private String leagueColor;
+
     // ===== Getter ve Setter Metotları =====
 
     public String getLeagueId() { return leagueId; }
@@ -45,4 +49,7 @@ public class LeagueModel {
 
     public String getSubLeagueName() { return subLeagueName; }
     public void setSubLeagueName(String subLeagueName) { this.subLeagueName = subLeagueName; }
+
+    public String getLeagueColor() { return leagueColor; }
+    public void setLeagueColor(String leagueColor) { this.leagueColor = leagueColor; }
 }

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- item_league.xml - Puan Durumu ekranındaki lig listesi satırı -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/margin_md"
+    android:layout_marginVertical="@dimen/margin_xs"
+    app:cardCornerRadius="@dimen/radius_md"
+    app:cardElevation="@dimen/elevation_sm"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/padding_md">
+
+        <!-- Lig renk çubuğu (lig rengiyle gösterilecek) -->
+        <View
+            android:id="@+id/viewLeagueColor"
+            android:layout_width="4dp"
+            android:layout_height="32dp"
+            android:background="@color/primary"
+            android:layout_marginEnd="@dimen/margin_md"/>
+
+        <!-- Lig tipi ikonu (🏆 Kupa, ⚽ Lig) -->
+        <TextView
+            android:id="@+id/tvLeagueIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_sm"
+            android:textSize="20sp"
+            tools:text="⚽" />
+
+        <!-- Lig adı ve kısa adı -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvLeagueName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="@dimen/text_body"
+                android:textStyle="bold"
+                tools:text="Türkiye Süper Lig" />
+
+            <TextView
+                android:id="@+id/tvLeagueShortName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="@dimen/text_caption"
+                tools:text="TUR SL" />
+
+        </LinearLayout>
+
+        <!-- Favori yıldız butonu -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFavoriteLeague"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:minWidth="0dp"
+            android:padding="0dp"
+            app:icon="@drawable/ic_star"
+            app:iconSize="@dimen/icon_md"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp" />
+
+        <!-- Sağ ok işareti -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenLeague"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:minWidth="0dp"
+            android:padding="0dp"
+            app:icon="@drawable/ic_back"
+            app:iconSize="@dimen/icon_sm"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            android:rotation="180" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

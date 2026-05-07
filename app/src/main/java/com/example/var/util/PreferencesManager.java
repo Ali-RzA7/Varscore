@@ -41,14 +41,28 @@ public class PreferencesManager {
 
     /**
      * Koyu tema durumunu kaydeder ve hemen uygular.
+     * AppCompatDelegate üzerinden tema anında değiştirilir, Activity yeniden oluşturulur.
+     *
      * @param isDarkMode true ise koyu tema, false ise açık tema
      */
     public void setDarkMode(boolean isDarkMode) {
         preferences.edit().putBoolean(KEY_DARK_MODE, isDarkMode).apply();
-        // Temayı anında uygula
+        // Temayı anında uygula (Activity recreate tetikler)
         AppCompatDelegate.setDefaultNightMode(
                 isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
         );
+    }
+
+    /**
+     * Koyu tema tercihini SADECE kaydeder, anında uygulamaz.
+     * SettingsDialogFragment tarafından kullanılır:
+     * dialog kapandıktan sonra tema uygulanır, böylece açık dialog sırasında
+     * sayfa yönlendirmesi yaşanmaz.
+     *
+     * @param isDarkMode true ise koyu tema, false ise açık tema
+     */
+    public void saveDarkMode(boolean isDarkMode) {
+        preferences.edit().putBoolean(KEY_DARK_MODE, isDarkMode).apply();
     }
 
     /**

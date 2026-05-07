@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- bottom_nav_color.xml - Alt navigasyon ikon ve metin renk seçicisi -->
+<!-- Seçili sekme: primary renk (yeşil), diğerleri: muted metin rengi -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/primary" android:state_checked="true" />
+    <item android:color="@color/text_secondary_light" />
+</selector>

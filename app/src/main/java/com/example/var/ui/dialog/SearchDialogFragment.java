@@ -175,12 +175,45 @@ public class SearchDialogFragment extends DialogFragment
         rvSearchResults.setVisibility(filtered.isEmpty() ? View.GONE : View.VISIBLE);
     }
 
+    /**
+     * Arama sonucuna tıklandığında ilgili sayfaya yönlendirir.
+     *
+     * - Takım seçildi → TeamMatchesFragment: Takımın geçmiş/gelecek maçları
+     * - Lig seçildi   → LeagueStandingsFragment: Ligin puan tablosu
+     *
+     * Dialog önce kapatılır, ardından Fragment transaction yapılır.
+     * addToBackStack(null) ile geri tuşu doğru çalışır.
+     */
     @Override
     public void onSearchResultClick(SearchResultAdapter.SearchResultItem item) {
-        // Sonuca tıklanınca snackbar göster (ileride detay sayfasına yönlendirme)
-        if (getView() != null) {
-            Snackbar.make(getView(), item.name, Snackbar.LENGTH_SHORT).show();
+        dismiss(); // Önce dialog'u kapat
+
+        // Hedef fragment'ı belirle
+        androidx.fragment.app.Fragment target;
+        if ("team".equals(item.category)) {
+            // Takım seçildi: Takımın maçlarını göster
+            target = com.example.var.ui.fragment.TeamMatchesFragment.newInstance(
+                    item.id,
+                    item.name,
+                    null  // Lig ID'si bilinmiyor (arama'dan gelinince)
+            );
+        } else {
+            // Lig seçildi: Ligin puan tablosunu göster
+            target = com.example.var.ui.fragment.LeagueStandingsFragment.newInstance(
+                    item.id,
+                    item.name
+            );
         }
-        dismiss();
+
+        // Fragment manager ile sayfa geçişi (animasyonlu, back stack'e ekle)
+        getParentFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(
+                        R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right
+                )
+                .replace(R.id.fragmentContainer, target)
+                .addToBackStack(null)
+                .commit();
     }
 }

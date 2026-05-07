@@ -166,7 +166,7 @@ public interface FootballApiService {
 
     /**
      * Tüm liglerin temel bilgilerini getirir.
-     * Arama fonksiyonunda lig araması için kullanılır.
+     * Arama fonksiyonunda ve Puan Durumu ekranında lig listesi için kullanılır.
      *
      * @param apiKey API anahtarı (zorunlu)
      * @return Lig bilgileri listesi
@@ -174,5 +174,34 @@ public interface FootballApiService {
     @GET("league/basic")
     Call<ApiResponse<LeagueModel>> getLeagues(
             @Query("api_key") String apiKey
+    );
+
+    /**
+     * Belirli bir ligin puan tablosunu getirir.
+     * Puan Durumu ekranında lig seçildiğinde kullanılır.
+     * Tabloda: sıra, takım, oynanan, galibiyet, beraberlik, mağlubiyet, gol farkı, puan.
+     *
+     * @param apiKey   API anahtarı (zorunlu)
+     * @param leagueId Lig kimliği (zorunlu)
+     * @return Puan tablosu listesi
+     */
+    @GET("league/table")
+    Call<ApiResponse<com.example.var.data.model.StandingModel>> getLeagueTable(
+            @Query("api_key") String apiKey,
+            @Query("leagueId") String leagueId
+    );
+
+    /**
+     * Belirli bir takımın geçmiş ve gelecek maçlarını getirir.
+     * Arama'da takıma tıklandığında ve Profil ekranındaki favori takımlar için kullanılır.
+     *
+     * @param apiKey API anahtarı (zorunlu)
+     * @param teamId Takım kimliği (zorunlu)
+     * @return Takıma ait maç listesi
+     */
+    @GET("schedule/basic")
+    Call<ApiResponse<MatchModel>> getTeamMatches(
+            @Query("api_key") String apiKey,
+            @Query("teamId") String teamId
     );
 }

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "1003095490095",
-    "project_id": "varagidildi",
-    "storage_bucket": "varagidildi.firebasestorage.app"
+    "project_number": "630701183714",
+    "project_id": "varscore-aee23",
+    "storage_bucket": "varscore-aee23.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1003095490095:android:0c9e06de134d30aee750da",
+        "mobilesdk_app_id": "1:630701183714:android:084a9cac871993f3dd84bb",
         "android_client_info": {
           "package_name": "com.example.var"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDaRb2aDKimWOYS9RhM4BeM_hOFV8l3_Bg"
+          "current_key": "AIzaSyAgE-00AakMskaMAEPUfIjQWxx1A0dHLMo"
         }
       ],
       "services": {

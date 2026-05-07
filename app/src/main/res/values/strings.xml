@@ -92,4 +92,107 @@
     <string name="home">Ev Sahibi</string>
     <string name="away">Deplasman</string>
     <string name="vs">vs</string>
+
+    <!-- ========================================= -->
+    <!-- Alt Navigasyon                             -->
+    <!-- ========================================= -->
+    <string name="nav_home">Maçlar</string>
+    <string name="nav_standings">Puan Durumu</string>
+    <string name="nav_account">Hesap</string>
+
+    <!-- ========================================= -->
+    <!-- Puan Durumu                                -->
+    <!-- ========================================= -->
+    <string name="standings_title">Puan Durumu</string>
+    <string name="league_standings">Lig Puan Tablosu</string>
+    <string name="team_matches">Takım Maçları</string>
+    <string name="no_leagues">Lig bulunamadı</string>
+    <string name="no_standings">Puan tablosu yüklenemedi</string>
+    <string name="rank">Sıra</string>
+    <string name="played">O</string>
+    <string name="won">G</string>
+    <string name="drawn">B</string>
+    <string name="lost">M</string>
+    <string name="goals">G/Y</string>
+    <string name="points">P</string>
+    <string name="search_league_hint">Lig ara…</string>
+
+    <!-- ========================================= -->
+    <!-- Giriş / Kayıt / Şifre                     -->
+    <!-- ========================================= -->
+    <string name="login">Giriş Yap</string>
+    <string name="login_title">Tekrar hoş geldiniz</string>
+    <string name="login_subtitle">Hesabınıza giriş yapın</string>
+    <string name="register">Kayıt Ol</string>
+    <string name="register_title">Hesap Oluştur</string>
+    <string name="register_subtitle">VarScore\'a katılın</string>
+    <string name="logout">Çıkış Yap</string>
+    <string name="forgot_password">Şifremi Unuttum</string>
+    <string name="forgot_password_desc">E-posta adresinizi girin. Şifre sıfırlama bağlantısı göndereceğiz.</string>
+    <string name="send_reset_email">Sıfırlama E-postası Gönder</string>
+    <string name="reset_email_sent">Sıfırlama e-postası gönderildi. Gelen kutunuzu kontrol edin.</string>
+    <string name="back_to_login">Girişe Dön</string>
+    <string name="email">E-posta</string>
+    <string name="password">Şifre</string>
+    <string name="password_hint">En az 6 karakter</string>
+    <string name="confirm_password">Şifre Tekrar</string>
+    <string name="display_name">Ad Soyad</string>
+    <string name="or">veya</string>
+    <string name="sign_in_google">Google ile Giriş Yap</string>
+    <string name="no_account">Hesabınız yok mu? Kayıt Ol</string>
+    <string name="have_account">Zaten hesabınız var mı? Giriş Yapın</string>
+
+    <!-- Doğrulama Hataları -->
+    <string name="email_required">E-posta zorunludur</string>
+    <string name="email_invalid">Geçerli bir e-posta girin</string>
+    <string name="password_required">Şifre zorunludur</string>
+    <string name="password_too_short">Şifre en az 6 karakter olmalıdır</string>
+    <string name="passwords_not_match">Şifreler eşleşmiyor</string>
+    <string name="name_required">Ad Soyad zorunludur</string>
+    <string name="login_failed">Giriş başarısız. E-posta veya şifrenizi kontrol edin.</string>
+    <string name="register_failed">Kayıt başarısız. Lütfen tekrar deneyin.</string>
+    <string name="google_sign_in_failed">Google ile giriş başarısız</string>
+    <string name="reset_email_failed">E-posta gönderilemedi. Lütfen tekrar deneyin.</string>
+
+    <!-- ========================================= -->
+    <!-- Profil                                     -->
+    <!-- ========================================= -->
+    <string name="profile">Profil</string>
+    <string name="change_photo">Fotoğrafı Değiştir</string>
+    <string name="uploading_photo">Fotoğraf yükleniyor…</string>
+    <string name="upload_failed">Fotoğraf yüklenemedi</string>
+    <string name="photo_updated">Profil fotoğrafı güncellendi</string>
+    <string name="account_settings">Hesap Ayarları</string>
+
+    <!-- ========================================= -->
+    <!-- Favoriler                                  -->
+    <!-- ========================================= -->
+    <string name="favorites">Favoriler</string>
+    <string name="favorite_teams">Favori Takımlar</string>
+    <string name="favorite_leagues">Favori Ligler</string>
+    <string name="no_favorites">Henüz favori eklemediniz</string>
+    <string name="favorite_count">%d favori</string>
+    <string name="league_favorite_info">Bir ligi favoriye eklediğinizde, o ligin tüm maçları için bildirim alabilirsiniz.</string>
+    <string name="added_to_favorites">Favorilere eklendi</string>
+    <string name="removed_from_favorites">Favorilerden kaldırıldı</string>
+    <string name="login_to_favorite">Favorilere eklemek için giriş yapın</string>
+
+    <!-- ========================================= -->
+    <!-- Yapay Zeka Tahmin                          -->
+    <!-- ========================================= -->
+    <string name="ai_prediction">AI Tahmin</string>
+    <string name="ai_analyzing">Maç analiz ediliyor…</string>
+    <string name="ai_error">Tahmin alınamadı. Lütfen tekrar deneyin.</string>
+    <string name="get_prediction">Tahmin Al</string>
+    <string name="login_required">Bu özellik için giriş yapmanız gerekiyor</string>
+    <string name="close">Kapat</string>
+
+    <!-- ========================================= -->
+    <!-- Genel Yardımcı                             -->
+    <!-- ========================================= -->
+    <string name="team">Takım</string>
+    <string name="back">Geri</string>
+    <string name="save">Kaydet</string>
+    <string name="cancel">İptal</string>
+    <string name="default_web_client_id" translatable="false">YOUR_WEB_CLIENT_ID</string>
 </resources>

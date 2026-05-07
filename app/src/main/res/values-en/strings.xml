@@ -92,4 +92,107 @@
     <string name="home">Home</string>
     <string name="away">Away</string>
     <string name="vs">vs</string>
+
+    <!-- ========================================= -->
+    <!-- Bottom Navigation                          -->
+    <!-- ========================================= -->
+    <string name="nav_home">Matches</string>
+    <string name="nav_standings">Standings</string>
+    <string name="nav_account">Account</string>
+
+    <!-- ========================================= -->
+    <!-- Standings                                  -->
+    <!-- ========================================= -->
+    <string name="standings_title">Standings</string>
+    <string name="league_standings">League Standings</string>
+    <string name="team_matches">Team Matches</string>
+    <string name="no_leagues">No leagues found</string>
+    <string name="no_standings">Standings could not be loaded</string>
+    <string name="rank">Rank</string>
+    <string name="played">P</string>
+    <string name="won">W</string>
+    <string name="drawn">D</string>
+    <string name="lost">L</string>
+    <string name="goals">GD</string>
+    <string name="points">Pts</string>
+    <string name="search_league_hint">Search leagues…</string>
+
+    <!-- ========================================= -->
+    <!-- Login / Register / Password                -->
+    <!-- ========================================= -->
+    <string name="login">Sign In</string>
+    <string name="login_title">Welcome back</string>
+    <string name="login_subtitle">Sign in to your account</string>
+    <string name="register">Sign Up</string>
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Join VarScore</string>
+    <string name="logout">Sign Out</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="forgot_password_desc">Enter your email address. We\'ll send you a password reset link.</string>
+    <string name="send_reset_email">Send Reset Email</string>
+    <string name="reset_email_sent">Reset email sent. Check your inbox.</string>
+    <string name="back_to_login">Back to Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="password_hint">At least 6 characters</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="display_name">Full Name</string>
+    <string name="or">or</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="no_account">Don\'t have an account? Sign Up</string>
+    <string name="have_account">Already have an account? Sign In</string>
+
+    <!-- Validation Errors -->
+    <string name="email_required">Email is required</string>
+    <string name="email_invalid">Enter a valid email address</string>
+    <string name="password_required">Password is required</string>
+    <string name="password_too_short">Password must be at least 6 characters</string>
+    <string name="passwords_not_match">Passwords do not match</string>
+    <string name="name_required">Full name is required</string>
+    <string name="login_failed">Sign in failed. Check your email or password.</string>
+    <string name="register_failed">Registration failed. Please try again.</string>
+    <string name="google_sign_in_failed">Google sign-in failed</string>
+    <string name="reset_email_failed">Could not send email. Please try again.</string>
+
+    <!-- ========================================= -->
+    <!-- Profile                                    -->
+    <!-- ========================================= -->
+    <string name="profile">Profile</string>
+    <string name="change_photo">Change Photo</string>
+    <string name="uploading_photo">Uploading photo…</string>
+    <string name="upload_failed">Photo upload failed</string>
+    <string name="photo_updated">Profile photo updated</string>
+    <string name="account_settings">Account Settings</string>
+
+    <!-- ========================================= -->
+    <!-- Favorites                                  -->
+    <!-- ========================================= -->
+    <string name="favorites">Favorites</string>
+    <string name="favorite_teams">Favorite Teams</string>
+    <string name="favorite_leagues">Favorite Leagues</string>
+    <string name="no_favorites">You haven\'t added any favorites yet</string>
+    <string name="favorite_count">%d favorites</string>
+    <string name="league_favorite_info">When you add a league to favorites, you can receive notifications for all matches in that league.</string>
+    <string name="added_to_favorites">Added to favorites</string>
+    <string name="removed_from_favorites">Removed from favorites</string>
+    <string name="login_to_favorite">Sign in to add favorites</string>
+
+    <!-- ========================================= -->
+    <!-- AI Prediction                              -->
+    <!-- ========================================= -->
+    <string name="ai_prediction">AI Prediction</string>
+    <string name="ai_analyzing">Analyzing match…</string>
+    <string name="ai_error">Could not get prediction. Please try again.</string>
+    <string name="get_prediction">Get Prediction</string>
+    <string name="login_required">You need to sign in to use this feature</string>
+    <string name="close">Close</string>
+
+    <!-- ========================================= -->
+    <!-- General Helpers                            -->
+    <!-- ========================================= -->
+    <string name="team">Team</string>
+    <string name="back">Back</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="default_web_client_id" translatable="false">YOUR_WEB_CLIENT_ID</string>
 </resources>

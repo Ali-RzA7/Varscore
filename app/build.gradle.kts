@@ -16,8 +16,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // API anahtarı local.properties dosyasından güvenli şekilde okunacak
+        // iSportsAPI anahtarı local.properties dosyasından güvenli şekilde okunacak
         buildConfigField("String", "API_KEY", "\"${project.findProperty("ISPORTS_API_KEY") ?: ""}\"")
+        // Groq AI API anahtarı
+        buildConfigField("String", "GROQ_API_KEY", "\"${project.findProperty("GROQ_API_KEY") ?: ""}\"")
+
     }
 
     buildTypes {
@@ -65,6 +68,12 @@ dependencies {
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
+
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.3.0")
 
     // SharedPreferences
     implementation("androidx.preference:preference:1.2.1")
