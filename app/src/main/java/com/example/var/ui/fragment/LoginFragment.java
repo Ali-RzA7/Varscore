@@ -155,7 +155,15 @@ public class LoginFragment extends Fragment {
                 .addOnSuccessListener(authResult -> {
                     if (!isAdded()) return;
                     showLoading(false);
-                    onLoginSuccess(authResult.getUser());
+                    
+                    FirebaseUser user = authResult.getUser();
+                    if (user != null && !user.isEmailVerified()) {
+                        auth.signOut();
+                        showSnackbar("Lütfen hesabınızı kullanabilmek için e-postanızı doğrulayın. (Spam/Gereksiz kutusunu kontrol edin)");
+                        return;
+                    }
+                    
+                    onLoginSuccess(user);
                 })
                 .addOnFailureListener(e -> {
                     if (!isAdded()) return;

@@ -179,51 +179,58 @@ public class RegisterFragment extends Fragment {
         firebaseUser.updateProfile(profileUpdates)
                 .addOnCompleteListener(task -> {
                     // Profil güncelleme başarılı olsa da olmasa da Firestore'a kaydet
-                    saveToFirestore(firebaseUser.getUid(), name, email);
+                    saveToFirestore(firebaseUser, name, email);
                 });
     }
 
     /**
      * Firestore'a yeni kullanıcı profili belgesi oluşturur.
-     * Başarılı olunca AccountFragment güncellenir.
+     * Başarılı olunca e-posta doğrulaması gönderilir.
      *
-     * @param userId Firebase Auth UID
+     * @param firebaseUser Yeni oluşturulan Firebase kullanıcısı
      * @param name   Görünen ad
      * @param email  E-posta
      */
-    private void saveToFirestore(String userId, String name, String email) {
-        UserModel user = new UserModel(userId, name, email);
+    private void saveToFirestore(FirebaseUser firebaseUser, String name, String email) {
+        UserModel user = new UserModel(firebaseUser.getUid(), name, email);
 
         FirebaseManager.saveUserProfile(user,
                 unused -> {
                     if (!isAdded()) return;
-                    showLoading(false);
-                    // Kayıt başarılı - AccountFragment güncelle
-                    refreshAccountFragment();
+                    sendVerificationAndSignOut(firebaseUser);
                 },
                 e -> {
-                    // Firestore hatası olsa bile kayıt başarılıdır
                     if (!isAdded()) return;
-                    showLoading(false);
-                    refreshAccountFragment();
+                    sendVerificationAndSignOut(firebaseUser);
                 }
         );
     }
 
     /**
-     * Ebeveyn veya üst fragment'ları üzerinden AccountFragment'ı bildirir.
-     * AccountFragment, yeni auth durumuna göre ProfileFragment gösterecektir.
+     * Kullanıcıya doğrulama e-postası gönderir, oturumunu kapatır ve Login ekranına geri döndürür.
      */
-    private void refreshAccountFragment() {
-        // Geri al (back stack'i temizle) ve AccountFragment güncelle
-        requireActivity().getSupportFragmentManager().popBackStack();
-        requireActivity().getSupportFragmentManager().popBackStack();
-
-        Fragment navParent = requireActivity().getSupportFragmentManager()
-                .findFragmentByTag("account_fragment");
-        if (navParent instanceof AccountFragment) {
-            ((AccountFragment) navParent).onAuthStateChanged();
-        }
+    private void sendVerificationAndSignOut(FirebaseUser firebaseUser) {
+        firebaseUser.sendEmailVerification()
+                .addOnCompleteListener(task -> {
+                    if (!isAdded()) return;
+                    showLoading(false);
+                    
+                    if (task.isSuccessful()) {
+                        showSnackbar("Kayıt başarılı! Giriş yapmadan önce e-postanızı doğrulamanız gerekmektedir.");
+                    } else {
+                        showSnackbar("Kayıt başarılı ancak doğrulama e-postası gönderilemedi.");
+                    }
+                    
+                    // Kullanıcıyı doğrulamadan uygulamaya sokmamak için hemen çıkış yapıyoruz
+                    auth.signOut();
+                    
+                    // Mesajın okunabilmesi için 1.5 saniye bekleyip Login sayfasına dön
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                        if (isAdded()) {
+                            requireActivity().getSupportFragmentManager().popBackStack();
+                        }
+                    }, 1500);
+                });
     }
 
     /**
