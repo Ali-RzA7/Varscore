@@ -1,9 +1,15 @@
 package com.example.var.ui;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
@@ -64,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottomNav);
 
         NotificationHelper.createChannels(this);
+        requestNotificationPermission();
         scheduleMatchMonitor();
 
         setupBottomNavigation();
@@ -146,6 +153,19 @@ public class MainActivity extends AppCompatActivity {
                 ExistingPeriodicWorkPolicy.KEEP,
                 work
         );
+    }
+
+    /**
+     * Android 13+ (API 33) için bildirim izni ister.
+     */
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
     }
 
     /**
