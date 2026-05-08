@@ -211,7 +211,7 @@ public class DatePickerAdapter extends RecyclerView.Adapter<DatePickerAdapter.Da
 
             // Tıklama olayı - tarih seçimi
             itemView.setOnClickListener(v -> {
-                int adapterPosition = getAdapterPosition();
+                int adapterPosition = getBindingAdapterPosition();
                 if (adapterPosition == RecyclerView.NO_POSITION) return;
 
                 int oldPosition = selectedPosition;

@@ -156,8 +156,8 @@ public class TeamMatchesFragment extends Fragment
     private void setupRecyclerView() {
         matchAdapter = new MatchAdapter(requireContext(), this);
         if (getArguments() != null) {
-            HashMap<String, String> logoMap = (HashMap<String, String>)
-                    getArguments().getSerializable(ARG_LOGO_MAP);
+            @SuppressWarnings("unchecked")
+            HashMap<String, String> logoMap = getArguments().getSerializable(ARG_LOGO_MAP, HashMap.class);
             if (logoMap != null) matchAdapter.setTeamLogoMap(logoMap);
         }
         binding.rvMatches.setLayoutManager(new LinearLayoutManager(requireContext()));

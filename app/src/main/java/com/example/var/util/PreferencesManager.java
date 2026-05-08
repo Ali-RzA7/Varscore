@@ -110,7 +110,7 @@ public class PreferencesManager {
      */
     public Context applyLanguage(Context context) {
         String language = getLanguage();
-        Locale locale = new Locale(language);
+        Locale locale = Locale.forLanguageTag(language);
         Locale.setDefault(locale);
 
         android.content.res.Configuration config = new android.content.res.Configuration(

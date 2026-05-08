@@ -126,13 +126,20 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         public final String id;
         /** Sonuç kategorisi (team veya league) */
         public final String category;
+        /** Takımlar için lig ID'si */
+        public final String leagueId;
 
         public SearchResultItem(String icon, String name, String type, String id, String category) {
+            this(icon, name, type, id, category, null);
+        }
+
+        public SearchResultItem(String icon, String name, String type, String id, String category, String leagueId) {
             this.icon = icon;
             this.name = name;
             this.type = type;
             this.id = id;
             this.category = category;
+            this.leagueId = leagueId;
         }
     }
 }

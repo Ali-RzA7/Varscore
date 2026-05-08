@@ -68,7 +68,7 @@ public class MatchDetailFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            match = (MatchModel) getArguments().getSerializable("match_data");
+            match = getArguments().getSerializable("match_data", MatchModel.class);
         }
     }
 
@@ -193,7 +193,7 @@ public class MatchDetailFragment extends Fragment {
 
     /** Toolbar geri tuşunu FragmentManager back stack'iyle bağlar. */
     private void setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener(v -> requireActivity().onBackPressed());
+        binding.toolbar.setNavigationOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
     }
 
     /**

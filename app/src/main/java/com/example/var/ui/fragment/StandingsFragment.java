@@ -47,7 +47,7 @@ import retrofit2.Response;
  */
 public class StandingsFragment extends Fragment
         implements LeagueListAdapter.OnLeagueClickListener,
-                   LeagueListAdapter.OnFavoriteClickListener {
+        LeagueListAdapter.OnFavoriteClickListener {
 
     /** ViewBinding referansı */
     private FragmentStandingsBinding binding;
@@ -94,8 +94,13 @@ public class StandingsFragment extends Fragment
      */
     private void setupSearchBox() {
         binding.etSearch.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int st, int c, int a) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int st, int b, int c) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -125,7 +130,8 @@ public class StandingsFragment extends Fragment
             @Override
             public void onResponse(@NonNull Call<ApiResponse<LeagueModel>> call,
                     @NonNull Response<ApiResponse<LeagueModel>> response) {
-                if (!isAdded()) return;
+                if (!isAdded())
+                    return;
                 binding.swipeRefreshLayout.setRefreshing(false);
 
                 if (response.isSuccessful() && response.body() != null
@@ -148,7 +154,8 @@ public class StandingsFragment extends Fragment
             @Override
             public void onFailure(@NonNull Call<ApiResponse<LeagueModel>> call,
                     @NonNull Throwable t) {
-                if (!isAdded()) return;
+                if (!isAdded())
+                    return;
                 binding.swipeRefreshLayout.setRefreshing(false);
                 showError(getString(R.string.error_loading));
             }
@@ -160,16 +167,18 @@ public class StandingsFragment extends Fragment
      * Adaptörü favori ID'leri ile günceller (yıldız ikonları güncellenir).
      */
     private void loadFavoriteLeagues() {
-        if (!FirebaseManager.isLoggedIn()) return;
+        if (!FirebaseManager.isLoggedIn())
+            return;
 
         String userId = FirebaseManager.getCurrentUser().getUid();
         FirebaseManager.getUserProfile(userId,
                 user -> {
-                    if (!isAdded()) return;
+                    if (!isAdded())
+                        return;
                     leagueAdapter.setFavoriteLeagueIds(user.getFavoriteLeagues());
                 },
-                e -> { /* Sessizce başarısız ol */ }
-        );
+                e -> {
+                    /* Sessizce başarısız ol */ });
     }
 
     // ===== Callback Uygulamaları =====
@@ -182,12 +191,11 @@ public class StandingsFragment extends Fragment
     public void onLeagueClick(LeagueModel league) {
         Fragment target = LeagueStandingsFragment.newInstance(
                 league.getLeagueId(),
-                league.getName()
-        );
+                league.getName());
         requireActivity().getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
-                                     R.anim.slide_in_left, R.anim.slide_out_right)
+                        R.anim.slide_in_left, R.anim.slide_out_right)
                 .replace(R.id.fragmentContainer, target)
                 .addToBackStack(null)
                 .commit();
@@ -216,26 +224,26 @@ public class StandingsFragment extends Fragment
             // Favoriden çıkar
             FirebaseManager.removeFavoriteLeague(league.getLeagueId(),
                     unused -> {
-                        if (!isAdded()) return;
+                        if (!isAdded())
+                            return;
                         Snackbar.make(binding.getRoot(),
                                 getString(R.string.removed_from_favorites),
                                 Snackbar.LENGTH_SHORT).show();
                         loadFavoriteLeagues();
                     },
-                    e -> showSnackbar(getString(R.string.error_loading))
-            );
+                    e -> showSnackbar(getString(R.string.error_loading)));
         } else {
             // Favoriye ekle
             FirebaseManager.addFavoriteLeague(league.getLeagueId(),
                     unused -> {
-                        if (!isAdded()) return;
+                        if (!isAdded())
+                            return;
                         Snackbar.make(binding.getRoot(),
                                 getString(R.string.added_to_favorites),
                                 Snackbar.LENGTH_SHORT).show();
                         loadFavoriteLeagues();
                     },
-                    e -> showSnackbar(getString(R.string.error_loading))
-            );
+                    e -> showSnackbar(getString(R.string.error_loading)));
         }
     }
 

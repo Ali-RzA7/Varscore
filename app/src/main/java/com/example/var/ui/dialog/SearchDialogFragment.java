@@ -131,14 +131,14 @@ public class SearchDialogFragment extends DialogFragment
                 allResults.add(new SearchResultAdapter.SearchResultItem(
                         "⚽", match.getHomeName(),
                         getString(R.string.search_teams),
-                        match.getHomeId(), "team"));
+                        match.getHomeId(), "team", match.getLeagueId()));
                 addedTeams.add(match.getHomeName());
             }
             if (match.getAwayName() != null && !addedTeams.contains(match.getAwayName())) {
                 allResults.add(new SearchResultAdapter.SearchResultItem(
                         "⚽", match.getAwayName(),
                         getString(R.string.search_teams),
-                        match.getAwayId(), "team"));
+                        match.getAwayId(), "team", match.getLeagueId()));
                 addedTeams.add(match.getAwayName());
             }
             // Ligleri ekle
@@ -196,7 +196,7 @@ public class SearchDialogFragment extends DialogFragment
             target = com.example.var.ui.fragment.TeamMatchesFragment.newInstance(
                     item.id,
                     item.name,
-                    null  // Lig ID'si bilinmiyor (arama'dan gelinince)
+                    item.leagueId
             );
         } else {
             // Lig seçildi: Ligin puan tablosunu göster

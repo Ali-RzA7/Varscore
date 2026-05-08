@@ -51,7 +51,7 @@ public class MatchStatsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             matchId = getArguments().getString("match_id");
-            match = (MatchModel) getArguments().getSerializable("match_data");
+            match = getArguments().getSerializable("match_data", MatchModel.class);
         }
         repository = new MatchRepository(BuildConfig.API_KEY);
     }

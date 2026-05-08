@@ -158,7 +158,9 @@ public class FirebaseManager {
                         user.setPhotoUrl(snapshot.getString("photoUrl"));
 
                         // Favori listelerini al (null kontrolü ile)
+                        @SuppressWarnings("unchecked")
                         List<String> teams = (List<String>) snapshot.get(FIELD_FAVORITE_TEAMS);
+                        @SuppressWarnings("unchecked")
                         List<String> leagues = (List<String>) snapshot.get(FIELD_FAVORITE_LEAGUES);
                         if (teams != null) user.setFavoriteTeams(teams);
                         if (leagues != null) user.setFavoriteLeagues(leagues);
@@ -223,7 +225,7 @@ public class FirebaseManager {
             addData.put(FIELD_FAVORITE_TEAM_LEAGUES + "." + teamId, leagueId);
         }
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .set(addData, SetOptions.merge())
+                .update(addData)
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
@@ -247,7 +249,7 @@ public class FirebaseManager {
         removeData.put(FIELD_FAVORITE_TEAM_NAMES + "." + teamId, FieldValue.delete());
         removeData.put(FIELD_FAVORITE_TEAM_LEAGUES + "." + teamId, FieldValue.delete());
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .set(removeData, SetOptions.merge())
+                .update(removeData)
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
@@ -278,7 +280,7 @@ public class FirebaseManager {
         Map<String, Object> addData = new HashMap<>();
         addData.put(FIELD_FAVORITE_LEAGUES, FieldValue.arrayUnion(leagueId));
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .set(addData, SetOptions.merge())
+                .update(addData)
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
@@ -300,7 +302,7 @@ public class FirebaseManager {
         Map<String, Object> removeData = new HashMap<>();
         removeData.put(FIELD_FAVORITE_LEAGUES, FieldValue.arrayRemove(leagueId));
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .set(removeData, SetOptions.merge())
+                .update(removeData)
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
@@ -330,7 +332,9 @@ public class FirebaseManager {
                         onResult.onSuccess(false);
                         return;
                     }
+                    @SuppressWarnings("unchecked")
                     List<String> teams = (List<String>) snapshot.get(FIELD_FAVORITE_TEAMS);
+                    @SuppressWarnings("unchecked")
                     List<String> leagues = (List<String>) snapshot.get(FIELD_FAVORITE_LEAGUES);
 
                     boolean teamFav = teams != null && teams.contains(teamId);

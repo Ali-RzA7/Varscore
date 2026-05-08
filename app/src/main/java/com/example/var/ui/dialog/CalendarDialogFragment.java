@@ -89,7 +89,7 @@ public class CalendarDialogFragment extends DialogFragment {
     }
 
     private void updateCalendar(TextView tvMonthYear, RecyclerView rvCalendarDays) {
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy", new Locale("tr"));
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("tr"));
         tvMonthYear.setText(sdf.format(currentMonth.getTime()));
 
         List<Calendar> days = generateDaysForMonth(currentMonth);
