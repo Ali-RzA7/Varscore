@@ -20,6 +20,7 @@ import com.example.var.data.repository.MatchRepository;
 import com.example.var.databinding.FragmentStandingsBinding;
 import com.example.var.ui.adapter.LeagueListAdapter;
 import com.example.var.util.FirebaseManager;
+import com.example.var.util.LeagueCache;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -116,7 +117,10 @@ public class StandingsFragment extends Fragment
      */
     private void setupSwipeRefresh() {
         binding.swipeRefreshLayout.setColorSchemeResources(R.color.primary, R.color.secondary);
-        binding.swipeRefreshLayout.setOnRefreshListener(this::loadLeagues);
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> {
+            LeagueCache.clear(requireContext());
+            loadLeagues();
+        });
     }
 
     /**
@@ -124,6 +128,15 @@ public class StandingsFragment extends Fragment
      * Yükleme, başarı, boş ve hata durumlarını yönetir.
      */
     private void loadLeagues() {
+        // Önce cache'e bak
+        List<LeagueModel> cached = LeagueCache.load(requireContext());
+        if (cached != null) {
+            leagueAdapter.setLeagues(cached);
+            showContent();
+            loadFavoriteLeagues();
+            return;
+        }
+
         showLoading();
 
         repository.getLeagues().enqueue(new Callback<ApiResponse<LeagueModel>>() {
@@ -138,6 +151,9 @@ public class StandingsFragment extends Fragment
                         && response.body().isSuccess()) {
                     List<LeagueModel> leagues = response.body().getData();
                     if (leagues != null && !leagues.isEmpty()) {
+                        // Cache'e kaydet
+                        LeagueCache.save(requireContext(), leagues);
+                        
                         // Ligleri adaptöre aktar
                         leagueAdapter.setLeagues(leagues);
                         showContent();
@@ -147,7 +163,15 @@ public class StandingsFragment extends Fragment
                         showEmpty();
                     }
                 } else {
-                    showError(getString(R.string.error_loading));
+                    // API hata verirse bile (rate limit gibi) cache'deki eski veriyi göster
+                    List<LeagueModel> anyCache = LeagueCache.loadAny(requireContext());
+                    if (anyCache != null) {
+                        leagueAdapter.setLeagues(anyCache);
+                        showContent();
+                        loadFavoriteLeagues();
+                    } else {
+                        showError(getString(R.string.error_loading));
+                    }
                 }
             }
 
@@ -157,7 +181,16 @@ public class StandingsFragment extends Fragment
                 if (!isAdded())
                     return;
                 binding.swipeRefreshLayout.setRefreshing(false);
-                showError(getString(R.string.error_loading));
+                
+                // Hata durumunda cache'deki eski veriyi dene
+                List<LeagueModel> anyCache = LeagueCache.loadAny(requireContext());
+                if (anyCache != null) {
+                    leagueAdapter.setLeagues(anyCache);
+                    showContent();
+                    loadFavoriteLeagues();
+                } else {
+                    showError(getString(R.string.error_loading));
+                }
             }
         });
     }

@@ -21,6 +21,7 @@ import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.MatchModel;
 import com.example.var.data.repository.MatchRepository;
 import com.example.var.ui.adapter.SearchResultAdapter;
+import com.example.var.util.MatchCache;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -95,9 +96,16 @@ public class SearchDialogFragment extends DialogFragment
      * Bugünün maçlarından takım ve lig isimlerini çeker.
      */
     private void loadSearchableData() {
-        MatchRepository repo = new MatchRepository(API_KEY);
         String today = com.example.var.util.DateUtils.formatForApi(Calendar.getInstance());
 
+        // Cache'ten yüklemeyi dene
+        List<MatchModel> cached = MatchCache.load(requireContext(), today);
+        if (cached != null) {
+            extractSearchItems(cached);
+            return;
+        }
+
+        MatchRepository repo = new MatchRepository(API_KEY);
         repo.getMatchesByDate(today).enqueue(new Callback<ApiResponse<MatchModel>>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse<MatchModel>> call,
@@ -106,7 +114,11 @@ public class SearchDialogFragment extends DialogFragment
                     return;
                 if (response.isSuccessful() && response.body() != null
                         && response.body().getData() != null) {
-                    extractSearchItems(response.body().getData());
+                    List<MatchModel> matches = response.body().getData();
+                    // Cache'e kaydet
+                    MatchCache.save(requireContext(), today, matches);
+                    
+                    extractSearchItems(matches);
                 }
             }
 

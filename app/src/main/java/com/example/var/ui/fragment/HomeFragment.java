@@ -24,6 +24,7 @@ import com.example.var.ui.dialog.SearchDialogFragment;
 import com.example.var.ui.dialog.SettingsDialogFragment;
 import com.example.var.ui.fragment.MatchDetailFragment;
 import com.example.var.util.DateUtils;
+import com.example.var.util.MatchCache;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -262,6 +263,7 @@ public class HomeFragment extends Fragment implements
         binding.swipeRefreshLayout.setColorSchemeResources(
                 R.color.primary, R.color.secondary);
         binding.swipeRefreshLayout.setOnRefreshListener(() -> {
+            MatchCache.clear(requireContext());
             if (isLiveMode) {
                 loadLiveMatches();
             } else {
@@ -282,9 +284,18 @@ public class HomeFragment extends Fragment implements
      * @param calendar Maçları çekilecek tarih
      */
     private void loadMatchesForDate(Calendar calendar) {
+        String dateStr = DateUtils.formatForApi(calendar);
+        
+        // Cache kontrolü
+        List<MatchModel> cached = MatchCache.load(requireContext(), dateStr);
+        if (cached != null) {
+            matchAdapter.setMatches(cached);
+            showContent();
+            return;
+        }
+
         showLoading();
 
-        String dateStr = DateUtils.formatForApi(calendar);
         repository.getMatchesByDate(dateStr).enqueue(new Callback<ApiResponse<MatchModel>>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse<MatchModel>> call,
@@ -297,6 +308,9 @@ public class HomeFragment extends Fragment implements
                         && response.body().isSuccess()) {
                     List<MatchModel> matches = response.body().getData();
                     if (matches != null && !matches.isEmpty()) {
+                        // Cache'e kaydet
+                        MatchCache.save(requireContext(), dateStr, matches);
+                        
                         showContent();
                         matchAdapter.setMatches(matches);
                     } else {
