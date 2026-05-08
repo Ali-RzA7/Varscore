@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.var.util.FirebaseManager;
+import com.google.android.material.snackbar.Snackbar;
+
 
 
 import retrofit2.Call;
@@ -67,6 +70,9 @@ public class LeagueStandingsFragment extends Fragment
 
     /** Toolbar'da gösterilecek lig adı */
     private String leagueName;
+
+    /** Lig favori durumu */
+    private boolean isFavorite = false;
 
     /** Standings'ten elde edilen teamId→logoUrl haritası; TeamMatchesFragment'a aktarılır */
     private final HashMap<String, String> teamLogoMap = new HashMap<>();
@@ -115,6 +121,7 @@ public class LeagueStandingsFragment extends Fragment
 
         setupToolbar();
         setupRecyclerView();
+        checkFavoriteStatus();
         loadStandings();
     }
 
@@ -130,6 +137,9 @@ public class LeagueStandingsFragment extends Fragment
         binding.toolbar.setNavigationOnClickListener(v ->
                 requireActivity().getSupportFragmentManager().popBackStack()
         );
+
+        // Favori butonuna tıklandığında işlemi yap
+        binding.btnFavorite.setOnClickListener(v -> toggleFavorite());
     }
 
     /**
@@ -242,6 +252,71 @@ public class LeagueStandingsFragment extends Fragment
                 .replace(R.id.fragmentContainer, target)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    /**
+     * Firebase Firestore'dan ligin favori durumunu kontrol eder.
+     * Favori ise yıldız dolu, değilse boş gösterilir.
+     */
+    private void checkFavoriteStatus() {
+        if (!FirebaseManager.isLoggedIn()) return;
+
+        // isTeamOrLeagueFavorite method can check league alone if teamId is null.
+        FirebaseManager.isTeamOrLeagueFavorite(null, leagueId, isFav -> {
+            if (!isAdded() || binding == null) return;
+            isFavorite = isFav;
+            updateFavoriteIcon();
+        });
+    }
+
+    /**
+     * Favori butonunun ikonunu mevcut duruma göre günceller.
+     */
+    private void updateFavoriteIcon() {
+        binding.btnFavorite.setIconResource(
+                isFavorite ? R.drawable.ic_star_filled : R.drawable.ic_star
+        );
+    }
+
+    /**
+     * Ligi favoriye ekler veya çıkarır.
+     * Giriş yapılmamışsa uyarı gösterir.
+     */
+    private void toggleFavorite() {
+        if (!FirebaseManager.isLoggedIn()) {
+            showSnackbar(getString(R.string.login_required));
+            return;
+        }
+
+        if (isFavorite) {
+            // Favoriden çıkar
+            FirebaseManager.removeFavoriteLeague(leagueId,
+                    unused -> {
+                        if (!isAdded() || binding == null) return;
+                        isFavorite = false;
+                        updateFavoriteIcon();
+                        showSnackbar(getString(R.string.removed_from_favorites));
+                    },
+                    e -> showSnackbar(getString(R.string.error_loading))
+            );
+        } else {
+            // Favoriye ekle
+            FirebaseManager.addFavoriteLeague(leagueId, leagueName,
+                    unused -> {
+                        if (!isAdded() || binding == null) return;
+                        isFavorite = true;
+                        updateFavoriteIcon();
+                        showSnackbar(getString(R.string.added_to_favorites));
+                    },
+                    e -> showSnackbar(getString(R.string.error_loading))
+            );
+        }
+    }
+
+    private void showSnackbar(String message) {
+        if (getView() != null) {
+            Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     // ===== UI Durum Metodları =====

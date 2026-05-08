@@ -242,13 +242,21 @@ public class ProfileFragment extends Fragment {
         }
 
         // ── Ligler ──
+        Map<String, String> leagueNames = currentUser != null
+                ? currentUser.getFavoriteLeagueNames() : new HashMap<>();
+
         binding.llFavoriteLeagues.removeAllViews();
         if (favoriteLeagues == null || favoriteLeagues.isEmpty()) {
             addEmptyRow(binding.llFavoriteLeagues);
         } else {
             for (String leagueId : favoriteLeagues) {
-                String name = leagueNameMap.containsKey(leagueId)
-                        ? leagueNameMap.get(leagueId) : leagueId;
+                String name = leagueId;
+                if (leagueNames.containsKey(leagueId) && leagueNames.get(leagueId) != null && !leagueNames.get(leagueId).isEmpty()) {
+                    name = leagueNames.get(leagueId);
+                } else if (leagueNameMap.containsKey(leagueId)) {
+                    name = leagueNameMap.get(leagueId);
+                }
+                
                 final String finalName = name;
                 addFavoriteRow(binding.llFavoriteLeagues, finalName,
                         v -> openLeague(leagueId, finalName));

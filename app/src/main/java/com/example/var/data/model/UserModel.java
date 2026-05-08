@@ -59,6 +59,9 @@ public class UserModel {
     /** Favori takımların ligleri: teamId → leagueId */
     private Map<String, String> favoriteTeamLeagues;
 
+    /** Favori liglerin adları: leagueId → leagueName */
+    private Map<String, String> favoriteLeagueNames;
+
     /**
      * Firestore deserialization için boş yapıcı metot.
      * Firestore, nesneyi oluştururken bu yapıcıyı kullanır.
@@ -68,6 +71,7 @@ public class UserModel {
         this.favoriteLeagues = new ArrayList<>();
         this.favoriteTeamNames = new HashMap<>();
         this.favoriteTeamLeagues = new HashMap<>();
+        this.favoriteLeagueNames = new HashMap<>();
     }
 
     /**
@@ -86,6 +90,7 @@ public class UserModel {
         this.favoriteLeagues = new ArrayList<>();
         this.favoriteTeamNames = new HashMap<>();
         this.favoriteTeamLeagues = new HashMap<>();
+        this.favoriteLeagueNames = new HashMap<>();
     }
 
     // ===== Getter ve Setter Metodları =====
@@ -121,6 +126,11 @@ public class UserModel {
         return favoriteTeamLeagues != null ? favoriteTeamLeagues : new HashMap<>();
     }
     public void setFavoriteTeamLeagues(Map<String, String> favoriteTeamLeagues) { this.favoriteTeamLeagues = favoriteTeamLeagues; }
+
+    public Map<String, String> getFavoriteLeagueNames() {
+        return favoriteLeagueNames != null ? favoriteLeagueNames : new HashMap<>();
+    }
+    public void setFavoriteLeagueNames(Map<String, String> favoriteLeagueNames) { this.favoriteLeagueNames = favoriteLeagueNames; }
 
     // ===== Yardımcı Metodlar =====
 

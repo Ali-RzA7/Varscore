@@ -234,7 +234,7 @@ public class StandingsFragment extends Fragment
                     e -> showSnackbar(getString(R.string.error_loading)));
         } else {
             // Favoriye ekle
-            FirebaseManager.addFavoriteLeague(league.getLeagueId(),
+            FirebaseManager.addFavoriteLeague(league.getLeagueId(), league.getName(),
                     unused -> {
                         if (!isAdded())
                             return;

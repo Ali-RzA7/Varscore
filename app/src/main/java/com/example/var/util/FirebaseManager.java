@@ -57,6 +57,9 @@ public class FirebaseManager {
     /** Firestore'daki favori takım adları haritası alanı */
     private static final String FIELD_FAVORITE_TEAM_NAMES = "favoriteTeamNames";
 
+    /** Firestore'daki favori lig adları haritası alanı */
+    private static final String FIELD_FAVORITE_LEAGUE_NAMES = "favoriteLeagueNames";
+
     /** Firestore'daki favori takım ligleri haritası alanı */
     private static final String FIELD_FAVORITE_TEAM_LEAGUES = "favoriteTeamLeagues";
 
@@ -184,6 +187,13 @@ public class FirebaseManager {
                             if (teamLeagues != null) user.setFavoriteTeamLeagues(teamLeagues);
                         } catch (Exception e) { e.printStackTrace(); }
 
+                        try {
+                            @SuppressWarnings("unchecked")
+                            Map<String, String> leagueNames =
+                                    (Map<String, String>) snapshot.get(FIELD_FAVORITE_LEAGUE_NAMES);
+                            if (leagueNames != null) user.setFavoriteLeagueNames(leagueNames);
+                        } catch (Exception e) { e.printStackTrace(); }
+
                         onSuccess.onSuccess(user);
                     } else {
                         // Profil yok (ilk giriş sonrası oluşturulmamış)
@@ -273,10 +283,11 @@ public class FirebaseManager {
      * Örneğin "Süper Lig" favoriye eklenince 18 takımın tüm maçları takip edilir.
      *
      * @param leagueId  Eklenecek ligin iSportsAPI ID'si
+     * @param leagueName Ligin adı
      * @param onSuccess Başarı callback'i
      * @param onFailure Hata callback'i
      */
-    public static void addFavoriteLeague(String leagueId,
+    public static void addFavoriteLeague(String leagueId, String leagueName,
             OnSuccessListener<Void> onSuccess,
             OnFailureListener onFailure) {
 
@@ -288,8 +299,11 @@ public class FirebaseManager {
 
         Map<String, Object> addData = new HashMap<>();
         addData.put(FIELD_FAVORITE_LEAGUES, FieldValue.arrayUnion(leagueId));
+        if (leagueName != null && !leagueName.isEmpty()) {
+            addData.put(FIELD_FAVORITE_LEAGUE_NAMES + "." + leagueId, leagueName);
+        }
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .set(addData, SetOptions.merge())
+                .update(addData)
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
@@ -310,8 +324,9 @@ public class FirebaseManager {
 
         Map<String, Object> removeData = new HashMap<>();
         removeData.put(FIELD_FAVORITE_LEAGUES, FieldValue.arrayRemove(leagueId));
+        removeData.put(FIELD_FAVORITE_LEAGUE_NAMES + "." + leagueId, FieldValue.delete());
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .set(removeData, SetOptions.merge())
+                .update(removeData)
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
