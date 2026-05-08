@@ -5,17 +5,22 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.var.BuildConfig;
 import com.example.var.R;
+import com.example.var.data.model.ApiResponse;
+import com.example.var.data.model.LeagueModel;
 import com.example.var.data.model.UserModel;
+import com.example.var.data.repository.MatchRepository;
 import com.example.var.databinding.FragmentProfileBinding;
 import com.example.var.ui.dialog.SettingsDialogFragment;
 import com.example.var.util.FirebaseManager;
@@ -25,7 +30,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * ProfileFragment - Giriş yapmış kullanıcının profil ekranı.
@@ -58,6 +69,11 @@ public class ProfileFragment extends Fragment {
     /** Mevcut kullanıcı profil verisi */
     private UserModel currentUser;
 
+    /** Ligleri adlandırmak için kullanılan tüm lig listesi */
+    private Map<String, String> leagueNameMap = new HashMap<>();
+
+    private MatchRepository repository;
+
     /**
      * Galeriden fotoğraf seçmek için ActivityResultLauncher.
      * Seçilen URI'yi Firebase Storage'a yükler.
@@ -85,8 +101,10 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         prefs = new PreferencesManager(requireContext());
+        repository = new MatchRepository(BuildConfig.API_KEY);
 
         setupClickListeners();
+        loadLeagueNames();
         loadUserProfile();
     }
 
@@ -146,7 +164,8 @@ public class ProfileFragment extends Fragment {
                         loadProfilePhoto(user.getPhotoUrl());
                     }
                     // Favori listelerini göster
-                    displayFavorites(user.getFavoriteTeams(), user.getFavoriteLeagues());
+                    displayFavorites(user.getFavoriteTeams(), user.getFavoriteLeagues(),
+                            user.getFavoriteTeamNames());
                 },
                 e -> { /* Sessizce başarısız ol, temel bilgiler zaten gösteriliyor */ }
         );
@@ -167,28 +186,148 @@ public class ProfileFragment extends Fragment {
                 .into(binding.ivProfilePhoto);
     }
 
+    /** Tüm ligleri API'den çekip leagueId → leagueName haritasını doldurur. */
+    private void loadLeagueNames() {
+        repository.getLeagues().enqueue(new Callback<ApiResponse<LeagueModel>>() {
+            @Override
+            public void onResponse(@NonNull Call<ApiResponse<LeagueModel>> call,
+                    @NonNull Response<ApiResponse<LeagueModel>> response) {
+                if (!isAdded() || binding == null) return;
+                if (!response.isSuccessful() || response.body() == null
+                        || response.body().getData() == null) return;
+                for (LeagueModel l : response.body().getData()) {
+                    if (l.getLeagueId() != null && l.getName() != null) {
+                        leagueNameMap.put(l.getLeagueId(), l.getName());
+                    }
+                }
+                // Kullanıcı profili zaten yüklendiyse lig adlarıyla ligleri yeniden çiz
+                if (currentUser != null) {
+                    displayFavorites(currentUser.getFavoriteTeams(),
+                            currentUser.getFavoriteLeagues(),
+                            currentUser.getFavoriteTeamNames());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ApiResponse<LeagueModel>> call, @NonNull Throwable t) { }
+        });
+    }
+
     /**
-     * Favori takım ve lig listelerini ekranda gösterir.
-     *
-     * @param favoriteTeams   Favori takım ID listesi (sadece sayıyı gösteriyoruz)
-     * @param favoriteLeagues Favori lig ID listesi
+     * Favori takım ve ligleri clickable satırlar olarak gösterir.
      */
-    private void displayFavorites(List<String> favoriteTeams, List<String> favoriteLeagues) {
-        // Favori takım sayısı
+    private void displayFavorites(List<String> favoriteTeams, List<String> favoriteLeagues,
+            Map<String, String> teamNames) {
+        Map<String, String> teamLeagues = currentUser != null
+                ? currentUser.getFavoriteTeamLeagues() : new HashMap<>();
+
+        // ── Takımlar ──
+        binding.llFavoriteTeams.removeAllViews();
         if (favoriteTeams == null || favoriteTeams.isEmpty()) {
-            binding.tvFavoriteTeams.setText(getString(R.string.no_favorites));
+            addEmptyRow(binding.llFavoriteTeams);
         } else {
-            binding.tvFavoriteTeams.setText(
-                    getString(R.string.favorite_count, favoriteTeams.size()));
+            for (String teamId : favoriteTeams) {
+                final String storedLeagueId = teamLeagues.containsKey(teamId)
+                        ? teamLeagues.get(teamId) : null;
+                boolean hasName = teamNames != null && teamNames.containsKey(teamId)
+                        && teamNames.get(teamId) != null && !teamNames.get(teamId).isEmpty();
+                final String name = hasName ? teamNames.get(teamId) : "";
+                View row = addFavoriteRow(binding.llFavoriteTeams,
+                        hasName ? name : "Yükleniyor…",
+                        v -> openTeam(teamId, name, storedLeagueId));
+                if (!hasName && storedLeagueId != null) {
+                    resolveTeamNameFromStandings(teamId, storedLeagueId, row);
+                }
+            }
         }
 
-        // Favori lig sayısı
+        // ── Ligler ──
+        binding.llFavoriteLeagues.removeAllViews();
         if (favoriteLeagues == null || favoriteLeagues.isEmpty()) {
-            binding.tvFavoriteLeagues.setText(getString(R.string.no_favorites));
+            addEmptyRow(binding.llFavoriteLeagues);
         } else {
-            binding.tvFavoriteLeagues.setText(
-                    getString(R.string.favorite_count, favoriteLeagues.size()));
+            for (String leagueId : favoriteLeagues) {
+                String name = leagueNameMap.containsKey(leagueId)
+                        ? leagueNameMap.get(leagueId) : leagueId;
+                final String finalName = name;
+                addFavoriteRow(binding.llFavoriteLeagues, finalName,
+                        v -> openLeague(leagueId, finalName));
+            }
         }
+    }
+
+    /**
+     * leagueId'nin standings/teamInfos listesinden teamId'ye karşılık gelen takım adını bulur.
+     * Bulunca satırı günceller ve Firestore'a kaydeder.
+     */
+    private void resolveTeamNameFromStandings(String teamId, String leagueId, View row) {
+        repository.getLeagueTable(leagueId).enqueue(new Callback<com.example.var.data.model.StandingLeagueResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<com.example.var.data.model.StandingLeagueResponse> call,
+                    @NonNull Response<com.example.var.data.model.StandingLeagueResponse> response) {
+                if (!isAdded() || binding == null) return;
+                if (!response.isSuccessful() || response.body() == null
+                        || !response.body().isSuccess()
+                        || response.body().getData() == null) return;
+
+                List<com.example.var.data.model.StandingLeagueResponse.TeamInfo> infos =
+                        response.body().getData().getTeamInfos();
+                if (infos == null) return;
+
+                for (com.example.var.data.model.StandingLeagueResponse.TeamInfo ti : infos) {
+                    if (teamId.equals(ti.getTeamId()) && ti.getName() != null) {
+                        final String resolvedName = ti.getName();
+                        ((TextView) row.findViewById(R.id.tvFavoriteName)).setText(resolvedName);
+                        row.setOnClickListener(v -> openTeam(teamId, resolvedName, leagueId));
+                        FirebaseManager.addFavoriteTeam(teamId, resolvedName, leagueId, u -> {}, e -> {});
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<com.example.var.data.model.StandingLeagueResponse> call,
+                    @NonNull Throwable t) { }
+        });
+    }
+
+    private View addFavoriteRow(LinearLayout container, String label, View.OnClickListener onClick) {
+        View row = LayoutInflater.from(requireContext())
+                .inflate(R.layout.item_favorite_row, container, false);
+        ((TextView) row.findViewById(R.id.tvFavoriteName)).setText(label);
+        row.setOnClickListener(onClick);
+        container.addView(row);
+        return row;
+    }
+
+    private void addEmptyRow(LinearLayout container) {
+        TextView tv = new TextView(requireContext());
+        tv.setText(getString(R.string.no_favorites));
+        tv.setTextColor(requireContext().getColor(android.R.color.darker_gray));
+        int pad = (int) (8 * getResources().getDisplayMetrics().density);
+        tv.setPadding(0, pad, 0, pad);
+        container.addView(tv);
+    }
+
+    private void openLeague(String leagueId, String leagueName) {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right)
+                .replace(R.id.fragmentContainer, LeagueStandingsFragment.newInstance(leagueId, leagueName))
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void openTeam(String teamId, String teamName, String leagueId) {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right)
+                .replace(R.id.fragmentContainer,
+                        TeamMatchesFragment.newInstance(teamId, teamName, leagueId))
+                .addToBackStack(null)
+                .commit();
     }
 
     /**

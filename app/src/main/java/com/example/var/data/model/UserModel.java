@@ -1,7 +1,9 @@
 package com.example.var.data.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * UserModel - Firebase Firestore'da saklanan kullanıcı profilini temsil eder.
@@ -51,6 +53,12 @@ public class UserModel {
      */
     private List<String> favoriteLeagues;
 
+    /** Favori takımların adları: teamId → teamName */
+    private Map<String, String> favoriteTeamNames;
+
+    /** Favori takımların ligleri: teamId → leagueId */
+    private Map<String, String> favoriteTeamLeagues;
+
     /**
      * Firestore deserialization için boş yapıcı metot.
      * Firestore, nesneyi oluştururken bu yapıcıyı kullanır.
@@ -58,6 +66,8 @@ public class UserModel {
     public UserModel() {
         this.favoriteTeams = new ArrayList<>();
         this.favoriteLeagues = new ArrayList<>();
+        this.favoriteTeamNames = new HashMap<>();
+        this.favoriteTeamLeagues = new HashMap<>();
     }
 
     /**
@@ -74,6 +84,8 @@ public class UserModel {
         this.photoUrl = "";
         this.favoriteTeams = new ArrayList<>();
         this.favoriteLeagues = new ArrayList<>();
+        this.favoriteTeamNames = new HashMap<>();
+        this.favoriteTeamLeagues = new HashMap<>();
     }
 
     // ===== Getter ve Setter Metodları =====
@@ -99,6 +111,16 @@ public class UserModel {
         return favoriteLeagues != null ? favoriteLeagues : new ArrayList<>();
     }
     public void setFavoriteLeagues(List<String> favoriteLeagues) { this.favoriteLeagues = favoriteLeagues; }
+
+    public Map<String, String> getFavoriteTeamNames() {
+        return favoriteTeamNames != null ? favoriteTeamNames : new HashMap<>();
+    }
+    public void setFavoriteTeamNames(Map<String, String> favoriteTeamNames) { this.favoriteTeamNames = favoriteTeamNames; }
+
+    public Map<String, String> getFavoriteTeamLeagues() {
+        return favoriteTeamLeagues != null ? favoriteTeamLeagues : new HashMap<>();
+    }
+    public void setFavoriteTeamLeagues(Map<String, String> favoriteTeamLeagues) { this.favoriteTeamLeagues = favoriteTeamLeagues; }
 
     // ===== Yardımcı Metodlar =====
 

@@ -223,15 +223,14 @@
                         android:text="@string/favorite_teams"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_body"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/margin_xs" />
 
-                    <TextView
-                        android:id="@+id/tvFavoriteTeams"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/llFavoriteTeams"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_xs"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="@dimen/text_body_small" />
+                        android:orientation="vertical" />
 
                     <View android:layout_width="match_parent" android:layout_height="1dp"
                         android:background="?attr/colorOutline" android:layout_marginVertical="@dimen/margin_md"/>
@@ -243,15 +242,14 @@
                         android:text="@string/favorite_leagues"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_body"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/margin_xs" />
 
-                    <TextView
-                        android:id="@+id/tvFavoriteLeagues"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/llFavoriteLeagues"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_xs"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="@dimen/text_body_small" />
+                        android:orientation="vertical" />
 
                     <!-- Favoriler lig açıklaması -->
                     <com.google.android.material.card.MaterialCardView

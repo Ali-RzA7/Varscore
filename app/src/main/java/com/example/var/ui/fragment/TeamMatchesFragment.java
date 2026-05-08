@@ -222,7 +222,7 @@ public class TeamMatchesFragment extends Fragment
             );
         } else {
             // Favoriye ekle
-            FirebaseManager.addFavoriteTeam(teamId,
+            FirebaseManager.addFavoriteTeam(teamId, teamName, leagueId,
                     unused -> {
                         if (!isAdded()) return;
                         isFavorite = true;

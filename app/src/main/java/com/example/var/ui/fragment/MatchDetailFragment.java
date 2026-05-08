@@ -208,7 +208,7 @@ public class MatchDetailFragment extends Fragment {
             switch (position) {
                 case 0: tab.setText(R.string.match_details); break;
                 case 1: tab.setText("İstatistik"); break;
-                case 2: tab.setText("H2H"); break;
+                case 2: tab.setText("Karşılaştırma"); break;
                 case 3: tab.setText("Kadro"); break;
             }
         }).attach();
@@ -266,7 +266,7 @@ public class MatchDetailFragment extends Fragment {
             switch (position) {
                 case 0: return MatchSummaryFragment.newInstance(match.getMatchId());
                 case 1: return MatchStatsFragment.newInstance(match);
-                case 2: return MatchH2HFragment.newInstance(match.getMatchId());
+                case 2: return MatchH2HFragment.newInstance(match);
                 default: return KadroFragment.newInstance(match);
             }
         }

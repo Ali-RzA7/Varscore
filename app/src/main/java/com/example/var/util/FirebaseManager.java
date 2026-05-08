@@ -54,6 +54,12 @@ public class FirebaseManager {
     /** Firestore'daki favori ligler alanı */
     private static final String FIELD_FAVORITE_LEAGUES = "favoriteLeagues";
 
+    /** Firestore'daki favori takım adları haritası alanı */
+    private static final String FIELD_FAVORITE_TEAM_NAMES = "favoriteTeamNames";
+
+    /** Firestore'daki favori takım ligleri haritası alanı */
+    private static final String FIELD_FAVORITE_TEAM_LEAGUES = "favoriteTeamLeagues";
+
     // ===== Auth İşlemleri =====
 
     /**
@@ -157,6 +163,16 @@ public class FirebaseManager {
                         if (teams != null) user.setFavoriteTeams(teams);
                         if (leagues != null) user.setFavoriteLeagues(leagues);
 
+                        @SuppressWarnings("unchecked")
+                        Map<String, String> teamNames =
+                                (Map<String, String>) snapshot.get(FIELD_FAVORITE_TEAM_NAMES);
+                        if (teamNames != null) user.setFavoriteTeamNames(teamNames);
+
+                        @SuppressWarnings("unchecked")
+                        Map<String, String> teamLeagues =
+                                (Map<String, String>) snapshot.get(FIELD_FAVORITE_TEAM_LEAGUES);
+                        if (teamLeagues != null) user.setFavoriteTeamLeagues(teamLeagues);
+
                         onSuccess.onSuccess(user);
                     } else {
                         // Profil yok (ilk giriş sonrası oluşturulmamış)
@@ -179,6 +195,18 @@ public class FirebaseManager {
     public static void addFavoriteTeam(String teamId,
             OnSuccessListener<Void> onSuccess,
             OnFailureListener onFailure) {
+        addFavoriteTeam(teamId, null, onSuccess, onFailure);
+    }
+
+    public static void addFavoriteTeam(String teamId, String teamName,
+            OnSuccessListener<Void> onSuccess,
+            OnFailureListener onFailure) {
+        addFavoriteTeam(teamId, teamName, null, onSuccess, onFailure);
+    }
+
+    public static void addFavoriteTeam(String teamId, String teamName, String leagueId,
+            OnSuccessListener<Void> onSuccess,
+            OnFailureListener onFailure) {
 
         FirebaseUser user = getCurrentUser();
         if (user == null) {
@@ -188,6 +216,12 @@ public class FirebaseManager {
 
         Map<String, Object> addData = new HashMap<>();
         addData.put(FIELD_FAVORITE_TEAMS, FieldValue.arrayUnion(teamId));
+        if (teamName != null && !teamName.isEmpty()) {
+            addData.put(FIELD_FAVORITE_TEAM_NAMES + "." + teamId, teamName);
+        }
+        if (leagueId != null && !leagueId.isEmpty()) {
+            addData.put(FIELD_FAVORITE_TEAM_LEAGUES + "." + teamId, leagueId);
+        }
         db.collection(USERS_COLLECTION).document(user.getUid())
                 .set(addData, SetOptions.merge())
                 .addOnSuccessListener(onSuccess)
@@ -210,6 +244,8 @@ public class FirebaseManager {
 
         Map<String, Object> removeData = new HashMap<>();
         removeData.put(FIELD_FAVORITE_TEAMS, FieldValue.arrayRemove(teamId));
+        removeData.put(FIELD_FAVORITE_TEAM_NAMES + "." + teamId, FieldValue.delete());
+        removeData.put(FIELD_FAVORITE_TEAM_LEAGUES + "." + teamId, FieldValue.delete());
         db.collection(USERS_COLLECTION).document(user.getUid())
                 .set(removeData, SetOptions.merge())
                 .addOnSuccessListener(onSuccess)
