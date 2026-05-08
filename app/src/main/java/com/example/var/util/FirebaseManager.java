@@ -157,23 +157,32 @@ public class FirebaseManager {
                         user.setEmail(snapshot.getString("email"));
                         user.setPhotoUrl(snapshot.getString("photoUrl"));
 
-                        // Favori listelerini al (null kontrolü ile)
-                        @SuppressWarnings("unchecked")
-                        List<String> teams = (List<String>) snapshot.get(FIELD_FAVORITE_TEAMS);
-                        @SuppressWarnings("unchecked")
-                        List<String> leagues = (List<String>) snapshot.get(FIELD_FAVORITE_LEAGUES);
-                        if (teams != null) user.setFavoriteTeams(teams);
-                        if (leagues != null) user.setFavoriteLeagues(leagues);
+                        // Favori listelerini al (null kontrolü ve try-catch ile)
+                        try {
+                            @SuppressWarnings("unchecked")
+                            List<String> teams = (List<String>) snapshot.get(FIELD_FAVORITE_TEAMS);
+                            if (teams != null) user.setFavoriteTeams(teams);
+                        } catch (Exception e) { e.printStackTrace(); }
 
-                        @SuppressWarnings("unchecked")
-                        Map<String, String> teamNames =
-                                (Map<String, String>) snapshot.get(FIELD_FAVORITE_TEAM_NAMES);
-                        if (teamNames != null) user.setFavoriteTeamNames(teamNames);
+                        try {
+                            @SuppressWarnings("unchecked")
+                            List<String> leagues = (List<String>) snapshot.get(FIELD_FAVORITE_LEAGUES);
+                            if (leagues != null) user.setFavoriteLeagues(leagues);
+                        } catch (Exception e) { e.printStackTrace(); }
 
-                        @SuppressWarnings("unchecked")
-                        Map<String, String> teamLeagues =
-                                (Map<String, String>) snapshot.get(FIELD_FAVORITE_TEAM_LEAGUES);
-                        if (teamLeagues != null) user.setFavoriteTeamLeagues(teamLeagues);
+                        try {
+                            @SuppressWarnings("unchecked")
+                            Map<String, String> teamNames =
+                                    (Map<String, String>) snapshot.get(FIELD_FAVORITE_TEAM_NAMES);
+                            if (teamNames != null) user.setFavoriteTeamNames(teamNames);
+                        } catch (Exception e) { e.printStackTrace(); }
+
+                        try {
+                            @SuppressWarnings("unchecked")
+                            Map<String, String> teamLeagues =
+                                    (Map<String, String>) snapshot.get(FIELD_FAVORITE_TEAM_LEAGUES);
+                            if (teamLeagues != null) user.setFavoriteTeamLeagues(teamLeagues);
+                        } catch (Exception e) { e.printStackTrace(); }
 
                         onSuccess.onSuccess(user);
                     } else {
@@ -280,7 +289,7 @@ public class FirebaseManager {
         Map<String, Object> addData = new HashMap<>();
         addData.put(FIELD_FAVORITE_LEAGUES, FieldValue.arrayUnion(leagueId));
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .update(addData)
+                .set(addData, SetOptions.merge())
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
@@ -302,7 +311,7 @@ public class FirebaseManager {
         Map<String, Object> removeData = new HashMap<>();
         removeData.put(FIELD_FAVORITE_LEAGUES, FieldValue.arrayRemove(leagueId));
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .update(removeData)
+                .set(removeData, SetOptions.merge())
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }

@@ -204,6 +204,7 @@ public class HomeFragment extends Fragment implements
 
         // Bugünün tarihini ortaya kaydır
         binding.rvDatePicker.post(() -> {
+            if (binding == null || binding.rvDatePicker == null) return;
             int todayPos = datePickerAdapter.getTodayPosition();
             layoutManager.scrollToPositionWithOffset(todayPos,
                     binding.rvDatePicker.getWidth() / 2 - 80);
