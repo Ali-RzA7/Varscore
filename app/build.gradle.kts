@@ -80,6 +80,9 @@ dependencies {
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.3.0")
 
+    // WorkManager — arka plan maç izleme
+    implementation("androidx.work:work-runtime:2.10.0")
+
     // SharedPreferences
     implementation("androidx.preference:preference:1.2.1")
 

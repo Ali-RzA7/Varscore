@@ -10,17 +10,21 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.bumptech.glide.Glide;
 import com.example.var.BuildConfig;
 import com.example.var.R;
 import com.example.var.databinding.FragmentMatchDetailBinding;
 import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.MatchModel;
+import com.example.var.data.model.StandingLeagueResponse;
 import com.example.var.data.repository.MatchRepository;
 import com.example.var.ui.dialog.AIPredictionDialogFragment;
 import com.example.var.util.DateUtils;
 import com.example.var.util.FirebaseManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.List;
 
 import java.util.Calendar;
 
@@ -85,11 +89,55 @@ public class MatchDetailFragment extends Fragment {
         if (match != null) {
             bindMatchData();
             fetchDetailedInfo();
+            loadTeamLogos();
         }
 
         setupToolbar();
         setupViewPager();
         setupAiFab();
+    }
+
+    /**
+     * Ev sahibi ve deplasman takımlarının logolarını standing/league API'sinden çeker.
+     */
+    private void loadTeamLogos() {
+        if (match.getLeagueId() == null) return;
+
+        repository.getLeagueTable(match.getLeagueId()).enqueue(new Callback<StandingLeagueResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<StandingLeagueResponse> call,
+                    @NonNull Response<StandingLeagueResponse> response) {
+                if (!isAdded() || binding == null) return;
+                if (!response.isSuccessful() || response.body() == null
+                        || !response.body().isSuccess()
+                        || response.body().getData() == null) return;
+
+                List<StandingLeagueResponse.TeamInfo> teamInfos =
+                        response.body().getData().getTeamInfos();
+                if (teamInfos == null) return;
+
+                for (StandingLeagueResponse.TeamInfo ti : teamInfos) {
+                    if (ti.getTeamId() == null || ti.getLogo() == null || ti.getLogo().isEmpty()) continue;
+                    if (ti.getTeamId().equals(match.getHomeId())) {
+                        Glide.with(MatchDetailFragment.this)
+                                .load(ti.getLogo())
+                                .placeholder(R.drawable.ic_launcher_background)
+                                .into(binding.ivHomeLogo);
+                    }
+                    if (ti.getTeamId().equals(match.getAwayId())) {
+                        Glide.with(MatchDetailFragment.this)
+                                .load(ti.getLogo())
+                                .placeholder(R.drawable.ic_launcher_background)
+                                .into(binding.ivAwayLogo);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<StandingLeagueResponse> call, @NonNull Throwable t) {
+                // Sessiz hata — logo olmadan devam et
+            }
+        });
     }
 
     /**
@@ -159,10 +207,9 @@ public class MatchDetailFragment extends Fragment {
         new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
             switch (position) {
                 case 0: tab.setText(R.string.match_details); break;
-                case 1: tab.setText(R.string.lineup); break;
-                case 2: tab.setText("İstatistik"); break;
-                case 3: tab.setText("H2H"); break;
-                case 4: tab.setText("Oranlar"); break;
+                case 1: tab.setText("İstatistik"); break;
+                case 2: tab.setText("H2H"); break;
+                case 3: tab.setText("Kadro"); break;
             }
         }).attach();
     }
@@ -218,16 +265,15 @@ public class MatchDetailFragment extends Fragment {
         public Fragment createFragment(int position) {
             switch (position) {
                 case 0: return MatchSummaryFragment.newInstance(match.getMatchId());
-                case 1: return MatchLineupFragment.newInstance(match.getMatchId());
-                case 2: return MatchStatsFragment.newInstance(match);
-                case 3: return MatchH2HFragment.newInstance(match.getMatchId());
-                default: return new Fragment(); // Oranlar — ileride eklenecek
+                case 1: return MatchStatsFragment.newInstance(match);
+                case 2: return MatchH2HFragment.newInstance(match.getMatchId());
+                default: return KadroFragment.newInstance(match);
             }
         }
 
         @Override
         public int getItemCount() {
-            return 5;
+            return 4;
         }
     }
 

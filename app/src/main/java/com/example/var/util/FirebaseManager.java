@@ -9,7 +9,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.List;
@@ -184,9 +186,10 @@ public class FirebaseManager {
             return;
         }
 
+        Map<String, Object> addData = new HashMap<>();
+        addData.put(FIELD_FAVORITE_TEAMS, FieldValue.arrayUnion(teamId));
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .update(FIELD_FAVORITE_TEAMS,
-                        com.google.firebase.firestore.FieldValue.arrayUnion(teamId))
+                .set(addData, SetOptions.merge())
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
@@ -205,9 +208,10 @@ public class FirebaseManager {
         FirebaseUser user = getCurrentUser();
         if (user == null) return;
 
+        Map<String, Object> removeData = new HashMap<>();
+        removeData.put(FIELD_FAVORITE_TEAMS, FieldValue.arrayRemove(teamId));
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .update(FIELD_FAVORITE_TEAMS,
-                        com.google.firebase.firestore.FieldValue.arrayRemove(teamId))
+                .set(removeData, SetOptions.merge())
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
@@ -235,9 +239,10 @@ public class FirebaseManager {
             return;
         }
 
+        Map<String, Object> addData = new HashMap<>();
+        addData.put(FIELD_FAVORITE_LEAGUES, FieldValue.arrayUnion(leagueId));
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .update(FIELD_FAVORITE_LEAGUES,
-                        com.google.firebase.firestore.FieldValue.arrayUnion(leagueId))
+                .set(addData, SetOptions.merge())
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
@@ -256,9 +261,10 @@ public class FirebaseManager {
         FirebaseUser user = getCurrentUser();
         if (user == null) return;
 
+        Map<String, Object> removeData = new HashMap<>();
+        removeData.put(FIELD_FAVORITE_LEAGUES, FieldValue.arrayRemove(leagueId));
         db.collection(USERS_COLLECTION).document(user.getUid())
-                .update(FIELD_FAVORITE_LEAGUES,
-                        com.google.firebase.firestore.FieldValue.arrayRemove(leagueId))
+                .set(removeData, SetOptions.merge())
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }

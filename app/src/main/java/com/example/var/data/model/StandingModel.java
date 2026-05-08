@@ -56,6 +56,17 @@ public class StandingModel {
     @SerializedName("integral")
     private int points;
 
+    /**
+     * Son 6 maç formu: 0=Galibiyet, 1=Beraberlik, 2=Mağlubiyet, 3=Boş
+     * (iSportsAPI /standing/league yanıtından gelir)
+     */
+    @SerializedName("recentFirstResult")  private int recentFirst;
+    @SerializedName("recentSecondResult") private int recentSecond;
+    @SerializedName("recentThirdResult")  private int recentThird;
+    @SerializedName("recentFourthResult") private int recentFourth;
+    @SerializedName("recentFifthResult")  private int recentFifth;
+    @SerializedName("recentSixthResult")  private int recentSixth;
+
     // ===== Getter Metodları =====
 
     /** @return Takımın ligteki sırası */
@@ -98,7 +109,11 @@ public class StandingModel {
      *
      * @return Pozitif sayı → gol avantajı, negatif → gol açığı
      */
-    public int getGoalDifference() {
-        return goalsFor - goalsAgainst;
+    public int getGoalDifference() { return goalsFor - goalsAgainst; }
+
+    /** Son 6 maç formu (en yeni = recentFirst). 0=G, 1=B, 2=M, 3=Boş */
+    public int[] getRecentForm() {
+        return new int[]{recentFirst, recentSecond, recentThird,
+                         recentFourth, recentFifth, recentSixth};
     }
 }

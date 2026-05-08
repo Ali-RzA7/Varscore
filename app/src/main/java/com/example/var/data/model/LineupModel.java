@@ -36,10 +36,10 @@ public class LineupModel {
         @SerializedName("playerId")
         private String playerId;
 
-        @SerializedName("playerName")
+        @SerializedName(value = "playerName", alternate = {"name"})
         private String playerName;
 
-        @SerializedName("number")
+        @SerializedName(value = "number", alternate = {"shirtNumber"})
         private int number;
 
         @SerializedName("position")

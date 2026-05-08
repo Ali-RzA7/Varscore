@@ -238,8 +238,62 @@ data: {
 | getTeamMatches | /schedule/basic?leagueId → client filtre | ✅ leagueId ile alınır, homeId/awayId==teamId filtrelenir |
 | getEvents | /analysis/event | ❓ Doğrulanmadı |
 | getStatistics | /analysis/statistics | ❓ Doğrulanmadı |
-| getAnalysis | /analysis | ❓ Doğrulanmadı |
-| getLineup | /analysis/lineup | ❓ Doğrulanmadı |
+| getAnalysis | /analysis | ✅ H2H + form karşılaştırması (docs id=109) |
+| getLineup | /analysis/lineup | ⚠️ Eski endpoint — yedek |
+| getLineups | /lineups | ✅ Güncel kadro endpoint'i (docs id=17) |
+
+---
+
+## 15. Lineups (Maç Kadrosu) ✅
+**Path:** `GET /sport/football/lineups`
+**Docs ID:** 17
+**Limit:** 10 sn/call | Tavsiye: Dakikada 1
+**Plan:** Live Data
+
+### Parametreler
+| Parametre | Zorunlu | Açıklama |
+|---|---|---|
+| matchId | Evet | Maç kimliği |
+
+### Yanıt Yapısı
+```
+data: [{
+  homeFormation: "4-3-3",
+  awayFormation: "4-4-2",
+  homeLineup: [ { playerId, playerName, number, position, isCaptain } ],
+  awayLineup: [ ... ],
+  homeBackup: [ ... ],   ← Yedekler
+  awayBackup: [ ... ]
+}]
+```
+
+### Notlar
+- `hasLineup` alanı `/schedule` veya `/livescores` yanıtında `true` ise kadro açıklanmıştır.
+- Kadro açıklanmadan önce bu endpoint boş liste döner.
+- `isCaptain` boolean, kaptan oyuncuyu işaretler.
+
+---
+
+## 16. Analysis (H2H + Form) ✅
+**Path:** `GET /sport/football/analysis`
+**Docs ID:** 109
+**Plan:** Stats
+
+### Parametreler
+| Parametre | Zorunlu | Açıklama |
+|---|---|---|
+| matchId | Evet | Maç kimliği |
+
+### Yanıt Yapısı (data[0])
+```json
+{
+  "homeDataVs": { "win", "draw", "lose", "scored", "conceded" },
+  "awayDataVs":  { "win", "draw", "lose", "scored", "conceded" },
+  "headToHead":  [ "string maç özeti", ... ]
+}
+```
+- `homeDataVs` / `awayDataVs`: İki takımın birbirine karşı W/D/L ve gol istatistikleri.
+- `headToHead`: Son karşılaşmaların metin listesi.
 
 ---
 

@@ -128,8 +128,13 @@ public class MatchRepository {
         return apiService.getStats(apiKey, matchId);
     }
 
-    /** Maç kadro bilgisini getirir: ilk 11, yedekler (/analysis/lineup) */
+    /** Maç kadro bilgisini getirir: ilk 11, yedekler (/analysis/lineup — eski) */
     public Call<ApiResponse<LineupModel>> getLineup(String matchId) {
         return apiService.getLineup(apiKey, matchId);
+    }
+
+    /** Maç kadro bilgisini getirir: formasyon + ilk 11 + yedekler (/lineups — güncel) */
+    public Call<ApiResponse<LineupModel>> getLineups(String matchId) {
+        return apiService.getLineups(apiKey, matchId);
     }
 }

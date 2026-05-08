@@ -166,6 +166,18 @@ public interface FootballApiService {
     );
 
     /**
+     * Maç kadrolarını getirir: formasyon, ilk 11 ve yedekler.
+     * Güncel endpoint — docs.html?id=17
+     * homeLineup/awayLineup: İlk 11, homeBackup/awayBackup: Yedekler
+     * Her oyuncu: playerId, playerName, number, position, isCaptain
+     */
+    @GET("lineups")
+    Call<ApiResponse<LineupModel>> getLineups(
+            @Query("api_key") String apiKey,
+            @Query("matchId") String matchId
+    );
+
+    /**
      * Tüm liglerin temel bilgilerini getirir.
      * Arama fonksiyonunda ve Puan Durumu ekranında lig listesi için kullanılır.
      *

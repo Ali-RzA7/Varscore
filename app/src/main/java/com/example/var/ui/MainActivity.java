@@ -5,13 +5,20 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.example.var.R;
 import com.example.var.ui.fragment.AccountFragment;
 import com.example.var.ui.fragment.HomeFragment;
 import com.example.var.ui.fragment.StandingsFragment;
+import com.example.var.util.MatchMonitorWorker;
+import com.example.var.util.NotificationHelper;
 import com.example.var.util.PreferencesManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * MainActivity - Uygulamanın tek Activity'si.
@@ -55,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         bottomNav = findViewById(R.id.bottomNav);
+
+        NotificationHelper.createChannels(this);
+        scheduleMatchMonitor();
 
         setupBottomNavigation();
 
@@ -120,6 +130,22 @@ public class MainActivity extends AppCompatActivity {
 
         transaction.replace(R.id.fragmentContainer, fragment)
                 .commit();
+    }
+
+    /**
+     * WorkManager ile arka planda periyodik maç izlemeyi başlatır.
+     * Her 15 dakikada bir favori takımların maçlarını kontrol eder.
+     * Unique work kullanıldığı için birden fazla kez çalıştırılmaz.
+     */
+    private void scheduleMatchMonitor() {
+        PeriodicWorkRequest work = new PeriodicWorkRequest.Builder(
+                MatchMonitorWorker.class, 15, TimeUnit.MINUTES)
+                .build();
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "match_monitor",
+                ExistingPeriodicWorkPolicy.KEEP,
+                work
+        );
     }
 
     /**
