@@ -204,7 +204,8 @@ public class LoginFragment extends Fragment {
         } catch (ApiException e) {
             if (!isAdded()) return;
             showLoading(false);
-            showSnackbar(getString(R.string.google_sign_in_failed));
+            Log.e(TAG, "Google Sign In failed. Status Code: " + e.getStatusCode(), e);
+            showSnackbar(getString(R.string.google_sign_in_failed) + " (Hata Kodu: " + e.getStatusCode() + ")");
         }
     }
 
