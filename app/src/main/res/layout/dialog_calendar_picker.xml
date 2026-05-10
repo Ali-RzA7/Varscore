@@ -60,13 +60,14 @@
             android:orientation="horizontal"
             android:layout_marginBottom="8dp">
 
-            <TextView style="@style/CalendarDayHeader" android:text="Pzt" />
-            <TextView style="@style/CalendarDayHeader" android:text="Sal" />
-            <TextView style="@style/CalendarDayHeader" android:text="Çar" />
-            <TextView style="@style/CalendarDayHeader" android:text="Per" />
-            <TextView style="@style/CalendarDayHeader" android:text="Cum" />
-            <TextView style="@style/CalendarDayHeader" android:text="Cmt" />
-            <TextView style="@style/CalendarDayHeader" android:text="Paz" />
+            <TextView style="@style/CalendarDayHeader" android:text="@string/day_mon" />
+            <TextView style="@style/CalendarDayHeader" android:text="@string/day_tue" />
+            <TextView style="@style/CalendarDayHeader" android:text="@string/day_wed" />
+            <TextView style="@style/CalendarDayHeader" android:text="@string/day_thu" />
+            <TextView style="@style/CalendarDayHeader" android:text="@string/day_fri" />
+            <TextView style="@style/CalendarDayHeader" android:text="@string/day_sat" />
+            <TextView style="@style/CalendarDayHeader" android:text="@string/day_sun" />
+
 
         </LinearLayout>
 
@@ -89,7 +90,7 @@
                 android:id="@+id/btnCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="İptal"
+                android:text="@string/cancel"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:textColor="@color/text_secondary_dark" />
 
@@ -98,7 +99,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Bugün"
+                android:text="@string/today"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:textColor="@color/secondary" />
 

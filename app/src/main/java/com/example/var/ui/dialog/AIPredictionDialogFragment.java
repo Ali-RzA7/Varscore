@@ -17,6 +17,8 @@ import com.example.var.data.model.MatchModel;
 import com.example.var.data.remote.GroqRetrofitClient;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import io.noties.markwon.Markwon;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +44,7 @@ import retrofit2.Response;
  * Groq API:
  * - Base URL: https://api.groq.com/openai/v1/
  * - Model: llama-3.3-70b-versatile
- * - API Key: BuildConfig.GROQ_API_KEY (local.properties'ten)
+ * - API Key: BuildConfig.GROQ_API_KEY (local.properties'ten BuildConfig üzerinden)
  */
 public class AIPredictionDialogFragment extends DialogFragment {
 
@@ -141,26 +143,13 @@ public class AIPredictionDialogFragment extends DialogFragment {
         String statusText = getStatusText(status);
 
         // Sistem mesajı: AI'ya futbol analisti kimliği ver
-        String systemPrompt = "Sen deneyimli bir futbol analisti ve tahmin uzmanısın. " +
-                "Verilen maç bilgileri ve mevcut durum üzerinden analiz yaparak " +
-                "oyunun nasıl sonuçlanabileceğini tahmin ediyorsun. " +
-                "Analizini Türkçe yap, net ve anlaşılır bir dil kullan.";
+        String systemPrompt = getString(R.string.ai_system_prompt);
+
 
         // Kullanıcı mesajı: Maç detayları
-        String userPrompt = String.format(
-                "Şu maçı analiz et ve tahmin yap:\n\n" +
-                "Lig: %s\n" +
-                "Ev Sahibi: %s\n" +
-                "Deplasman: %s\n" +
-                "Mevcut Skor: %d - %d\n" +
-                "Maç Durumu: %s\n\n" +
-                "Lütfen şunları içeren bir analiz yaz:\n" +
-                "1. Bu maç için tahminini\n" +
-                "2. Tahminin nedenlerini\n" +
-                "3. Olası final skoru\n" +
-                "4. Dikkat edilmesi gereken faktörler",
-                leagueName, homeTeam, awayTeam, homeScore, awayScore, statusText
-        );
+        String userPrompt = getString(R.string.ai_user_prompt,
+                leagueName, homeTeam, awayTeam, homeScore, awayScore, statusText);
+
 
         // Groq isteği oluştur
         List<GroqRequest.Message> messages = new ArrayList<>();
@@ -210,16 +199,17 @@ public class AIPredictionDialogFragment extends DialogFragment {
      */
     private String getStatusText(int status) {
         switch (status) {
-            case 0: return "Başlamadı";
-            case 1: return "1. Yarı";
-            case 2: return "Devre Arası";
-            case 3: return "2. Yarı";
-            case 4: return "Uzatma";
-            case 5: return "Penaltılar";
-            case -1: return "Maç Sona Erdi";
-            default: return "Bilinmiyor";
+            case 0: return getString(R.string.status_not_started);
+            case 1: return getString(R.string.status_first_half);
+            case 2: return getString(R.string.status_half_time);
+            case 3: return getString(R.string.status_second_half);
+            case 4: return getString(R.string.status_extra_time);
+            case 5: return getString(R.string.status_penalties);
+            case -1: return getString(R.string.status_finished_full);
+            default: return getString(R.string.unknown);
         }
     }
+
 
     // ===== UI Durum Metodları =====
 
@@ -239,7 +229,10 @@ public class AIPredictionDialogFragment extends DialogFragment {
         loadingContainer.setVisibility(View.GONE);
         resultContainer.setVisibility(View.VISIBLE);
         errorContainer.setVisibility(View.GONE);
-        tvPrediction.setText(prediction);
+        
+        // Markdown formatında render et
+        final Markwon markwon = Markwon.create(requireContext());
+        markwon.setMarkdown(tvPrediction, prediction);
     }
 
     /**

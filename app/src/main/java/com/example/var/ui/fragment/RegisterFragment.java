@@ -142,16 +142,16 @@ public class RegisterFragment extends Fragment {
                         // Kullanıcıya anlamlı hata mesajı göster
                         switch (code) {
                             case "ERROR_EMAIL_ALREADY_IN_USE":
-                                showSnackbar("Bu e-posta adresi zaten kayıtlı");
+                                showSnackbar(getString(R.string.error_email_already_in_use));
                                 break;
                             case "ERROR_INVALID_EMAIL":
-                                showSnackbar("Geçersiz e-posta adresi");
+                                showSnackbar(getString(R.string.error_invalid_email_firebase));
                                 break;
                             case "ERROR_WEAK_PASSWORD":
-                                showSnackbar("Şifre çok zayıf, daha güçlü bir şifre seçin");
+                                showSnackbar(getString(R.string.error_weak_password));
                                 break;
                             case "ERROR_OPERATION_NOT_ALLOWED":
-                                showSnackbar("E-posta/şifre girişi Firebase Console'da aktif değil");
+                                showSnackbar(getString(R.string.error_operation_not_allowed));
                                 break;
                             default:
                                 showSnackbar(getString(R.string.register_failed) + " (" + code + ")");
@@ -216,9 +216,10 @@ public class RegisterFragment extends Fragment {
                     showLoading(false);
                     
                     if (task.isSuccessful()) {
-                        showSnackbar("Kayıt başarılı! Giriş yapmadan önce e-postanızı doğrulamanız gerekmektedir.");
+                        showSnackbar(getString(R.string.register_success_verify));
                     } else {
-                        showSnackbar("Kayıt başarılı ancak doğrulama e-postası gönderilemedi.");
+                        showSnackbar(getString(R.string.register_success_no_verify));
+
                     }
                     
                     // Kullanıcıyı doğrulamadan uygulamaya sokmamak için hemen çıkış yapıyoruz

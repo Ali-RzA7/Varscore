@@ -30,7 +30,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Son Form"
+                    android:text="@string/recent_form"
                     android:textColor="?android:attr/textColorPrimary"
                     android:textStyle="bold"
                     android:textSize="14sp"
@@ -49,7 +49,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
-                        android:text="Ev Sahibi"
+                        android:text="@string/home"
                         android:textSize="13sp"
                         android:textColor="?android:attr/textColorPrimary"
                         android:ellipsize="end"
@@ -78,7 +78,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
-                        android:text="Deplasman"
+                        android:text="@string/away"
                         android:textSize="13sp"
                         android:textColor="?android:attr/textColorPrimary"
                         android:ellipsize="end"
@@ -117,7 +117,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Form Karşılaştırması (Birbirine Karşı)"
+                    android:text="@string/form_comparison_h2h"
                     android:textColor="?android:attr/textColorPrimary"
                     android:textStyle="bold"
                     android:textSize="14sp"
@@ -133,7 +133,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
-                        android:text="Takım"
+                        android:text="@string/team"
                         android:textColor="?android:attr/textColorSecondary"
                         android:textSize="12sp" />
 
@@ -142,7 +142,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="G"
+                        android:text="@string/won"
                         android:textColor="@color/score_green"
                         android:textStyle="bold"
                         android:textSize="12sp" />
@@ -152,7 +152,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="B"
+                        android:text="@string/drawn"
                         android:textColor="?android:attr/textColorSecondary"
                         android:textStyle="bold"
                         android:textSize="12sp" />
@@ -162,7 +162,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="M"
+                        android:text="@string/lost"
                         android:textColor="@color/match_finished"
                         android:textStyle="bold"
                         android:textSize="12sp" />
@@ -172,7 +172,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
                         android:gravity="center"
-                        android:text="Atılan-Yenen"
+                        android:text="@string/goals_for_against"
                         android:textColor="?android:attr/textColorSecondary"
                         android:textSize="12sp" />
                 </LinearLayout>

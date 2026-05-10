@@ -1,5 +1,6 @@
 package com.example.var.data.model;
 
+import com.example.var.R;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -37,64 +38,64 @@ public class StatModel {
     }
 
     /**
-     * İstatistik tipinin adını döndürür.
+     * İstatistik tipinin adının string kaynak ID'sini döndürür.
      */
-    public String getTypeName() {
+    public int getTypeNameResId() {
         switch (type) {
             case 3:
-                return "Toplam Şut";
+                return R.string.stat_total_shots;
             case 4:
-                return "İsabetli Şut";
+                return R.string.stat_shots_on_goal;
             case 5:
-                return "Faul";
+                return R.string.stat_fouls;
             case 6:
-                return "Korner";
+                return R.string.stat_corners;
             case 9:
             case 11:
-                return "Sarı Kart";
+                return R.string.stat_yellow_cards;
             case 10:
             case 13:
-                return "Kırmızı Kart";
+                return R.string.stat_red_cards;
             case 14:
-                return "Topla Oynama %";
+                return R.string.stat_possession;
             case 19:
-                return "Başarılı Top Kapma";
+                return R.string.stat_tackles;
             case 20:
-                return "Pas Arası";
+                return R.string.stat_interceptions;
             case 34:
-                return "İsabetsiz Şut";
+                return R.string.stat_shots_off_goal;
             case 37:
-                return "Engellenen Şut";
+                return R.string.stat_blocked_shots;
             case 39:
-                return "Başarılı Çalım";
+                return R.string.stat_dribbles;
             case 40:
-                return "Taç Atışı";
+                return R.string.stat_throw_ins;
             case 41:
-                return "Toplam Pas";
+                return R.string.stat_total_passes;
             case 42:
-                return "İsabetli Pas Oranı";
+                return R.string.stat_pass_accuracy;
             case 43:
-                return "Atak";
+                return R.string.stat_attacks;
             case 44:
-                return "Tehlikeli Atak";
+                return R.string.stat_dangerous_attacks;
             case 45:
-                return "Serbest Vuruş";
+                return R.string.stat_free_kicks;
             case 46:
-                return "Birinci Yarı Topla Oynama";
+                return R.string.stat_possession_1h;
             case 48:
-                return "Kaçan Net Pozisyon";
+                return R.string.stat_big_chances_missed;
             case 51:
-                return "Kazanılan İkili Mücadele";
+                return R.string.stat_duels_won;
             case 52:
-                return "Gol Beklentisi";
+                return R.string.stat_xg;
             case 57:
-                return "Rakip Ceza Sahasında Topla Buluşma";
+                return R.string.stat_touches_in_box;
             case 60:
-                return "Kazanılan Hava Topu";
+                return R.string.stat_aerials_won;
             case 61:
-                return "Uzaklaştırma";
+                return R.string.stat_clearances;
             default:
-                return null;
+                return 0;
         }
     }
 

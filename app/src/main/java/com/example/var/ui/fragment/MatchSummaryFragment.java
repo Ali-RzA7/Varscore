@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.var.BuildConfig;
+import com.example.var.R;
 import com.example.var.ui.adapter.MatchEventAdapter;
 import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.EventModel;
@@ -137,7 +138,7 @@ public class MatchSummaryFragment extends Fragment {
                     // Uzatma Süresi
                     if (detailedMatch.getInjuryTime() > 0) {
                         binding.llInjuryTime.setVisibility(View.VISIBLE);
-                        binding.tvInjuryTimeValue.setText("+" + detailedMatch.getInjuryTime() + " dk");
+                        binding.tvInjuryTimeValue.setText("+" + detailedMatch.getInjuryTime() + " " + getString(R.string.minute_abbr));
                     }
 
                     // VAR Olayı

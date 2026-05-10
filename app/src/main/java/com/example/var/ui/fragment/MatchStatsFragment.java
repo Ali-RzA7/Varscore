@@ -156,25 +156,25 @@ public class MatchStatsFragment extends Fragment {
         // Kornerler (Type 6)
         if (match.getHomeCorner() > 0 || match.getAwayCorner() > 0) {
             StatModel s = new StatModel(6, String.valueOf(match.getHomeCorner()), String.valueOf(match.getAwayCorner()));
-            if (s.getTypeName() != null) list.add(s);
+            if (s.getTypeNameResId() != 0) list.add(s);
         }
         // Sarı Kartlar (Type 11 - Python/Stats endpoint standardı tercih edildi)
         if (match.getHomeYellow() > 0 || match.getAwayYellow() > 0) {
             StatModel s = new StatModel(11, String.valueOf(match.getHomeYellow()), String.valueOf(match.getAwayYellow()));
-            if (s.getTypeName() != null) list.add(s);
+            if (s.getTypeNameResId() != 0) list.add(s);
         }
         // Kırmızı Kartlar (Type 13)
         if (match.getHomeRed() > 0 || match.getAwayRed() > 0) {
             StatModel s = new StatModel(13, String.valueOf(match.getHomeRed()), String.valueOf(match.getAwayRed()));
-            if (s.getTypeName() != null) list.add(s);
+            if (s.getTypeNameResId() != 0) list.add(s);
         }
     }
 
     private boolean isAlreadyAdded(List<StatModel> list, StatModel newStat) {
-        String newName = newStat.getTypeName();
-        if (newName == null) return true; // İsmi olmayanı zaten listeye almayacağız, o yüzden eklenmiş gibi davran (atla)
+        int newResId = newStat.getTypeNameResId();
+        if (newResId == 0) return true; // İsmi olmayanı zaten listeye almayacağız
         for (StatModel s : list) {
-            if (newName.equals(s.getTypeName())) return true;
+            if (newResId == s.getTypeNameResId()) return true;
         }
         return false;
     }

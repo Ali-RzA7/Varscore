@@ -107,7 +107,7 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         LinkedHashMap<String, List<MatchModel>> grouped = new LinkedHashMap<>();
         for (MatchModel match : matches) {
             String leagueName = match.getLeagueName() != null
-                    ? match.getLeagueName() : "Other";
+                    ? match.getLeagueName() : context.getString(R.string.other);
             grouped.computeIfAbsent(leagueName, k -> new ArrayList<>()).add(match);
         }
 

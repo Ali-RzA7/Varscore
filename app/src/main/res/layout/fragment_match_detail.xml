@@ -57,7 +57,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Ev Sahibi"
+                            android:text="@string/home"
                             android:textColor="@color/white"
                             android:textSize="16sp"
                             android:textStyle="bold"
@@ -90,7 +90,7 @@
                             android:background="@drawable/bg_status_badge"
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="2dp"
-                            android:text="MS"
+                            android:text="@string/status_finished"
                             android:textColor="@color/white"
                             android:textSize="12sp" />
 
@@ -126,7 +126,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Deplasman"
+                            android:text="@string/away"
                             android:textColor="@color/white"
                             android:textSize="16sp"
                             android:textStyle="bold"

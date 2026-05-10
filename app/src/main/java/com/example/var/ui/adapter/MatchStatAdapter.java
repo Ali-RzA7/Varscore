@@ -59,7 +59,13 @@ public class MatchStatAdapter extends RecyclerView.Adapter<MatchStatAdapter.Stat
         }
 
         void bind(StatModel stat) {
-            tvStatName.setText(stat.getTypeName());
+            int nameResId = stat.getTypeNameResId();
+            if (nameResId != 0) {
+                tvStatName.setText(itemView.getContext().getString(nameResId));
+            } else {
+                tvStatName.setText("-");
+            }
+            
             tvHomeValue.setText(stat.getHomeValue());
             tvAwayValue.setText(stat.getAwayValue());
 

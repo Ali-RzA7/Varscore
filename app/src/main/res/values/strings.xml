@@ -17,6 +17,7 @@
 
     <!-- Tarih Seçici -->
     <string name="select_date">Tarih Seçin</string>
+    <string name="loading">Yükleniyor…</string>
 
     <!-- Maç Durumları -->
     <string name="status_not_started">Başlamadı</string>
@@ -48,12 +49,12 @@
     <string name="about">Hakkında</string>
 
     <!-- Genel -->
-    <string name="loading">Yükleniyor…</string>
     <string name="error_loading">Veriler yüklenirken hata oluştu</string>
     <string name="retry">Tekrar Dene</string>
     <string name="no_matches">Bu tarihte maç bulunamadı</string>
     <string name="no_live_matches">Şu anda canlı maç yok</string>
     <string name="pull_to_refresh">Yenilemek için çekin</string>
+    <string name="other">Diğer</string>
 
     <!-- Maç Detayı -->
     <string name="match_details">Maç Detayları</string>
@@ -92,6 +93,21 @@
     <string name="home">Ev Sahibi</string>
     <string name="away">Deplasman</string>
     <string name="vs">vs</string>
+    <string name="statistics">İstatistik</string>
+    <string name="comparison">Karşılaştırma</string>
+    <string name="recent_form">Son Form</string>
+    <string name="recent_head_to_head">Son Karşılaşmalar</string>
+    <string name="no_h2h_data">Bu maç için geçmiş karşılaşma verisi bulunamadı.</string>
+    <string name="form_comparison_h2h">Form Karşılaştırması (Birbirine Karşı)</string>
+    <string name="goals_for_against">Atılan-Yenen</string>
+    <string name="starting_lineup">İlk 11</string>
+    <string name="substitutes">Yedekler</string>
+    <string name="lineup_not_available">Kadro bilgisi henüz açıklanmadı.</string>
+    <string name="status_finished_full">Maç Sona Erdi</string>
+    <string name="unknown">Bilinmiyor</string>
+    <string name="minute_abbr">dk</string>
+    <string name="data_error">Veri Hatası</string>
+
 
     <!-- ========================================= -->
     <!-- Alt Navigasyon                             -->
@@ -153,6 +169,15 @@
     <string name="register_failed">Kayıt başarısız. Lütfen tekrar deneyin.</string>
     <string name="google_sign_in_failed">Google ile giriş başarısız</string>
     <string name="reset_email_failed">E-posta gönderilemedi. Lütfen tekrar deneyin.</string>
+    <string name="error_email_already_in_use">Bu e-posta adresi zaten kayıtlı</string>
+    <string name="error_invalid_email_firebase">Geçersiz e-posta adresi</string>
+    <string name="error_weak_password">Şifre çok zayıf, daha güçlü bir şifre seçin</string>
+    <string name="error_operation_not_allowed">E-posta/şifre girişi Firebase Console\'da aktif değil</string>
+    <string name="register_success_verify">Kayıt başarılı! Giriş yapmadan önce e-postanızı doğrulamanız gerekmektedir.</string>
+    <string name="register_success_no_verify">Kayıt başarılı ancak doğrulama e-postası gönderilemedi.</string>
+    <string name="error_verify_email">Lütfen hesabınızı kullanabilmek için e-postanızı doğrulayın. (Spam/Gereksiz kutusunu kontrol edin)</string>
+
+
 
     <!-- ========================================= -->
     <!-- Profil                                     -->
@@ -186,6 +211,9 @@
     <string name="get_prediction">Tahmin Al</string>
     <string name="login_required">Bu özellik için giriş yapmanız gerekiyor</string>
     <string name="close">Kapat</string>
+    <string name="ai_system_prompt">Sen deneyimli bir futbol analisti ve tahmin uzmanısın. Verilen maç bilgileri ve mevcut durum üzerinden analiz yaparak oyunun nasıl sonuçlanabileceğini tahmin ediyorsun. Analizini Türkçe yap, net ve anlaşılır bir dil kullan.</string>
+    <string name="ai_user_prompt">Şu maçı analiz et ve tahmin yap:\n\nLig: %1$s\nEv Sahibi: %2$s\nDeplasman: %3$s\nMevcut Skor: %4$d - %5$d\nMaç Durumu: %6$s\n\nLütfen şunları içeren bir analiz yaz:\n1. Bu maç için tahminini\n2. Tahminin nedenlerini\n3. Olası final skoru\n4. Dikkat edilmesi gereken faktörler</string>
+
 
     <!-- ========================================= -->
     <!-- Genel Yardımcı                             -->
@@ -194,5 +222,48 @@
     <string name="back">Geri</string>
     <string name="save">Kaydet</string>
     <string name="cancel">İptal</string>
+    <string name="channel_live_name">Canlı Maç Bildirimleri</string>
+    <string name="channel_live_desc">Gol, kırmızı kart, maç başlangıcı/sonu bildirimleri</string>
+    <string name="channel_reminder_name">Maç Hatırlatmaları</string>
+    <string name="channel_reminder_desc">Maç başlamadan 1 saat önce hatırlatma</string>
+    <string name="notification_match_started">🔴 Maç Başladı</string>
+    <string name="notification_goal">⚽ Gol!</string>
+    <string name="notification_red_card">🟥 Kırmızı Kart</string>
+    <string name="notification_half_time">⏸ Devre Arası</string>
+    <string name="notification_half_time_body">İlk yarı: %1$s %2$d - %3$d %4$s</string>
+    <string name="notification_match_ended">🏁 Maç Sona Erdi</string>
+    <string name="notification_lineups_ready">📋 Kadrolar Açıklandı</string>
+    <string name="notification_lineups_ready_body">%1$s - %2$s kadroları belli oldu</string>
+    <string name="notification_var">📺 VAR İncelemesi</string>
+    <string name="notification_penalty">🥅 Penaltı Atışları</string>
+    <string name="notification_penalty_body">%1$s - %2$s penaltıya gidildi</string>
+    <string name="notification_reminder">⏰ Maç Hatırlatması</string>
+    <string name="notification_reminder_body">%1$s - %2$s 1 saat sonra başlıyor! (%3$s)</string>
+    <string name="stat_total_shots">Toplam Şut</string>
+    <string name="stat_shots_on_goal">İsabetli Şut</string>
+    <string name="stat_fouls">Faullar</string>
+    <string name="stat_corners">Kornerler</string>
+    <string name="stat_yellow_cards">Sarı Kartlar</string>
+    <string name="stat_red_cards">Kırmızı Kartlar</string>
+    <string name="stat_possession">Topla Oynama %</string>
+    <string name="stat_tackles">Başarılı Top Kapma</string>
+    <string name="stat_interceptions">Pas Arası</string>
+    <string name="stat_shots_off_goal">İsabetsiz Şut</string>
+    <string name="stat_blocked_shots">Engellenen Şut</string>
+    <string name="stat_dribbles">Başarılı Çalım</string>
+    <string name="stat_throw_ins">Taç Atışı</string>
+    <string name="stat_total_passes">Toplam Pas</string>
+    <string name="stat_pass_accuracy">İsabetli Pas Oranı</string>
+    <string name="stat_attacks">Atak</string>
+    <string name="stat_dangerous_attacks">Tehlikeli Atak</string>
+    <string name="stat_free_kicks">Serbest Vuruş</string>
+    <string name="stat_possession_1h">İlk Yarı Topla Oynama</string>
+    <string name="stat_big_chances_missed">Kaçan Net Pozisyon</string>
+    <string name="stat_duels_won">Kazanılan İkili Mücadele</string>
+    <string name="stat_xg">Gol Beklentisi</string>
+    <string name="stat_touches_in_box">Rakip Ceza Sahasında Topla Buluşma</string>
+    <string name="stat_aerials_won">Kazanılan Hava Topu</string>
+    <string name="stat_clearances">Uzaklaştırma</string>
     <string name="default_web_client_id" translatable="false">YOUR_WEB_CLIENT_ID</string>
+
 </resources>

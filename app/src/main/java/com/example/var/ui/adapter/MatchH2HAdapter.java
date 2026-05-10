@@ -74,7 +74,7 @@ public class MatchH2HAdapter extends RecyclerView.Adapter<MatchH2HAdapter.H2HVie
             } else {
                 tvLeagueName.setText("-");
                 tvDate.setText("-");
-                tvHomeTeam.setText("Veri Hatası");
+                tvHomeTeam.setText(itemView.getContext().getString(R.string.data_error));
                 tvAwayTeam.setText("-");
                 tvScore.setText("-");
             }

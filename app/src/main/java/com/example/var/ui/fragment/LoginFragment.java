@@ -159,7 +159,8 @@ public class LoginFragment extends Fragment {
                     FirebaseUser user = authResult.getUser();
                     if (user != null && !user.isEmailVerified()) {
                         auth.signOut();
-                        showSnackbar("Lütfen hesabınızı kullanabilmek için e-postanızı doğrulayın. (Spam/Gereksiz kutusunu kontrol edin)");
+                        showSnackbar(getString(R.string.error_verify_email));
+
                         return;
                     }
                     
@@ -173,7 +174,8 @@ public class LoginFragment extends Fragment {
                         String code = ((FirebaseAuthException) e).getErrorCode();
                         Log.e(TAG, "Firebase hata kodu: " + code);
                         if ("ERROR_OPERATION_NOT_ALLOWED".equals(code)) {
-                            showSnackbar("E-posta/şifre girişi Firebase Console'da aktif değil");
+                            showSnackbar(getString(R.string.error_operation_not_allowed));
+
                         } else {
                             showSnackbar(getString(R.string.login_failed) + " (" + code + ")");
                         }

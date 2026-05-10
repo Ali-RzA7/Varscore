@@ -86,6 +86,9 @@ dependencies {
     // SharedPreferences
     implementation("androidx.preference:preference:1.2.1")
 
+    // Markwon - Markdown rendering for AI predictions
+    implementation("io.noties.markwon:core:4.6.2")
+
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

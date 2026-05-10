@@ -233,7 +233,7 @@ public class ProfileFragment extends Fragment {
                         && teamNames.get(teamId) != null && !teamNames.get(teamId).isEmpty();
                 final String name = hasName ? teamNames.get(teamId) : "";
                 View row = addFavoriteRow(binding.llFavoriteTeams,
-                        hasName ? name : "Yükleniyor…",
+                        hasName ? name : getString(R.string.loading),
                         v -> openTeam(teamId, name, storedLeagueId));
                 if (!hasName && storedLeagueId != null) {
                     resolveTeamNameFromStandings(teamId, storedLeagueId, row);

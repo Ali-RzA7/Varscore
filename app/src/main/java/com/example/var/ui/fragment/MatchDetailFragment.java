@@ -207,9 +207,10 @@ public class MatchDetailFragment extends Fragment {
         new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
             switch (position) {
                 case 0: tab.setText(R.string.match_details); break;
-                case 1: tab.setText("İstatistik"); break;
-                case 2: tab.setText("Karşılaştırma"); break;
-                case 3: tab.setText("Kadro"); break;
+                case 1: tab.setText(R.string.statistics); break;
+                case 2: tab.setText(R.string.comparison); break;
+                case 3: tab.setText(R.string.lineup); break;
+
             }
         }).attach();
     }

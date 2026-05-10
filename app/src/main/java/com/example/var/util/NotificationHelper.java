@@ -30,89 +30,99 @@ public class NotificationHelper {
 
         NotificationChannel live = new NotificationChannel(
                 CHANNEL_LIVE,
-                "Canlı Maç Bildirimleri",
+                ctx.getString(R.string.channel_live_name),
                 NotificationManager.IMPORTANCE_HIGH
         );
-        live.setDescription("Gol, kırmızı kart, maç başlangıcı/sonu bildirimleri");
+        live.setDescription(ctx.getString(R.string.channel_live_desc));
         live.enableVibration(true);
 
         NotificationChannel reminder = new NotificationChannel(
                 CHANNEL_REMINDER,
-                "Maç Hatırlatmaları",
+                ctx.getString(R.string.channel_reminder_name),
                 NotificationManager.IMPORTANCE_DEFAULT
         );
-        reminder.setDescription("Maç başlamadan 1 saat önce hatırlatma");
+        reminder.setDescription(ctx.getString(R.string.channel_reminder_desc));
 
         nm.createNotificationChannel(live);
         nm.createNotificationChannel(reminder);
+
     }
 
     // ── Canlı Maç Bildirimleri ──────────────────────────────────────────
 
     public static void showMatchStart(Context ctx, String home, String away) {
         show(ctx, CHANNEL_LIVE,
-                "🔴 Maç Başladı",
+                ctx.getString(R.string.notification_match_started),
                 home + " - " + away,
                 id(home + away + "start"));
+
     }
 
     public static void showGoal(Context ctx, String home, String away, int hs, int as) {
         show(ctx, CHANNEL_LIVE,
-                "⚽ Gol!",
+                ctx.getString(R.string.notification_goal),
                 home + " " + hs + " - " + as + " " + away,
                 id(home + away + "goal" + hs + as));
+
     }
 
     public static void showRedCard(Context ctx, String home, String away, boolean isHome) {
         String team = isHome ? home : away;
         show(ctx, CHANNEL_LIVE,
-                "🟥 Kırmızı Kart",
+                ctx.getString(R.string.notification_red_card),
                 team + " | " + home + " - " + away,
                 id(home + away + "red" + isHome));
+
     }
 
     public static void showHalfTime(Context ctx, String home, String away, int hs, int as) {
         show(ctx, CHANNEL_LIVE,
-                "⏸ Devre Arası",
-                "İlk yarı: " + home + " " + hs + " - " + as + " " + away,
+                ctx.getString(R.string.notification_half_time),
+                ctx.getString(R.string.notification_half_time_body, home, hs, as, away),
                 id(home + away + "half"));
+
     }
 
     public static void showMatchEnd(Context ctx, String home, String away, int hs, int as) {
         show(ctx, CHANNEL_LIVE,
-                "🏁 Maç Sona Erdi",
+                ctx.getString(R.string.notification_match_ended),
                 home + " " + hs + " - " + as + " " + away,
                 id(home + away + "end"));
+
     }
 
     public static void showLineupReady(Context ctx, String home, String away) {
         show(ctx, CHANNEL_LIVE,
-                "📋 Kadrolar Açıklandı",
-                home + " - " + away + " kadroları belli oldu",
+                ctx.getString(R.string.notification_lineups_ready),
+                ctx.getString(R.string.notification_lineups_ready_body, home, away),
                 id(home + away + "lineup"));
+
     }
 
     public static void showVar(Context ctx, String home, String away) {
         show(ctx, CHANNEL_LIVE,
-                "📺 VAR İncelemesi",
+                ctx.getString(R.string.notification_var),
                 home + " - " + away,
                 id(home + away + "var"));
+
     }
 
     public static void showPenalty(Context ctx, String home, String away) {
         show(ctx, CHANNEL_LIVE,
-                "🥅 Penaltı Atışları",
-                home + " - " + away + " penaltıya gidildi",
+                ctx.getString(R.string.notification_penalty),
+                ctx.getString(R.string.notification_penalty_body, home, away),
                 id(home + away + "penalty"));
+
     }
 
     // ── Hatırlatma Bildirimleri ─────────────────────────────────────────
 
     public static void showReminder(Context ctx, String home, String away, String matchTime) {
         show(ctx, CHANNEL_REMINDER,
-                "⏰ Maç Hatırlatması",
-                home + " - " + away + " 1 saat sonra başlıyor! (" + matchTime + ")",
+                ctx.getString(R.string.notification_reminder),
+                ctx.getString(R.string.notification_reminder_body, home, away, matchTime),
                 id(home + away + "reminder"));
+
     }
 
     // ── Yardımcı Metodlar ──────────────────────────────────────────────
