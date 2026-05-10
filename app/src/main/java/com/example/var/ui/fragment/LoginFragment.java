@@ -257,6 +257,11 @@ public class LoginFragment extends Fragment {
                 firebaseUser.getDisplayName() != null ? firebaseUser.getDisplayName() : "",
                 firebaseUser.getEmail() != null ? firebaseUser.getEmail() : ""
         );
+        
+        // Eğer FirebaseUser'da (örneğin Google login) fotoğraf URL'si varsa onu da ekle
+        if (firebaseUser.getPhotoUrl() != null) {
+            user.setPhotoUrl(firebaseUser.getPhotoUrl().toString());
+        }
 
         FirebaseManager.saveUserProfile(user,
                 unused -> {

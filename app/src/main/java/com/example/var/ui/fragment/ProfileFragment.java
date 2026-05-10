@@ -1,7 +1,10 @@
 package com.example.var.ui.fragment;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +30,10 @@ import com.example.var.util.FirebaseManager;
 import com.example.var.util.PreferencesManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,51 +43,25 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * ProfileFragment - Giriş yapmış kullanıcının profil ekranı.
- *
- * AccountFragment tarafından kullanıcı giriş yapmış ise gösterilir.
- *
- * Gösterilen bilgiler:
- * - Profil fotoğrafı (Firebase Storage'dan Glide ile yüklenir)
- * - Görünen ad ve e-posta
- * - Tema ayarı (dark/light mode switch)
- * - Dil ayarı (mevcut dil gösterilir, SettingsDialog açar)
- * - Favori takımlar listesi (Firestore'dan)
- * - Favori ligler listesi (Firestore'dan)
- * - Lig favorisi açıklaması
- * - Çıkış Yap butonu
- *
- * Fotoğraf değiştirme:
- * - Galeriden seçim (ActivityResultLauncher ile)
- * - Firebase Storage'a yükleme
- * - Firestore'da photoUrl güncelleme
+ * ProfileFragment - Yerel depolama destekli profil ekranı.
+ * Fotoğraflar sunucuya yüklenmez, cihazın yerel hafızasında saklanır.
  */
 public class ProfileFragment extends Fragment {
 
-    /** ViewBinding referansı */
+    private static final String TAG = "ProfileFragment";
+
     private FragmentProfileBinding binding;
-
-    /** Kullanıcı tercihleri yöneticisi */
     private PreferencesManager prefs;
-
-    /** Mevcut kullanıcı profil verisi */
     private UserModel currentUser;
-
-    /** Ligleri adlandırmak için kullanılan tüm lig listesi */
     private Map<String, String> leagueNameMap = new HashMap<>();
-
     private MatchRepository repository;
 
-    /**
-     * Galeriden fotoğraf seçmek için ActivityResultLauncher.
-     * Seçilen URI'yi Firebase Storage'a yükler.
-     */
     private final ActivityResultLauncher<String> imagePickerLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.GetContent(),
                     uri -> {
                         if (uri != null) {
-                            uploadProfilePhoto(uri);
+                            saveProfilePhotoLocally(uri);
                         }
                     });
 
@@ -108,129 +86,142 @@ public class ProfileFragment extends Fragment {
         loadUserProfile();
     }
 
-    /**
-     * Tüm buton ve tıklama olaylarını yapılandırır.
-     */
     private void setupClickListeners() {
-        // Profil fotoğrafına tıklayınca galeriden seçim başlat
         binding.cardPhoto.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
         binding.tvChangePhoto.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
 
-        // Tema switch'i
         binding.switchDarkMode.setChecked(prefs.isDarkMode());
         binding.switchDarkMode.setOnCheckedChangeListener((btn, isChecked) -> {
-            prefs.setDarkMode(isChecked); // setDarkMode anında AppCompatDelegate'i çağırır
+            prefs.setDarkMode(isChecked);
         });
 
-        // Dil ayarına tıklanınca SettingsDialogFragment aç (sadece dil seçimi için)
         binding.layoutLanguage.setOnClickListener(v -> {
             SettingsDialogFragment dialog = new SettingsDialogFragment();
             dialog.show(getParentFragmentManager(), "settings_dialog");
         });
 
-        // Çıkış Yap butonu
         binding.btnSignOut.setOnClickListener(v -> signOut());
     }
 
-    /**
-     * Firebase'den kullanıcı profilini ve favori listelerini yükler.
-     * Profil fotoğrafını, adı ve e-postayı günceller.
-     */
     private void loadUserProfile() {
         FirebaseUser firebaseUser = FirebaseManager.getCurrentUser();
         if (firebaseUser == null) return;
 
-        // Temel bilgileri anında göster (Firestore beklerken)
         binding.tvDisplayName.setText(
                 firebaseUser.getDisplayName() != null ? firebaseUser.getDisplayName() : "");
         binding.tvEmail.setText(
                 firebaseUser.getEmail() != null ? firebaseUser.getEmail() : "");
 
-        // Mevcut dil tercihini göster
         updateLanguageDisplay();
 
-        // Profil fotoğrafını göster (Firebase Auth URL'si varsa)
-        if (firebaseUser.getPhotoUrl() != null) {
+        // 1. Önce yerel cihazda bir fotoğraf var mı bak
+        File localFile = getLocalProfileFile(firebaseUser.getUid());
+        if (localFile.exists()) {
+            loadProfilePhoto(localFile.getAbsolutePath());
+        } 
+        // 2. Yerelde yoksa ve Google hesabıysa, Google URL'sini dene
+        else if (firebaseUser.getPhotoUrl() != null) {
             loadProfilePhoto(firebaseUser.getPhotoUrl().toString());
         }
 
-        // Firestore'dan detaylı profil yükle (favori listeler için)
         FirebaseManager.getUserProfile(firebaseUser.getUid(),
                 user -> {
                     if (!isAdded()) return;
                     currentUser = user;
-                    // Firestore'dan gelen fotoğraf URL'si varsa güncelle
-                    if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
+                    // Eğer yerel dosya yoksa ama Firestore'da bir URL (Google vb.) varsa onu yükle
+                    if (!localFile.exists() && user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
                         loadProfilePhoto(user.getPhotoUrl());
                     }
-                    // Favori listelerini göster
                     displayFavorites(user.getFavoriteTeams(), user.getFavoriteLeagues(),
                             user.getFavoriteTeamNames());
                 },
-                e -> { /* Sessizce başarısız ol, temel bilgiler zaten gösteriliyor */ }
+                e -> { /* Sessizce başarısız ol */ }
         );
     }
 
-    /**
-     * Profil fotoğrafını Glide ile yükler.
-     * Placeholder olarak ic_person ikonu kullanılır.
-     *
-     * @param photoUrl Firebase Storage veya Google hesabından gelen fotoğraf URL'si
-     */
-    private void loadProfilePhoto(String photoUrl) {
+    private void loadProfilePhoto(Object source) {
         Glide.with(this)
-                .load(photoUrl)
+                .load(source)
                 .placeholder(R.drawable.ic_person)
                 .error(R.drawable.ic_person)
                 .circleCrop()
                 .into(binding.ivProfilePhoto);
     }
 
-    /** Tüm ligleri API'den çekip leagueId → leagueName haritasını doldurur. */
+    /**
+     * Seçilen fotoğrafı cihazın yerel hafızasına kaydeder.
+     */
+    private void saveProfilePhotoLocally(Uri imageUri) {
+        FirebaseUser user = FirebaseManager.getCurrentUser();
+        if (user == null) return;
+
+        try {
+            // Görseli oku ve sıkıştır (yer tasarrufu için)
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            
+            // Dosya yolunu belirle: /data/user/0/com.example.var/files/profile_[uid].jpg
+            File file = getLocalProfileFile(user.getUid());
+            
+            FileOutputStream outputStream = new FileOutputStream(file);
+            // %80 kalite ile JPEG olarak kaydet
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+            
+            outputStream.flush();
+            outputStream.close();
+            
+            // UI'da hemen göster
+            loadProfilePhoto(file.getAbsolutePath());
+            showSnackbar(getString(R.string.photo_updated));
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Yerel kaydetme hatası", e);
+            showSnackbar(getString(R.string.error_loading));
+        }
+    }
+
+    /**
+     * Kullanıcıya özel yerel profil fotoğrafı dosyasını döndürür.
+     */
+    private File getLocalProfileFile(String uid) {
+        return new File(requireContext().getFilesDir(), "profile_" + uid + ".jpg");
+    }
+
     private void loadLeagueNames() {
         repository.getLeagues().enqueue(new Callback<ApiResponse<LeagueModel>>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse<LeagueModel>> call,
                     @NonNull Response<ApiResponse<LeagueModel>> response) {
                 if (!isAdded() || binding == null) return;
-                if (!response.isSuccessful() || response.body() == null
-                        || response.body().getData() == null) return;
+                if (!response.isSuccessful() || response.body() == null || response.body().getData() == null) return;
                 for (LeagueModel l : response.body().getData()) {
                     if (l.getLeagueId() != null && l.getName() != null) {
                         leagueNameMap.put(l.getLeagueId(), l.getName());
                     }
                 }
-                // Kullanıcı profili zaten yüklendiyse lig adlarıyla ligleri yeniden çiz
                 if (currentUser != null) {
                     displayFavorites(currentUser.getFavoriteTeams(),
                             currentUser.getFavoriteLeagues(),
                             currentUser.getFavoriteTeamNames());
                 }
             }
-
             @Override
             public void onFailure(@NonNull Call<ApiResponse<LeagueModel>> call, @NonNull Throwable t) { }
         });
     }
 
-    /**
-     * Favori takım ve ligleri clickable satırlar olarak gösterir.
-     */
     private void displayFavorites(List<String> favoriteTeams, List<String> favoriteLeagues,
             Map<String, String> teamNames) {
         Map<String, String> teamLeagues = currentUser != null
                 ? currentUser.getFavoriteTeamLeagues() : new HashMap<>();
 
-        // ── Takımlar ──
         binding.llFavoriteTeams.removeAllViews();
         if (favoriteTeams == null || favoriteTeams.isEmpty()) {
             addEmptyRow(binding.llFavoriteTeams);
         } else {
             for (String teamId : favoriteTeams) {
-                final String storedLeagueId = teamLeagues.containsKey(teamId)
-                        ? teamLeagues.get(teamId) : null;
-                boolean hasName = teamNames != null && teamNames.containsKey(teamId)
-                        && teamNames.get(teamId) != null && !teamNames.get(teamId).isEmpty();
+                final String storedLeagueId = teamLeagues.get(teamId);
+                boolean hasName = teamNames != null && teamNames.containsKey(teamId);
                 final String name = hasName ? teamNames.get(teamId) : "";
                 View row = addFavoriteRow(binding.llFavoriteTeams,
                         hasName ? name : getString(R.string.loading),
@@ -241,7 +232,6 @@ public class ProfileFragment extends Fragment {
             }
         }
 
-        // ── Ligler ──
         Map<String, String> leagueNames = currentUser != null
                 ? currentUser.getFavoriteLeagueNames() : new HashMap<>();
 
@@ -251,12 +241,11 @@ public class ProfileFragment extends Fragment {
         } else {
             for (String leagueId : favoriteLeagues) {
                 String name = leagueId;
-                if (leagueNames.containsKey(leagueId) && leagueNames.get(leagueId) != null && !leagueNames.get(leagueId).isEmpty()) {
+                if (leagueNames.containsKey(leagueId)) {
                     name = leagueNames.get(leagueId);
                 } else if (leagueNameMap.containsKey(leagueId)) {
                     name = leagueNameMap.get(leagueId);
                 }
-                
                 final String finalName = name;
                 addFavoriteRow(binding.llFavoriteLeagues, finalName,
                         v -> openLeague(leagueId, finalName));
@@ -264,19 +253,13 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    /**
-     * leagueId'nin standings/teamInfos listesinden teamId'ye karşılık gelen takım adını bulur.
-     * Bulunca satırı günceller ve Firestore'a kaydeder.
-     */
     private void resolveTeamNameFromStandings(String teamId, String leagueId, View row) {
         repository.getLeagueTable(leagueId).enqueue(new Callback<com.example.var.data.model.StandingLeagueResponse>() {
             @Override
             public void onResponse(@NonNull Call<com.example.var.data.model.StandingLeagueResponse> call,
                     @NonNull Response<com.example.var.data.model.StandingLeagueResponse> response) {
                 if (!isAdded() || binding == null) return;
-                if (!response.isSuccessful() || response.body() == null
-                        || !response.body().isSuccess()
-                        || response.body().getData() == null) return;
+                if (!response.isSuccessful() || response.body() == null || response.body().getData() == null) return;
 
                 List<com.example.var.data.model.StandingLeagueResponse.TeamInfo> infos =
                         response.body().getData().getTeamInfos();
@@ -292,10 +275,8 @@ public class ProfileFragment extends Fragment {
                     }
                 }
             }
-
             @Override
-            public void onFailure(@NonNull Call<com.example.var.data.model.StandingLeagueResponse> call,
-                    @NonNull Throwable t) { }
+            public void onFailure(@NonNull Call<com.example.var.data.model.StandingLeagueResponse> call, @NonNull Throwable t) { }
         });
     }
 
@@ -338,9 +319,6 @@ public class ProfileFragment extends Fragment {
                 .commit();
     }
 
-    /**
-     * Mevcut dil ayarını gösterir (Türkçe/İngilizce).
-     */
     private void updateLanguageDisplay() {
         String lang = prefs.getLanguage();
         binding.tvCurrentLanguage.setText("tr".equals(lang)
@@ -348,65 +326,8 @@ public class ProfileFragment extends Fragment {
                 : getString(R.string.language_english));
     }
 
-    /**
-     * Seçilen fotoğrafı Firebase Storage'a yükler ve Firestore'da URL'yi günceller.
-     * Yükleme sırasında SnackBar gösterilir.
-     *
-     * @param imageUri Galeriden seçilen fotoğrafın URI'si
-     */
-    private void uploadProfilePhoto(Uri imageUri) {
-        FirebaseUser user = FirebaseManager.getCurrentUser();
-        if (user == null) return;
-
-        showSnackbar(getString(R.string.uploading_photo));
-
-        // Firebase Storage'da kullanıcı klasörüne kaydet
-        StorageReference photoRef = FirebaseStorage.getInstance().getReference()
-                .child("profile_photos")
-                .child(user.getUid() + ".jpg");
-
-        photoRef.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // Yükleme başarılı - download URL'si al
-                    photoRef.getDownloadUrl()
-                            .addOnSuccessListener(uri -> {
-                                if (!isAdded()) return;
-                                // Firestore'da photoUrl güncelle
-                                updatePhotoUrlInFirestore(uri.toString());
-                                // Fotoğrafı hemen göster
-                                loadProfilePhoto(uri.toString());
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    if (!isAdded()) return;
-                    showSnackbar(getString(R.string.upload_failed));
-                });
-    }
-
-    /**
-     * Firestore'daki kullanıcı belgesinde photoUrl alanını günceller.
-     *
-     * @param photoUrl Firebase Storage'dan alınan yeni fotoğraf URL'si
-     */
-    private void updatePhotoUrlInFirestore(String photoUrl) {
-        FirebaseUser user = FirebaseManager.getCurrentUser();
-        if (user == null) return;
-
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(user.getUid())
-                .update("photoUrl", photoUrl)
-                .addOnSuccessListener(unused -> showSnackbar(getString(R.string.photo_updated)))
-                .addOnFailureListener(e -> { /* Sessizce başarısız ol */ });
-    }
-
-    /**
-     * Kullanıcıyı Firebase'den çıkarır ve AccountFragment'a LoginFragment'ı göstermesini söyler.
-     */
     private void signOut() {
         FirebaseManager.signOut();
-
-        // Ebeveyn AccountFragment'ı güncelle (LoginFragment gösterilsin)
         Fragment parent = getParentFragment();
         if (parent instanceof AccountFragment) {
             ((AccountFragment) parent).onAuthStateChanged();
