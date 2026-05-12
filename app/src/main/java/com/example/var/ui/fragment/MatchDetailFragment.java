@@ -98,26 +98,31 @@ public class MatchDetailFragment extends Fragment {
     }
 
     /**
-     * Ev sahibi ve deplasman takımlarının logolarını standing/league API'sinden çeker.
+     * Ev sahibi ve deplasman takımlarının logolarını standing/league API'sinden
+     * çeker.
      */
     private void loadTeamLogos() {
-        if (match.getLeagueId() == null) return;
+        if (match.getLeagueId() == null)
+            return;
 
         repository.getLeagueTable(match.getLeagueId()).enqueue(new Callback<StandingLeagueResponse>() {
             @Override
             public void onResponse(@NonNull Call<StandingLeagueResponse> call,
                     @NonNull Response<StandingLeagueResponse> response) {
-                if (!isAdded() || binding == null) return;
+                if (!isAdded() || binding == null)
+                    return;
                 if (!response.isSuccessful() || response.body() == null
                         || !response.body().isSuccess()
-                        || response.body().getData() == null) return;
+                        || response.body().getData() == null)
+                    return;
 
-                List<StandingLeagueResponse.TeamInfo> teamInfos =
-                        response.body().getData().getTeamInfos();
-                if (teamInfos == null) return;
+                List<StandingLeagueResponse.TeamInfo> teamInfos = response.body().getData().getTeamInfos();
+                if (teamInfos == null)
+                    return;
 
                 for (StandingLeagueResponse.TeamInfo ti : teamInfos) {
-                    if (ti.getTeamId() == null || ti.getLogo() == null || ti.getLogo().isEmpty()) continue;
+                    if (ti.getTeamId() == null || ti.getLogo() == null || ti.getLogo().isEmpty())
+                        continue;
                     if (ti.getTeamId().equals(match.getHomeId())) {
                         Glide.with(MatchDetailFragment.this)
                                 .load(ti.getLogo())
@@ -145,7 +150,8 @@ public class MatchDetailFragment extends Fragment {
      * Başarısız olursa sessizce devam eder (ilk veri zaten gösterilmekte).
      */
     private void fetchDetailedInfo() {
-        if (match.getMatchId() == null) return;
+        if (match.getMatchId() == null)
+            return;
 
         repository.getMatchDetail(match.getMatchId()).enqueue(new Callback<ApiResponse<MatchModel>>() {
             @Override
@@ -193,7 +199,8 @@ public class MatchDetailFragment extends Fragment {
 
     /** Toolbar geri tuşunu FragmentManager back stack'iyle bağlar. */
     private void setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
+        binding.toolbar
+                .setNavigationOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
     }
 
     /**
@@ -206,10 +213,18 @@ public class MatchDetailFragment extends Fragment {
 
         new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
             switch (position) {
-                case 0: tab.setText(R.string.match_details); break;
-                case 1: tab.setText(R.string.statistics); break;
-                case 2: tab.setText(R.string.comparison); break;
-                case 3: tab.setText(R.string.lineup); break;
+                case 0:
+                    tab.setText(R.string.match_details);
+                    break;
+                case 1:
+                    tab.setText(R.string.statistics);
+                    break;
+                case 2:
+                    tab.setText(R.string.comparison);
+                    break;
+                case 3:
+                    tab.setText(R.string.lineup);
+                    break;
 
             }
         }).attach();
@@ -218,8 +233,9 @@ public class MatchDetailFragment extends Fragment {
     /**
      * AI tahmin FAB'ını yapılandırır.
      *
-     * - Giriş yapmış kullanıcı → FAB görünür, tıklanınca AIPredictionDialogFragment açılır
-     * - Giriş yapılmamış      → FAB gizli; tıklanırsa Snackbar gösterir
+     * - Giriş yapmış kullanıcı → FAB görünür, tıklanınca AIPredictionDialogFragment
+     * açılır
+     * - Giriş yapılmamış → FAB gizli; tıklanırsa Snackbar gösterir
      *
      * Not: FAB yalnızca giriş yapılmış kullanıcılara sunulur; giriş yapılmamışsa
      * tıklama olayı da bağlanmaz (FAB zaten GONE).
@@ -240,7 +256,8 @@ public class MatchDetailFragment extends Fragment {
      * Mevcut maç verisi dialog'a iletilir ve Groq API analizi başlatılır.
      */
     private void openAiPrediction() {
-        if (match == null) return;
+        if (match == null)
+            return;
         AIPredictionDialogFragment dialog = AIPredictionDialogFragment.newInstance(match);
         dialog.show(getChildFragmentManager(), "ai_prediction");
     }
@@ -265,10 +282,14 @@ public class MatchDetailFragment extends Fragment {
         @Override
         public Fragment createFragment(int position) {
             switch (position) {
-                case 0: return MatchSummaryFragment.newInstance(match.getMatchId());
-                case 1: return MatchStatsFragment.newInstance(match);
-                case 2: return MatchH2HFragment.newInstance(match);
-                default: return KadroFragment.newInstance(match);
+                case 0:
+                    return MatchSummaryFragment.newInstance(match.getMatchId());
+                case 1:
+                    return MatchStatsFragment.newInstance(match);
+                case 2:
+                    return MatchH2HFragment.newInstance(match);
+                default:
+                    return KadroFragment.newInstance(match);
             }
         }
 

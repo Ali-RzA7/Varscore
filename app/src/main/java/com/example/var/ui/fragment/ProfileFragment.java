@@ -1,7 +1,5 @@
 package com.example.var.ui.fragment;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,10 +28,10 @@ import com.example.var.util.FirebaseManager;
 import com.example.var.util.PreferencesManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,27 +41,38 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * ProfileFragment - Yerel depolama destekli profil ekranı.
- * Fotoğraflar sunucuya yüklenmez, cihazın yerel hafızasında saklanır.
+ * ProfileFragment - Giriş yapmış kullanıcının profil ekranı.
+ *
+ * AccountFragment tarafından kullanıcı giriş yapmış ise gösterilir.
  */
 public class ProfileFragment extends Fragment {
 
     private static final String TAG = "ProfileFragment";
 
+    /** ViewBinding referansı */
     private FragmentProfileBinding binding;
+
+    /** Kullanıcı tercihleri yöneticisi */
     private PreferencesManager prefs;
+
+    /** Mevcut kullanıcı profil verisi */
     private UserModel currentUser;
+
+    /** Ligleri adlandırmak için kullanılan tüm lig listesi */
     private Map<String, String> leagueNameMap = new HashMap<>();
+
     private MatchRepository repository;
 
-    private final ActivityResultLauncher<String> imagePickerLauncher =
-            registerForActivityResult(
-                    new ActivityResultContracts.GetContent(),
-                    uri -> {
-                        if (uri != null) {
-                            saveProfilePhotoLocally(uri);
-                        }
-                    });
+    /**
+     * Galeriden fotoğraf seçmek için ActivityResultLauncher.
+     */
+    private final ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            uri -> {
+                if (uri != null) {
+                    uploadProfilePhoto(uri);
+                }
+            });
 
     @Nullable
     @Override
@@ -105,7 +114,8 @@ public class ProfileFragment extends Fragment {
 
     private void loadUserProfile() {
         FirebaseUser firebaseUser = FirebaseManager.getCurrentUser();
-        if (firebaseUser == null) return;
+        if (firebaseUser == null)
+            return;
 
         binding.tvDisplayName.setText(
                 firebaseUser.getDisplayName() != null ? firebaseUser.getDisplayName() : "");
@@ -114,77 +124,37 @@ public class ProfileFragment extends Fragment {
 
         updateLanguageDisplay();
 
-        // 1. Önce yerel cihazda bir fotoğraf var mı bak
-        File localFile = getLocalProfileFile(firebaseUser.getUid());
-        if (localFile.exists()) {
-            loadProfilePhoto(localFile.getAbsolutePath());
-        } 
-        // 2. Yerelde yoksa ve Google hesabıysa, Google URL'sini dene
-        else if (firebaseUser.getPhotoUrl() != null) {
+        // Önce Auth'daki fotoğrafı dene (hızlı yükleme)
+        if (firebaseUser.getPhotoUrl() != null) {
             loadProfilePhoto(firebaseUser.getPhotoUrl().toString());
         }
 
+        // Firestore'dan detaylı profil yükle
         FirebaseManager.getUserProfile(firebaseUser.getUid(),
                 user -> {
-                    if (!isAdded()) return;
+                    if (!isAdded())
+                        return;
                     currentUser = user;
-                    // Eğer yerel dosya yoksa ama Firestore'da bir URL (Google vb.) varsa onu yükle
-                    if (!localFile.exists() && user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
+                    // Firestore'daki fotoğraf URL'si daha güncel olabilir
+                    if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
                         loadProfilePhoto(user.getPhotoUrl());
                     }
                     displayFavorites(user.getFavoriteTeams(), user.getFavoriteLeagues(),
                             user.getFavoriteTeamNames());
                 },
-                e -> { /* Sessizce başarısız ol */ }
-        );
+                e -> {
+                    /* Sessizce başarısız ol */ });
     }
 
-    private void loadProfilePhoto(Object source) {
+    private void loadProfilePhoto(String photoUrl) {
+        Object loadTarget = (photoUrl == null || photoUrl.isEmpty()) ? R.drawable.ic_person : photoUrl;
+
         Glide.with(this)
-                .load(source)
+                .load(loadTarget)
                 .placeholder(R.drawable.ic_person)
                 .error(R.drawable.ic_person)
                 .circleCrop()
                 .into(binding.ivProfilePhoto);
-    }
-
-    /**
-     * Seçilen fotoğrafı cihazın yerel hafızasına kaydeder.
-     */
-    private void saveProfilePhotoLocally(Uri imageUri) {
-        FirebaseUser user = FirebaseManager.getCurrentUser();
-        if (user == null) return;
-
-        try {
-            // Görseli oku ve sıkıştır (yer tasarrufu için)
-            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
-            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-            
-            // Dosya yolunu belirle: /data/user/0/com.example.var/files/profile_[uid].jpg
-            File file = getLocalProfileFile(user.getUid());
-            
-            FileOutputStream outputStream = new FileOutputStream(file);
-            // %80 kalite ile JPEG olarak kaydet
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
-            
-            outputStream.flush();
-            outputStream.close();
-            
-            // UI'da hemen göster
-            loadProfilePhoto(file.getAbsolutePath());
-            showSnackbar(getString(R.string.photo_updated));
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Yerel kaydetme hatası", e);
-            showSnackbar(getString(R.string.error_loading));
-        }
-    }
-
-    /**
-     * Kullanıcıya özel yerel profil fotoğrafı dosyasını döndürür.
-     */
-    private File getLocalProfileFile(String uid) {
-        return new File(requireContext().getFilesDir(), "profile_" + uid + ".jpg");
     }
 
     private void loadLeagueNames() {
@@ -192,8 +162,11 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<ApiResponse<LeagueModel>> call,
                     @NonNull Response<ApiResponse<LeagueModel>> response) {
-                if (!isAdded() || binding == null) return;
-                if (!response.isSuccessful() || response.body() == null || response.body().getData() == null) return;
+                if (!isAdded() || binding == null)
+                    return;
+                if (!response.isSuccessful() || response.body() == null
+                        || response.body().getData() == null)
+                    return;
                 for (LeagueModel l : response.body().getData()) {
                     if (l.getLeagueId() != null && l.getName() != null) {
                         leagueNameMap.put(l.getLeagueId(), l.getName());
@@ -205,15 +178,18 @@ public class ProfileFragment extends Fragment {
                             currentUser.getFavoriteTeamNames());
                 }
             }
+
             @Override
-            public void onFailure(@NonNull Call<ApiResponse<LeagueModel>> call, @NonNull Throwable t) { }
+            public void onFailure(@NonNull Call<ApiResponse<LeagueModel>> call, @NonNull Throwable t) {
+            }
         });
     }
 
     private void displayFavorites(List<String> favoriteTeams, List<String> favoriteLeagues,
             Map<String, String> teamNames) {
         Map<String, String> teamLeagues = currentUser != null
-                ? currentUser.getFavoriteTeamLeagues() : new HashMap<>();
+                ? currentUser.getFavoriteTeamLeagues()
+                : new HashMap<>();
 
         binding.llFavoriteTeams.removeAllViews();
         if (favoriteTeams == null || favoriteTeams.isEmpty()) {
@@ -233,7 +209,8 @@ public class ProfileFragment extends Fragment {
         }
 
         Map<String, String> leagueNames = currentUser != null
-                ? currentUser.getFavoriteLeagueNames() : new HashMap<>();
+                ? currentUser.getFavoriteLeagueNames()
+                : new HashMap<>();
 
         binding.llFavoriteLeagues.removeAllViews();
         if (favoriteLeagues == null || favoriteLeagues.isEmpty()) {
@@ -258,25 +235,33 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<com.example.var.data.model.StandingLeagueResponse> call,
                     @NonNull Response<com.example.var.data.model.StandingLeagueResponse> response) {
-                if (!isAdded() || binding == null) return;
-                if (!response.isSuccessful() || response.body() == null || response.body().getData() == null) return;
+                if (!isAdded() || binding == null)
+                    return;
+                if (!response.isSuccessful() || response.body() == null || response.body().getData() == null)
+                    return;
 
-                List<com.example.var.data.model.StandingLeagueResponse.TeamInfo> infos =
-                        response.body().getData().getTeamInfos();
-                if (infos == null) return;
+                List<com.example.var.data.model.StandingLeagueResponse.TeamInfo> infos = response.body().getData()
+                        .getTeamInfos();
+                if (infos == null)
+                    return;
 
                 for (com.example.var.data.model.StandingLeagueResponse.TeamInfo ti : infos) {
                     if (teamId.equals(ti.getTeamId()) && ti.getName() != null) {
                         final String resolvedName = ti.getName();
                         ((TextView) row.findViewById(R.id.tvFavoriteName)).setText(resolvedName);
                         row.setOnClickListener(v -> openTeam(teamId, resolvedName, leagueId));
-                        FirebaseManager.addFavoriteTeam(teamId, resolvedName, leagueId, u -> {}, e -> {});
+                        FirebaseManager.addFavoriteTeam(teamId, resolvedName, leagueId, u -> {
+                        }, e -> {
+                        });
                         return;
                     }
                 }
             }
+
             @Override
-            public void onFailure(@NonNull Call<com.example.var.data.model.StandingLeagueResponse> call, @NonNull Throwable t) { }
+            public void onFailure(@NonNull Call<com.example.var.data.model.StandingLeagueResponse> call,
+                    @NonNull Throwable t) {
+            }
         });
     }
 
@@ -324,6 +309,75 @@ public class ProfileFragment extends Fragment {
         binding.tvCurrentLanguage.setText("tr".equals(lang)
                 ? getString(R.string.language_turkish)
                 : getString(R.string.language_english));
+    }
+
+    /**
+     * Seçilen fotoğrafı Firebase Storage'a yükler ve download URL'sini alır.
+     * "Object does not exist" hatasını önlemek için modern task chaining kullanır.
+     */
+    private void uploadProfilePhoto(Uri imageUri) {
+        FirebaseUser user = FirebaseManager.getCurrentUser();
+        if (user == null)
+            return;
+
+        showSnackbar(getString(R.string.uploading_photo));
+
+        final StorageReference photoRef = FirebaseStorage.getInstance().getReference()
+                .child("profile_photos")
+                .child(user.getUid() + ".jpg");
+
+        // Yükleme işlemini başlat
+        UploadTask uploadTask = photoRef.putFile(imageUri);
+
+        // Task zincirleme: Yükleme bitince URL almayı dene
+        uploadTask.continueWithTask(task -> {
+            if (!task.isSuccessful()) {
+                if (task.getException() != null)
+                    throw task.getException();
+            }
+            // Yükleme bitti, şimdi URL'yi iste
+            return photoRef.getDownloadUrl();
+        }).addOnSuccessListener(uri -> {
+            if (!isAdded())
+                return;
+            String downloadUrl = uri.toString();
+
+            // Firestore'da güncelle
+            updatePhotoUrlInFirestore(downloadUrl);
+
+            // UI'da göster
+            loadProfilePhoto(downloadUrl);
+
+        }).addOnFailureListener(e -> {
+            if (!isAdded())
+                return;
+            Log.e(TAG, "Yükleme hatası: " + e.getMessage(), e);
+
+            // "Object does not exist" hatası genelde bucket veya kurallar kaynaklıdır
+            String errorMsg = e.getMessage();
+            if (errorMsg != null && errorMsg.contains("does not exist")) {
+                showSnackbar(
+                        getString(R.string.upload_failed) + ": Depolama alanı (Bucket) bulunamadı veya yetki yok.");
+            } else {
+                showSnackbar(
+                        getString(R.string.upload_failed) + ": " + (errorMsg != null ? errorMsg : "Bilinmeyen hata"));
+            }
+        });
+    }
+
+    private void updatePhotoUrlInFirestore(String photoUrl) {
+        FirebaseUser user = FirebaseManager.getCurrentUser();
+        if (user == null)
+            return;
+
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(user.getUid())
+                .update("photoUrl", photoUrl)
+                .addOnSuccessListener(unused -> showSnackbar(getString(R.string.photo_updated)))
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Firestore güncellenemedi", e);
+                });
     }
 
     private void signOut() {
