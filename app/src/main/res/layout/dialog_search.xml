@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ===================================================================== -->
-<!-- dialog_search.xml - Arama dialog'u layout'u                            -->
-<!-- Kullanıcı takım veya lig arayabilir                                    -->
-<!-- TextInputLayout + RecyclerView ile arama sonuçları listelenir          -->
-<!-- ===================================================================== -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -13,30 +8,63 @@
     android:background="?attr/colorSurface"
     android:padding="@dimen/padding_lg">
 
-    <!-- Arama Giriş Alanı -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilSearch"
+    <!-- Arama satırı: input alanı + kapsam butonu -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:hintEnabled="false"
-        app:boxCornerRadiusTopStart="@dimen/radius_xl"
-        app:boxCornerRadiusTopEnd="@dimen/radius_xl"
-        app:boxCornerRadiusBottomStart="@dimen/radius_xl"
-        app:boxCornerRadiusBottomEnd="@dimen/radius_xl"
-        app:boxBackgroundMode="outline"
-        app:startIconDrawable="@android:drawable/ic_menu_search"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSearch"
-            android:layout_width="match_parent"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSearch"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/search_hint"
-            android:inputType="text"
-            android:imeOptions="actionSearch"
-            android:maxLines="1" />
+            android:layout_weight="1"
+            app:hintEnabled="false"
+            app:boxCornerRadiusTopStart="@dimen/radius_xl"
+            app:boxCornerRadiusTopEnd="@dimen/radius_xl"
+            app:boxCornerRadiusBottomStart="@dimen/radius_xl"
+            app:boxCornerRadiusBottomEnd="@dimen/radius_xl"
+            app:boxBackgroundMode="outline"
+            app:startIconDrawable="@android:drawable/ic_menu_search"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/search_hint"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Kapsam geçiş butonu: Günlük ↔ Genel -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSearchScope"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/search_scope_daily"
+            android:textSize="12sp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="?attr/colorPrimary" />
+
+    </LinearLayout>
+
+    <!-- Kapsam açıklama metni -->
+    <TextView
+        android:id="@+id/tvSearchScopeHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/search_scope_daily_hint"
+        android:textSize="11sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:gravity="end" />
 
     <!-- Yükleme göstergesi -->
     <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -54,7 +82,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="@dimen/margin_md"
-        android:clipToPadding="false" />
+        android:clipToPadding="false"
+        android:visibility="gone" />
 
     <!-- Sonuç Bulunamadı Mesajı -->
     <TextView

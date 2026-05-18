@@ -136,7 +136,8 @@ public class HomeFragment extends Fragment implements
     private void setupToolbar() {
         // Arama butonu - SearchDialogFragment açar
         binding.btnSearch.setOnClickListener(v -> {
-            SearchDialogFragment searchDialog = new SearchDialogFragment();
+            SearchDialogFragment searchDialog = SearchDialogFragment.newInstance(
+                    com.example.var.util.DateUtils.formatForApi(selectedDate));
             searchDialog.show(getParentFragmentManager(), "search_dialog");
         });
 

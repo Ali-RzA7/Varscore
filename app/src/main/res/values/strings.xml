@@ -39,6 +39,10 @@
     <string name="search_teams">Takımlar</string>
     <string name="search_leagues">Lig</string>
     <string name="search_cup">Kupa</string>
+    <string name="search_scope_daily">Günlük</string>
+    <string name="search_scope_global">Genel</string>
+    <string name="search_scope_daily_hint">Sadece seçili gün maçları</string>
+    <string name="search_scope_global_hint">Tüm ligler ve takımlar</string>
 
     <!-- Ayarlar -->
     <string name="settings">Ayarlar</string>

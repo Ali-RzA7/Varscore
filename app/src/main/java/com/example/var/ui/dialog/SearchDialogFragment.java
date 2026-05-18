@@ -27,6 +27,7 @@ import com.example.var.ui.adapter.SearchResultAdapter;
 import com.example.var.util.DateUtils;
 import com.example.var.util.LeagueCache;
 import com.example.var.util.MatchCache;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 
@@ -42,51 +43,78 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * SearchDialogFragment - Genel arama dialog'u.
+ * SearchDialogFragment — Takım ve lig arama diyaloğu.
  *
- * İki veri kaynağı kullanır:
- *  1. Lig arama: LeagueCache → /league/basic tüm lig listesi (yüzlerce lig anında aranabilir)
- *  2. Takım arama: dün+bugün+yarın maç penceresi → geniş takım indexi
+ * İki mod:
+ *  - Günlük (Daily): Yalnızca seçili günün maçlarından takım/lig arar.
+ *  - Genel  (Global): Tüm ligler (LeagueCache) + geniş tarih penceresinden takımlar.
  *
- * Ligler önce sıralanır; takım satırlarında ait oldukları lig gösterilir.
- * Minimum 2 karakter girildikten sonra sonuçlar listelenir.
- * Debounce (300ms) ile gereksiz filtreleme engellenir.
+ * Global modun avantajı:
+ *  - /league/basic tüm lig listesini kullanır (yüzlerce lig).
+ *  - loadIgnoreTTL ile geçmiş günlerde önbelleğe alınan takımlar da dahil edilir.
+ *  - Bugün maçı olmayan takımlar (ör. Beşiktaş JK) genel modda bulunabilir.
  */
 public class SearchDialogFragment extends DialogFragment
         implements SearchResultAdapter.OnSearchResultClickListener {
 
+    private static final String ARG_SELECTED_DATE = "selected_date";
     private static final long DEBOUNCE_MS = 300;
+    /** Global modda taranan gün sayısı (bugün ± N) */
+    private static final int GLOBAL_DAY_RADIUS = 3;
     private static final String API_KEY = BuildConfig.API_KEY;
 
     private EditText etSearch;
     private RecyclerView rvSearchResults;
     private TextView tvNoResults;
+    private TextView tvScopeHint;
+    private MaterialButton btnSearchScope;
     private LinearProgressIndicator progressBar;
     private SearchResultAdapter adapter;
+    private MatchRepository repo;
 
-    /** Tüm aranabilir sonuçlar (lig + takım karışık) */
     private final List<SearchResultAdapter.SearchResultItem> allResults = new ArrayList<>();
-
-    /** Mükerrer takım girişini önlemek için teamId seti */
     private final Set<String> addedTeamIds = new HashSet<>();
-
-    /** Uçuşta olan asenkron yükleme sayısı */
     private int pendingLoads = 0;
+    private boolean isGlobalMode = false;
+    private String selectedDate;
 
     private final Handler debounceHandler = new Handler(Looper.getMainLooper());
     private Runnable debounceRunnable;
 
-    private MatchRepository repo;
+    // ================================================================
+    // Factory
+    // ================================================================
+
+    public static SearchDialogFragment newInstance(String selectedDate) {
+        SearchDialogFragment f = new SearchDialogFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_SELECTED_DATE, selectedDate);
+        f.setArguments(args);
+        return f;
+    }
+
+    // ================================================================
+    // Oluşturma
+    // ================================================================
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        if (getArguments() != null) {
+            selectedDate = getArguments().getString(ARG_SELECTED_DATE);
+        }
+        if (selectedDate == null) {
+            selectedDate = DateUtils.formatForApi(Calendar.getInstance());
+        }
+
         View view = LayoutInflater.from(requireContext())
                 .inflate(R.layout.dialog_search, null);
 
         etSearch = view.findViewById(R.id.etSearch);
         rvSearchResults = view.findViewById(R.id.rvSearchResults);
         tvNoResults = view.findViewById(R.id.tvNoResults);
+        tvScopeHint = view.findViewById(R.id.tvSearchScopeHint);
+        btnSearchScope = view.findViewById(R.id.btnSearchScope);
         progressBar = view.findViewById(R.id.progressBarSearch);
 
         repo = new MatchRepository(API_KEY);
@@ -95,20 +123,9 @@ public class SearchDialogFragment extends DialogFragment
         rvSearchResults.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvSearchResults.setAdapter(adapter);
 
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
-            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (debounceRunnable != null) debounceHandler.removeCallbacks(debounceRunnable);
-                String query = s.toString().trim();
-                debounceRunnable = () -> filterResults(query);
-                debounceHandler.postDelayed(debounceRunnable, DEBOUNCE_MS);
-            }
-        });
-
-        loadSearchableData();
+        setupScopeButton();
+        setupSearchInput();
+        loadForCurrentMode();
 
         return new MaterialAlertDialogBuilder(requireContext())
                 .setView(view)
@@ -116,44 +133,147 @@ public class SearchDialogFragment extends DialogFragment
     }
 
     // ================================================================
+    // Kapsam Butonu
+    // ================================================================
+
+    private void setupScopeButton() {
+        updateScopeUI();
+        btnSearchScope.setOnClickListener(v -> {
+            isGlobalMode = !isGlobalMode;
+            updateScopeUI();
+            resetAndReload();
+        });
+    }
+
+    /** Buton rengini ve açıklama metnini moda göre günceller. */
+    private void updateScopeUI() {
+        if (isGlobalMode) {
+            btnSearchScope.setText(getString(R.string.search_scope_global));
+            btnSearchScope.setBackgroundTintList(
+                    requireContext().getColorStateList(R.color.secondary));
+            btnSearchScope.setTextColor(requireContext().getColor(R.color.on_secondary));
+            btnSearchScope.setStrokeColorResource(R.color.secondary);
+            tvScopeHint.setText(getString(R.string.search_scope_global_hint));
+        } else {
+            btnSearchScope.setText(getString(R.string.search_scope_daily));
+            btnSearchScope.setBackgroundTintList(
+                    requireContext().getColorStateList(android.R.color.transparent));
+            btnSearchScope.setTextColor(requireContext().getColor(R.color.primary));
+            btnSearchScope.setStrokeColorResource(R.color.primary);
+            tvScopeHint.setText(getString(R.string.search_scope_daily_hint));
+        }
+    }
+
+    // ================================================================
+    // Arama Girişi
+    // ================================================================
+
+    private void setupSearchInput() {
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int st, int c, int a) {}
+            @Override public void onTextChanged(CharSequence s, int st, int b, int c) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (debounceRunnable != null) debounceHandler.removeCallbacks(debounceRunnable);
+                String q = s.toString().trim();
+                debounceRunnable = () -> filterResults(q);
+                debounceHandler.postDelayed(debounceRunnable, DEBOUNCE_MS);
+            }
+        });
+    }
+
+    // ================================================================
     // Veri Yükleme
     // ================================================================
 
-    private void loadSearchableData() {
-        loadLeagues();
-        loadTeamsFromMultipleDays();
+    /** Modu sıfırla ve yeniden yükle (mod değiştiğinde çağrılır). */
+    private void resetAndReload() {
+        allResults.clear();
+        addedTeamIds.clear();
+        adapter.setResults(new ArrayList<>());
+        tvNoResults.setVisibility(View.GONE);
+        rvSearchResults.setVisibility(View.GONE);
+        loadForCurrentMode();
     }
 
-    /**
-     * Tüm lig listesini LeagueCache'ten yükler.
-     * Cache boşsa /league/basic API'sinden çeker ve cache'e kaydeder.
-     * Bu sayede yüzlerce lig anında aranabilir hale gelir.
-     */
-    private void loadLeagues() {
-        // Geçerli cache varsa hemen kullan
-        List<LeagueModel> cached = LeagueCache.load(requireContext());
-        if (cached != null) {
-            addLeaguesToResults(cached);
-            return;
+    private void loadForCurrentMode() {
+        if (isGlobalMode) {
+            loadGlobal();
+        } else {
+            loadDaily();
         }
+    }
 
-        // Süresi geçmiş eski cache varsa geçici olarak kullan
+    // ---- Günlük Mod ----
+
+    /**
+     * Günlük mod: sadece selectedDate'in maçlarından takım/lig toplar.
+     * Ligler de yalnızca o günkü maçlardan çıkarılır.
+     */
+    private void loadDaily() {
+        List<MatchModel> cached = MatchCache.load(requireContext(), selectedDate);
+        if (cached != null) {
+            extractLeaguesFromMatches(cached);
+            extractTeams(cached);
+        } else {
+            pendingLoads++;
+            updateLoadingState();
+            repo.getMatchesByDate(selectedDate).enqueue(new Callback<ApiResponse<MatchModel>>() {
+                @Override
+                public void onResponse(@NonNull Call<ApiResponse<MatchModel>> call,
+                        @NonNull Response<ApiResponse<MatchModel>> response) {
+                    if (!isAdded()) return;
+                    pendingLoads--;
+                    if (response.isSuccessful() && response.body() != null
+                            && response.body().getData() != null) {
+                        List<MatchModel> matches = response.body().getData();
+                        MatchCache.save(requireContext(), selectedDate, matches);
+                        extractLeaguesFromMatches(matches);
+                        extractTeams(matches);
+                    }
+                    updateLoadingState();
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ApiResponse<MatchModel>> call, @NonNull Throwable t) {
+                    if (!isAdded()) return;
+                    pendingLoads--;
+                    updateLoadingState();
+                }
+            });
+        }
+    }
+
+    // ---- Genel Mod ----
+
+    /**
+     * Genel mod:
+     *  1. TÜM ligler: LeagueCache → /league/basic
+     *  2. Takımlar: bugün ± GLOBAL_DAY_RADIUS gün (loadIgnoreTTL + bugün API)
+     */
+    private void loadGlobal() {
+        loadAllLeagues();
+        loadTeamsGlobalWindow();
+    }
+
+    /** Tüm lig listesini LeagueCache'ten veya API'den yükler. */
+    private void loadAllLeagues() {
+        List<LeagueModel> cached = LeagueCache.load(requireContext());
+        if (cached != null) { addLeaguesToResults(cached); return; }
+
         List<LeagueModel> stale = LeagueCache.loadAny(requireContext());
         if (stale != null) {
             addLeaguesToResults(stale);
-            // Arka planda taze veriyi çek
-            fetchLeaguesFromApi();
+            fetchLeaguesFromApiBackground(); // arka planda tazele
             return;
         }
-
-        // Cache yok — API'den çek
-        fetchLeaguesFromApi();
+        fetchLeaguesFromApiBackground();
     }
 
-    private void fetchLeaguesFromApi() {
+    private void fetchLeaguesFromApiBackground() {
         pendingLoads++;
         updateLoadingState();
-
         repo.getLeagues().enqueue(new Callback<ApiResponse<LeagueModel>>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse<LeagueModel>> call,
@@ -178,46 +298,33 @@ public class SearchDialogFragment extends DialogFragment
         });
     }
 
-    private void addLeaguesToResults(List<LeagueModel> leagues) {
-        for (LeagueModel league : leagues) {
-            if (league.getLeagueId() == null || league.getName() == null) continue;
-            String icon = league.getType() == 2 ? "🏆" : "⚽";
-            String subtitle = league.getType() == 2
-                    ? getString(R.string.search_cup)
-                    : getString(R.string.search_leagues);
-            allResults.add(new SearchResultAdapter.SearchResultItem(
-                    icon, league.getName(), subtitle,
-                    league.getLeagueId(), "league"));
-        }
-        refreshFilter();
-    }
-
     /**
-     * Dün, bugün ve yarınki maçlardan takımları toplar.
-     * Birden fazla günden veri gelmesi, sadece bugün oynamayan takımları da
-     * aranabilir kılar. Cache'te olmayanlar için sadece bugünü API'den çeker.
+     * Bugün ± GLOBAL_DAY_RADIUS gün aralığında takım indexi oluşturur.
+     * loadIgnoreTTL sayesinde geçmiş oturumlarda önbelleğe alınan veriler de kullanılır.
+     * Bugün cache'te yoksa API'den çekilir; diğer günler yalnızca mevcut cache kullanılır.
      */
-    private void loadTeamsFromMultipleDays() {
+    private void loadTeamsGlobalWindow() {
         Calendar base = Calendar.getInstance();
-        for (int offset = -1; offset <= 1; offset++) {
+        for (int offset = -GLOBAL_DAY_RADIUS; offset <= GLOBAL_DAY_RADIUS; offset++) {
             Calendar day = (Calendar) base.clone();
             day.add(Calendar.DAY_OF_YEAR, offset);
             String dateStr = DateUtils.formatForApi(day);
 
-            List<MatchModel> cached = MatchCache.load(requireContext(), dateStr);
-            if (cached != null) {
-                extractTeams(cached);
+            // TTL'den bağımsız olarak daha önce kaydedilmiş veriyi oku
+            List<MatchModel> stored = MatchCache.loadIgnoreTTL(requireContext(), dateStr);
+            if (stored != null) {
+                extractTeams(stored);
             } else if (offset == 0) {
-                // Sadece bugünü API'den çek (rate limit aşımını önlemek için)
+                // Bugün hiç çekilmemiş — API'den al
                 fetchTeamsForDate(dateStr);
             }
+            // Diğer günler için API çağrısı yapılmaz (rate limit koruması)
         }
     }
 
     private void fetchTeamsForDate(String date) {
         pendingLoads++;
         updateLoadingState();
-
         repo.getMatchesByDate(date).enqueue(new Callback<ApiResponse<MatchModel>>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse<MatchModel>> call,
@@ -242,6 +349,42 @@ public class SearchDialogFragment extends DialogFragment
         });
     }
 
+    // ================================================================
+    // Veri Çıkarma
+    // ================================================================
+
+    /** Maç listesinden benzersiz ligleri çıkarır (günlük mod için). */
+    private void extractLeaguesFromMatches(List<MatchModel> matches) {
+        Set<String> addedLeagueIds = new HashSet<>();
+        for (MatchModel match : matches) {
+            if (match.getLeagueId() == null || match.getLeagueName() == null) continue;
+            if (addedLeagueIds.contains(match.getLeagueId())) continue;
+            String icon = match.getLeagueType() == 2 ? "🏆" : "⚽";
+            String subtitle = match.getLeagueType() == 2
+                    ? getString(R.string.search_cup) : getString(R.string.search_leagues);
+            allResults.add(new SearchResultAdapter.SearchResultItem(
+                    icon, match.getLeagueName(), subtitle,
+                    match.getLeagueId(), "league"));
+            addedLeagueIds.add(match.getLeagueId());
+        }
+        refreshFilter();
+    }
+
+    /** LeagueModel listesinden sonuç öğeleri oluşturur (genel mod için). */
+    private void addLeaguesToResults(List<LeagueModel> leagues) {
+        for (LeagueModel league : leagues) {
+            if (league.getLeagueId() == null || league.getName() == null) continue;
+            String icon = league.getType() == 2 ? "🏆" : "⚽";
+            String subtitle = league.getType() == 2
+                    ? getString(R.string.search_cup) : getString(R.string.search_leagues);
+            allResults.add(new SearchResultAdapter.SearchResultItem(
+                    icon, league.getName(), subtitle,
+                    league.getLeagueId(), "league"));
+        }
+        refreshFilter();
+    }
+
+    /** Maç listesinden benzersiz takımları çıkarır. */
     private void extractTeams(List<MatchModel> matches) {
         boolean changed = false;
         for (MatchModel match : matches) {
@@ -268,19 +411,16 @@ public class SearchDialogFragment extends DialogFragment
     }
 
     // ================================================================
-    // Filtreleme ve UI
+    // Filtreleme
     // ================================================================
 
-    /** Mevcut arama metni ile filtreyi yeniden uygular. */
     private void refreshFilter() {
-        if (etSearch != null) {
-            filterResults(etSearch.getText().toString().trim());
-        }
+        if (etSearch != null) filterResults(etSearch.getText().toString().trim());
     }
 
     /**
-     * Arama metnine göre sonuçları filtreler.
-     * Ligler önce, takımlar arkada sıralanır.
+     * Sorguyu küçük harfe çevirip tüm sonuçları filtreler.
+     * Ligler önce, takımlar arkada gösterilir.
      * 2 karakterden az girişte liste gizlenir.
      */
     private void filterResults(String query) {
@@ -301,12 +441,12 @@ public class SearchDialogFragment extends DialogFragment
             else teams.add(item);
         }
 
-        List<SearchResultAdapter.SearchResultItem> merged = new ArrayList<>(leagues.size() + teams.size());
+        List<SearchResultAdapter.SearchResultItem> merged =
+                new ArrayList<>(leagues.size() + teams.size());
         merged.addAll(leagues);
         merged.addAll(teams);
 
         adapter.setResults(merged);
-
         boolean empty = merged.isEmpty();
         tvNoResults.setVisibility(empty ? View.VISIBLE : View.GONE);
         rvSearchResults.setVisibility(empty ? View.GONE : View.VISIBLE);
@@ -319,7 +459,7 @@ public class SearchDialogFragment extends DialogFragment
     }
 
     // ================================================================
-    // Tıklama: Seçilen sonuca yönlendir
+    // Sonuç Tıklaması
     // ================================================================
 
     @Override

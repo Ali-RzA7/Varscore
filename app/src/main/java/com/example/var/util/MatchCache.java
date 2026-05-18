@@ -45,6 +45,17 @@ public class MatchCache {
         return new Gson().fromJson(json, type);
     }
 
+    /**
+     * Tarih bazlı maç verisini TTL kontrolü olmadan yükler.
+     * Arama gibi hafif bayatlığın sorun olmadığı durumlarda kullanılır.
+     */
+    public static List<MatchModel> loadIgnoreTTL(Context ctx, String date) {
+        String json = prefs(ctx).getString(KEY_PREFIX + date, null);
+        if (json == null) return null;
+        Type type = new TypeToken<List<MatchModel>>() {}.getType();
+        return new Gson().fromJson(json, type);
+    }
+
     public static void clear(Context ctx) {
         prefs(ctx).edit().clear().apply();
     }
