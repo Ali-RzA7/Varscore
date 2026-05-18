@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 
 import androidx.core.app.NotificationCompat;
 
@@ -16,18 +17,29 @@ import com.example.var.ui.MainActivity;
  * NotificationHelper — Bildirim kanallarını oluşturur ve bildirimleri gösterir.
  *
  * Kanallar:
- *  - CHANNEL_LIVE     : Gol, kart, durum değişikliği gibi canlı maç bildirimleri
- *  - CHANNEL_REMINDER : 1 saat öncesi maç hatırlatmaları
+ *  - CHANNEL_LIVE         : Kırmızı kart, devre arası, kadro, VAR, penaltı bildirimleri
+ *  - CHANNEL_GOAL         : Gol bildirimleri (gol.mp3)
+ *  - CHANNEL_MATCH_START  : Maç başlangıç bildirimleri (macbaslama.mp3)
+ *  - CHANNEL_MATCH_END    : Maç sonu bildirimleri (macbitis.mp3)
+ *  - CHANNEL_REMINDER     : 1 saat öncesi maç hatırlatmaları (machatirlatma.mp3)
  */
 public class NotificationHelper {
 
-    public static final String CHANNEL_LIVE     = "varscore_live";
-    public static final String CHANNEL_REMINDER = "varscore_reminder";
+    public static final String CHANNEL_LIVE        = "varscore_live";
+    public static final String CHANNEL_GOAL        = "varscore_goal";
+    public static final String CHANNEL_MATCH_START = "varscore_match_start";
+    public static final String CHANNEL_MATCH_END   = "varscore_match_end";
+    public static final String CHANNEL_REMINDER    = "varscore_reminder";
+
+    private static Uri soundUri(Context ctx, int rawResId) {
+        return Uri.parse("android.resource://" + ctx.getPackageName() + "/" + rawResId);
+    }
 
     /** Uygulama ilk açıldığında çağrılır — kanalları oluşturur. */
     public static void createChannels(Context ctx) {
         NotificationManager nm = ctx.getSystemService(NotificationManager.class);
 
+        // Diğer canlı bildirimler (kırmızı kart, devre, kadro, VAR, penaltı)
         NotificationChannel live = new NotificationChannel(
                 CHANNEL_LIVE,
                 ctx.getString(R.string.channel_live_name),
@@ -36,34 +48,63 @@ public class NotificationHelper {
         live.setDescription(ctx.getString(R.string.channel_live_desc));
         live.enableVibration(true);
 
+        // Gol — gol.mp3
+        NotificationChannel goal = new NotificationChannel(
+                CHANNEL_GOAL,
+                ctx.getString(R.string.channel_live_name) + " (Gol)",
+                NotificationManager.IMPORTANCE_HIGH
+        );
+        goal.setSound(soundUri(ctx, R.raw.gol), null);
+        goal.enableVibration(true);
+
+        // Maç başlangıcı — macbaslama.mp3
+        NotificationChannel matchStart = new NotificationChannel(
+                CHANNEL_MATCH_START,
+                ctx.getString(R.string.channel_live_name) + " (Maç Başlangıcı)",
+                NotificationManager.IMPORTANCE_HIGH
+        );
+        matchStart.setSound(soundUri(ctx, R.raw.macbaslama), null);
+        matchStart.enableVibration(true);
+
+        // Maç sonu — macbitis.mp3
+        NotificationChannel matchEnd = new NotificationChannel(
+                CHANNEL_MATCH_END,
+                ctx.getString(R.string.channel_live_name) + " (Maç Sonu)",
+                NotificationManager.IMPORTANCE_HIGH
+        );
+        matchEnd.setSound(soundUri(ctx, R.raw.macbitis), null);
+        matchEnd.enableVibration(true);
+
+        // Hatırlatma — machatirlatma.mp3
         NotificationChannel reminder = new NotificationChannel(
                 CHANNEL_REMINDER,
                 ctx.getString(R.string.channel_reminder_name),
                 NotificationManager.IMPORTANCE_DEFAULT
         );
         reminder.setDescription(ctx.getString(R.string.channel_reminder_desc));
+        reminder.setSound(soundUri(ctx, R.raw.machatirlatma), null);
 
         nm.createNotificationChannel(live);
+        nm.createNotificationChannel(goal);
+        nm.createNotificationChannel(matchStart);
+        nm.createNotificationChannel(matchEnd);
         nm.createNotificationChannel(reminder);
-
     }
 
     // ── Canlı Maç Bildirimleri ──────────────────────────────────────────
 
     public static void showMatchStart(Context ctx, String home, String away) {
-        show(ctx, CHANNEL_LIVE,
+        show(ctx, CHANNEL_MATCH_START,
                 ctx.getString(R.string.notification_match_started),
                 home + " - " + away,
                 id(home + away + "start"));
-
     }
 
     public static void showGoal(Context ctx, String home, String away, int hs, int as) {
-        show(ctx, CHANNEL_LIVE,
+        show(ctx, CHANNEL_GOAL,
                 ctx.getString(R.string.notification_goal),
                 home + " " + hs + " - " + as + " " + away,
                 id(home + away + "goal" + hs + as));
-
     }
 
     public static void showRedCard(Context ctx, String home, String away, boolean isHome) {
@@ -84,11 +125,10 @@ public class NotificationHelper {
     }
 
     public static void showMatchEnd(Context ctx, String home, String away, int hs, int as) {
-        show(ctx, CHANNEL_LIVE,
+        show(ctx, CHANNEL_MATCH_END,
                 ctx.getString(R.string.notification_match_ended),
                 home + " " + hs + " - " + as + " " + away,
                 id(home + away + "end"));
-
     }
 
     public static void showLineupReady(Context ctx, String home, String away) {
