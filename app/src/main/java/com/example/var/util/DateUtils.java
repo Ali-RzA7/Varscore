@@ -39,6 +39,23 @@ public class DateUtils {
     }
 
     /**
+     * API formatındaki tarih string'ini Calendar'a dönüştürür.
+     * @param dateStr "yyyy-MM-dd" formatında tarih
+     * @return Calendar nesnesi, parse hatasında bugünün tarihi
+     */
+    public static Calendar parseApiDate(String dateStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(API_DATE_FORMAT, Locale.US);
+            Date date = sdf.parse(dateStr);
+            Calendar cal = Calendar.getInstance();
+            if (date != null) cal.setTime(date);
+            return cal;
+        } catch (Exception e) {
+            return Calendar.getInstance();
+        }
+    }
+
+    /**
      * Unix timestamp'i saat formatına dönüştürür.
      * API'den gelen matchTime (saniye cinsinden) -> "HH:mm" formatı.
      *

@@ -1,5 +1,6 @@
 package com.example.var.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,6 +27,7 @@ import com.example.var.ui.fragment.LeagueStandingsFragment;
 import com.example.var.ui.fragment.MatchDetailFragment;
 import com.example.var.util.DateUtils;
 import com.example.var.util.FirebaseManager;
+import com.example.var.util.GlobalTeamCache;
 import com.example.var.util.MatchCache;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -93,6 +95,8 @@ public class HomeFragment extends Fragment implements
     private List<MatchModel> currentMatches = null;
 
     private static final String API_KEY = BuildConfig.API_KEY;
+    /** Uygulama süresi boyunca yalnızca bir kez build tetiklenmesi için statik kilit */
+    private static boolean isBuildingTeamCache = false;
 
     @Nullable
     @Override
@@ -117,6 +121,12 @@ public class HomeFragment extends Fragment implements
         setupDatePicker();
         setupMatchList();
         setupSwipeRefresh();
+
+        // GlobalTeamCache boş veya süresi dolmuşsa arka planda yeniden doldur
+        if (GlobalTeamCache.needsRefresh(requireContext()) && !isBuildingTeamCache) {
+            isBuildingTeamCache = true;
+            buildGlobalTeamCacheInBackground();
+        }
 
         // Favorileri yükle (giriş yapmışsa), maçlarla eş zamanlı
         loadUserFavorites();
@@ -293,6 +303,52 @@ public class HomeFragment extends Fragment implements
     }
 
     // ================================================================
+    // Global Team Cache — Arka Plan Doldurma
+    // ================================================================
+
+    /**
+     * Bugün ± 14 gün aralığındaki maç verilerini paralel olarak API'den çekip
+     * GlobalTeamCache'i doldurur. Sonuç: tarihten bağımsız genel arama için
+     * tüm aktif takımlar tek seferlik olarak cache'e yazılır (30 gün geçerli).
+     *
+     * Bu metot yalnızca cache boşken veya 30 günlük TTL dolduğunda çağrılır.
+     */
+    private void buildGlobalTeamCacheInBackground() {
+        Context appCtx = requireContext().getApplicationContext();
+        int radius = 14; // bugün ± 14 gün = 29 tarih
+        int[] remaining = {radius * 2 + 1};
+
+        Calendar base = Calendar.getInstance();
+        for (int offset = -radius; offset <= radius; offset++) {
+            Calendar day = (Calendar) base.clone();
+            day.add(Calendar.DAY_OF_YEAR, offset);
+            String dateStr = DateUtils.formatForApi(day);
+
+            repository.getMatchesByDate(dateStr).enqueue(new Callback<ApiResponse<MatchModel>>() {
+                @Override
+                public void onResponse(@NonNull Call<ApiResponse<MatchModel>> call,
+                        @NonNull Response<ApiResponse<MatchModel>> response) {
+                    // Her başarılı yanıt anında merge edilir — ilk yanıt dosyayı oluşturur
+                    if (response.isSuccessful() && response.body() != null
+                            && response.body().getData() != null) {
+                        List<MatchModel> matches = response.body().getData();
+                        if (!matches.isEmpty()) {
+                            GlobalTeamCache.merge(appCtx, matches);
+                        }
+                    }
+                    if (--remaining[0] == 0) isBuildingTeamCache = false;
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ApiResponse<MatchModel>> call,
+                        @NonNull Throwable t) {
+                    if (--remaining[0] == 0) isBuildingTeamCache = false;
+                }
+            });
+        }
+    }
+
+    // ================================================================
     // Veri Yükleme
     // ================================================================
 
@@ -309,6 +365,7 @@ public class HomeFragment extends Fragment implements
         // Cache kontrolü
         List<MatchModel> cached = MatchCache.load(requireContext(), dateStr);
         if (cached != null) {
+            GlobalTeamCache.merge(requireContext(), cached);
             currentMatches = cached;
             matchAdapter.setMatches(sortMatchesByFavorites(cached));
             showContent();
@@ -330,6 +387,7 @@ public class HomeFragment extends Fragment implements
                     List<MatchModel> matches = response.body().getData();
                     if (matches != null && !matches.isEmpty()) {
                         MatchCache.save(requireContext(), dateStr, matches);
+                        GlobalTeamCache.merge(requireContext(), matches);
                         currentMatches = matches;
                         showContent();
                         matchAdapter.setMatches(sortMatchesByFavorites(matches));
@@ -372,6 +430,7 @@ public class HomeFragment extends Fragment implements
                     // Sadece canlı maçları filtrele (status 1-5)
                     List<MatchModel> liveMatches = new ArrayList<>();
                     if (allMatches != null) {
+                        GlobalTeamCache.merge(requireContext(), allMatches);
                         for (MatchModel m : allMatches) {
                             if (m.isLive())
                                 liveMatches.add(m);

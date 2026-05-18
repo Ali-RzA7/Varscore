@@ -25,6 +25,7 @@ import com.example.var.data.model.MatchModel;
 import com.example.var.data.repository.MatchRepository;
 import com.example.var.ui.adapter.SearchResultAdapter;
 import com.example.var.util.DateUtils;
+import com.example.var.util.GlobalTeamCache;
 import com.example.var.util.LeagueCache;
 import com.example.var.util.MatchCache;
 import com.google.android.material.button.MaterialButton;
@@ -47,20 +48,16 @@ import retrofit2.Response;
  *
  * İki mod:
  *  - Günlük (Daily): Yalnızca seçili günün maçlarından takım/lig arar.
- *  - Genel  (Global): Tüm ligler (LeagueCache) + geniş tarih penceresinden takımlar.
+ *  - Genel  (Global): Tüm ligler (LeagueCache, 30 gün) + GlobalTeamCache (tarihten bağımsız).
  *
- * Global modun avantajı:
- *  - /league/basic tüm lig listesini kullanır (yüzlerce lig).
- *  - loadIgnoreTTL ile geçmiş günlerde önbelleğe alınan takımlar da dahil edilir.
- *  - Bugün maçı olmayan takımlar (ör. Beşiktaş JK) genel modda bulunabilir.
+ * GlobalTeamCache: HomeFragment her maç yüklediğinde otomatik birikir.
+ * İlk açılışta boşsa selectedDate API'den çekilerek seed oluşturulur.
  */
 public class SearchDialogFragment extends DialogFragment
         implements SearchResultAdapter.OnSearchResultClickListener {
 
     private static final String ARG_SELECTED_DATE = "selected_date";
     private static final long DEBOUNCE_MS = 300;
-    /** Global modda taranan gün sayısı (bugün ± N) */
-    private static final int GLOBAL_DAY_RADIUS = 3;
     private static final String API_KEY = BuildConfig.API_KEY;
 
     private EditText etSearch;
@@ -249,12 +246,12 @@ public class SearchDialogFragment extends DialogFragment
 
     /**
      * Genel mod:
-     *  1. TÜM ligler: LeagueCache → /league/basic
-     *  2. Takımlar: bugün ± GLOBAL_DAY_RADIUS gün (loadIgnoreTTL + bugün API)
+     *  1. TÜM ligler: LeagueCache (30 gün TTL) → /league/basic
+     *  2. TÜM takımlar: GlobalTeamCache (tarihten bağımsız) → birikimli cache
      */
     private void loadGlobal() {
         loadAllLeagues();
-        loadTeamsGlobalWindow();
+        loadAllTeamsGlobal();
     }
 
     /** Tüm lig listesini LeagueCache'ten veya API'den yükler. */
@@ -265,13 +262,13 @@ public class SearchDialogFragment extends DialogFragment
         List<LeagueModel> stale = LeagueCache.loadAny(requireContext());
         if (stale != null) {
             addLeaguesToResults(stale);
-            fetchLeaguesFromApiBackground(); // arka planda tazele
+            fetchLeaguesFromApi();
             return;
         }
-        fetchLeaguesFromApiBackground();
+        fetchLeaguesFromApi();
     }
 
-    private void fetchLeaguesFromApiBackground() {
+    private void fetchLeaguesFromApi() {
         pendingLoads++;
         updateLoadingState();
         repo.getLeagues().enqueue(new Callback<ApiResponse<LeagueModel>>() {
@@ -299,33 +296,39 @@ public class SearchDialogFragment extends DialogFragment
     }
 
     /**
-     * Bugün ± GLOBAL_DAY_RADIUS gün aralığında takım indexi oluşturur.
-     * loadIgnoreTTL sayesinde geçmiş oturumlarda önbelleğe alınan veriler de kullanılır.
-     * Bugün cache'te yoksa API'den çekilir; diğer günler yalnızca mevcut cache kullanılır.
+     * GlobalTeamCache'ten tüm takımları yükler (tarihten tamamen bağımsız).
+     * Cache boşsa selectedDate API'den çekilerek seed oluşturulur.
      */
-    private void loadTeamsGlobalWindow() {
-        Calendar base = Calendar.getInstance();
-        for (int offset = -GLOBAL_DAY_RADIUS; offset <= GLOBAL_DAY_RADIUS; offset++) {
-            Calendar day = (Calendar) base.clone();
-            day.add(Calendar.DAY_OF_YEAR, offset);
-            String dateStr = DateUtils.formatForApi(day);
-
-            // TTL'den bağımsız olarak daha önce kaydedilmiş veriyi oku
-            List<MatchModel> stored = MatchCache.loadIgnoreTTL(requireContext(), dateStr);
-            if (stored != null) {
-                extractTeams(stored);
-            } else if (offset == 0) {
-                // Bugün hiç çekilmemiş — API'den al
-                fetchTeamsForDate(dateStr);
-            }
-            // Diğer günler için API çağrısı yapılmaz (rate limit koruması)
+    private void loadAllTeamsGlobal() {
+        List<GlobalTeamCache.TeamEntry> teams = GlobalTeamCache.loadAny(requireContext());
+        if (teams != null && !teams.isEmpty()) {
+            addGlobalTeamsToResults(teams);
+        } else {
+            // Cache tamamen boş — selectedDate API'den çekerek seed oluştur
+            seedGlobalTeamCache();
         }
     }
 
-    private void fetchTeamsForDate(String date) {
+    /** GlobalTeamCache girişlerini sonuç listesine ekler. */
+    private void addGlobalTeamsToResults(List<GlobalTeamCache.TeamEntry> teams) {
+        for (GlobalTeamCache.TeamEntry team : teams) {
+            String subtitle = team.leagueName != null
+                    ? team.leagueName : getString(R.string.search_teams);
+            allResults.add(new SearchResultAdapter.SearchResultItem(
+                    "👕", team.teamName, subtitle,
+                    team.teamId, "team", team.leagueId));
+        }
+        refreshFilter();
+    }
+
+    /**
+     * GlobalTeamCache boşken çağrılır: selectedDate'i API'den çekip cache'i başlatır.
+     * Yanıt gelince takımlar sonuç listesine eklenir.
+     */
+    private void seedGlobalTeamCache() {
         pendingLoads++;
         updateLoadingState();
-        repo.getMatchesByDate(date).enqueue(new Callback<ApiResponse<MatchModel>>() {
+        repo.getMatchesByDate(selectedDate).enqueue(new Callback<ApiResponse<MatchModel>>() {
             @Override
             public void onResponse(@NonNull Call<ApiResponse<MatchModel>> call,
                     @NonNull Response<ApiResponse<MatchModel>> response) {
@@ -334,8 +337,10 @@ public class SearchDialogFragment extends DialogFragment
                 if (response.isSuccessful() && response.body() != null
                         && response.body().getData() != null) {
                     List<MatchModel> matches = response.body().getData();
-                    MatchCache.save(requireContext(), date, matches);
-                    extractTeams(matches);
+                    MatchCache.save(requireContext(), selectedDate, matches);
+                    GlobalTeamCache.merge(requireContext(), matches);
+                    List<GlobalTeamCache.TeamEntry> seeded = GlobalTeamCache.loadAny(requireContext());
+                    if (seeded != null) addGlobalTeamsToResults(seeded);
                 }
                 updateLoadingState();
             }

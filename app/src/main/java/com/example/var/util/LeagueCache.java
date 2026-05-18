@@ -16,24 +16,26 @@ import java.util.List;
  * /league/basic endpoint'inin rate limit'ini aşmamak için:
  * - Oturum içi erişimler için in-memory cache
  * - Uygulama yeniden başlatıldığında SharedPreferences'ten yükleme
- * - TTL: 1 saat (rate limit 1800s olduğu için güvenli aralık)
+ * - TTL: 30 gün (lig listesi nadiren değişir)
  */
 public class LeagueCache {
 
     private static final String PREF_NAME  = "league_cache";
     private static final String KEY_JSON   = "leagues_json";
     private static final String KEY_TIME   = "cache_time";
-    private static final long   TTL_MS     = 1_800_000L; // 30 dakika (API rate limit perioduna eşit)
+    private static final long   TTL_MS     = 30L * 24 * 60 * 60 * 1000; // 30 gün
 
     private static List<LeagueModel> memory;
+    private static long memoryTime = 0;
 
     /** Ligleri hem memory hem SharedPreferences'e yazar. */
     public static void save(Context ctx, List<LeagueModel> leagues) {
         memory = leagues;
+        memoryTime = System.currentTimeMillis();
         String json = new Gson().toJson(leagues);
         prefs(ctx).edit()
                 .putString(KEY_JSON, json)
-                .putLong(KEY_TIME, System.currentTimeMillis())
+                .putLong(KEY_TIME, memoryTime)
                 .apply();
     }
 
@@ -43,7 +45,8 @@ public class LeagueCache {
      * TTL süresi aşılmışsa null döner.
      */
     public static List<LeagueModel> load(Context ctx) {
-        if (memory != null && !memory.isEmpty()) return memory;
+        long now = System.currentTimeMillis();
+        if (memory != null && !memory.isEmpty() && now - memoryTime <= TTL_MS) return memory;
 
         SharedPreferences sp = prefs(ctx);
         long savedAt = sp.getLong(KEY_TIME, 0);
@@ -63,16 +66,19 @@ public class LeagueCache {
      */
     public static List<LeagueModel> loadAny(Context ctx) {
         if (memory != null && !memory.isEmpty()) return memory;
-        String json = prefs(ctx).getString(KEY_JSON, null);
+        SharedPreferences sp = prefs(ctx);
+        String json = sp.getString(KEY_JSON, null);
         if (json == null) return null;
         Type type = new TypeToken<List<LeagueModel>>() {}.getType();
         memory = new Gson().fromJson(json, type);
+        memoryTime = sp.getLong(KEY_TIME, 0);
         return memory;
     }
 
     /** Cache'i tamamen temizler (swipe-refresh ile zorla yenileme için). */
     public static void clear(Context ctx) {
         memory = null;
+        memoryTime = 0;
         prefs(ctx).edit().remove(KEY_JSON).remove(KEY_TIME).apply();
     }
 
