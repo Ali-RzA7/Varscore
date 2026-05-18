@@ -98,6 +98,27 @@ Bildirim kanalları: Canlı Maç Bildirimleri + Maç Hatırlatmaları.
 
 ---
 
+## Arama (SearchDialogFragment)
+
+### Veri Kaynakları
+1. **Lig arama**: `LeagueCache` → `/league/basic` (TÜM ligler, yüzlercesi anında aranabilir)
+   - Cache geçerliyse anında yükle; süresi dolmuşsa eski cache kullan + arka planda tazele
+   - Yükleme bitene kadar `LinearProgressIndicator` gösterilir
+2. **Takım arama**: dün+bugün+yarın = 3 günlük maç penceresi
+   - Her günün cache'ini kontrol et; sadece bugün cache'te yoksa API'den çek
+   - Takım satırında ait olduğu lig adı gösterilir (subtitle)
+3. Sonuçlar: Ligler önce, takımlar arkada
+4. Minimum 2 karakter, 300ms debounce
+
+### Değiştirilen Dosyalar
+| Dosya | Değişiklik |
+|-------|-----------|
+| `SearchDialogFragment.java` | Tamamen yeniden yazıldı: LeagueCache entegrasyonu, 3-gün takım penceresi, debounce, progress indicator |
+| `dialog_search.xml` | `LinearProgressIndicator` eklendi |
+| `strings.xml` | `search_cup` ("Kupa"), `search_leagues` değeri "Lig" olarak güncellendi |
+
+---
+
 ## Veri Akışı (Ana Sayfa)
 ```
 onViewCreated()

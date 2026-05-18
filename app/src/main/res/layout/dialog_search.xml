@@ -38,6 +38,15 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Yükleme göstergesi -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBarSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
     <!-- Arama Sonuçları Listesi -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSearchResults"

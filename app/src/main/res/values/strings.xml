@@ -37,7 +37,8 @@
     <string name="search_hint">Takım veya lig ara…</string>
     <string name="search_no_results">Sonuç bulunamadı</string>
     <string name="search_teams">Takımlar</string>
-    <string name="search_leagues">Ligler</string>
+    <string name="search_leagues">Lig</string>
+    <string name="search_cup">Kupa</string>
 
     <!-- Ayarlar -->
     <string name="settings">Ayarlar</string>
