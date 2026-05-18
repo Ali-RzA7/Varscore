@@ -273,4 +273,25 @@
     <string name="stat_clearances">Uzaklaştırma</string>
     <string name="default_web_client_id" translatable="false">YOUR_WEB_CLIENT_ID</string>
 
+    <!-- ========================================= -->
+    <!-- Ses Bildirimi Ayarları                     -->
+    <!-- ========================================= -->
+    <string name="notification_sound_settings">Ses Bildirimlerini Özelleştir</string>
+    <string name="notification_sounds_title">Bildirim Sesleri</string>
+    <string name="sound_goal">Gol Sesi</string>
+    <string name="sound_match_start">Maç Başlama Sesi</string>
+    <string name="sound_match_end">Maç Bitiş Sesi</string>
+    <string name="sound_reminder">Maç Hatırlatma Sesi</string>
+    <string name="sound_play">Oynat</string>
+    <string name="sound_change">Değiştir</string>
+    <string name="sound_reset">Varsayılana Sıfırla</string>
+    <string name="sound_select_file">Dosyadan Seç</string>
+    <string name="sound_default">Varsayılan</string>
+    <string name="sound_custom">Özel</string>
+    <string name="sound_changed">Bildirim sesi güncellendi</string>
+    <string name="sound_reset_done">Varsayılan sese sıfırlandı</string>
+    <string name="sound_too_long">Seçilen ses 5 saniyeden uzun olmamalıdır</string>
+    <string name="sound_invalid_format">Lütfen geçerli bir ses dosyası seçin</string>
+    <string name="sound_info">Her bildirim türü için farklı ses belirleyebilirsiniz. Ses dosyası en fazla 5 saniye olmalıdır.</string>
+
 </resources>

@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.net.Uri;
 
 import androidx.core.app.NotificationCompat;
@@ -31,13 +32,18 @@ public class NotificationHelper {
     public static final String CHANNEL_MATCH_END   = "varscore_match_end";
     public static final String CHANNEL_REMINDER    = "varscore_reminder";
 
-    private static Uri soundUri(Context ctx, int rawResId) {
-        return Uri.parse("android.resource://" + ctx.getPackageName() + "/" + rawResId);
+    private static AudioAttributes notifAudioAttrs() {
+        return new AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .build();
     }
 
     /** Uygulama ilk açıldığında çağrılır — kanalları oluşturur. */
     public static void createChannels(Context ctx) {
+        SoundPreferencesManager sp = new SoundPreferencesManager(ctx);
         NotificationManager nm = ctx.getSystemService(NotificationManager.class);
+        AudioAttributes attrs = notifAudioAttrs();
 
         // Diğer canlı bildirimler (kırmızı kart, devre, kadro, VAR, penaltı)
         NotificationChannel live = new NotificationChannel(
@@ -48,47 +54,56 @@ public class NotificationHelper {
         live.setDescription(ctx.getString(R.string.channel_live_desc));
         live.enableVibration(true);
 
-        // Gol — gol.mp3
+        // Gol
         NotificationChannel goal = new NotificationChannel(
                 CHANNEL_GOAL,
                 ctx.getString(R.string.channel_live_name) + " (Gol)",
                 NotificationManager.IMPORTANCE_HIGH
         );
-        goal.setSound(soundUri(ctx, R.raw.gol), null);
+        goal.setSound(sp.getSoundUri(SoundPreferencesManager.KEY_GOAL, R.raw.gol), attrs);
         goal.enableVibration(true);
 
-        // Maç başlangıcı — macbaslama.mp3
+        // Maç başlangıcı
         NotificationChannel matchStart = new NotificationChannel(
                 CHANNEL_MATCH_START,
                 ctx.getString(R.string.channel_live_name) + " (Maç Başlangıcı)",
                 NotificationManager.IMPORTANCE_HIGH
         );
-        matchStart.setSound(soundUri(ctx, R.raw.macbaslama), null);
+        matchStart.setSound(sp.getSoundUri(SoundPreferencesManager.KEY_MATCH_START, R.raw.macbaslama), attrs);
         matchStart.enableVibration(true);
 
-        // Maç sonu — macbitis.mp3
+        // Maç sonu
         NotificationChannel matchEnd = new NotificationChannel(
                 CHANNEL_MATCH_END,
                 ctx.getString(R.string.channel_live_name) + " (Maç Sonu)",
                 NotificationManager.IMPORTANCE_HIGH
         );
-        matchEnd.setSound(soundUri(ctx, R.raw.macbitis), null);
+        matchEnd.setSound(sp.getSoundUri(SoundPreferencesManager.KEY_MATCH_END, R.raw.macbitis), attrs);
         matchEnd.enableVibration(true);
 
-        // Hatırlatma — machatirlatma.mp3
+        // Hatırlatma
         NotificationChannel reminder = new NotificationChannel(
                 CHANNEL_REMINDER,
                 ctx.getString(R.string.channel_reminder_name),
                 NotificationManager.IMPORTANCE_DEFAULT
         );
         reminder.setDescription(ctx.getString(R.string.channel_reminder_desc));
-        reminder.setSound(soundUri(ctx, R.raw.machatirlatma), null);
+        reminder.setSound(sp.getSoundUri(SoundPreferencesManager.KEY_REMINDER, R.raw.machatirlatma), attrs);
 
         nm.createNotificationChannel(live);
         nm.createNotificationChannel(goal);
         nm.createNotificationChannel(matchStart);
         nm.createNotificationChannel(matchEnd);
         nm.createNotificationChannel(reminder);
+    }
+
+    /**
+     * Belirli bir kanalı siler ve güncel ses tercihiyle yeniden oluşturur.
+     * Kullanıcı ses değiştirdiğinde çağrılır.
+     */
+    public static void updateChannelSound(Context ctx, String channelId) {
+        ctx.getSystemService(NotificationManager.class).deleteNotificationChannel(channelId);
+        createChannels(ctx);
     }
 
     // ── Canlı Maç Bildirimleri ──────────────────────────────────────────

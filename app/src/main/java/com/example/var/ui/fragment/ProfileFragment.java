@@ -109,6 +109,8 @@ public class ProfileFragment extends Fragment {
             dialog.show(getParentFragmentManager(), "settings_dialog");
         });
 
+        binding.btnNotificationSounds.setOnClickListener(v -> openNotificationSounds());
+
         binding.btnSignOut.setOnClickListener(v -> signOut());
     }
 
@@ -281,6 +283,16 @@ public class ProfileFragment extends Fragment {
         int pad = (int) (8 * getResources().getDisplayMetrics().density);
         tv.setPadding(0, pad, 0, pad);
         container.addView(tv);
+    }
+
+    private void openNotificationSounds() {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right)
+                .replace(R.id.fragmentContainer, new NotificationSoundFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
     private void openLeague(String leagueId, String leagueName) {

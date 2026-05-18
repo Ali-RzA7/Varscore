@@ -9,4 +9,21 @@
     <string name="search_scope_global">Global</string>
     <string name="search_scope_daily_hint">Only selected day\'s matches</string>
     <string name="search_scope_global_hint">All leagues and teams</string>
+    <string name="notification_sound_settings">Customize Notification Sounds</string>
+    <string name="notification_sounds_title">Notification Sounds</string>
+    <string name="sound_goal">Goal Sound</string>
+    <string name="sound_match_start">Match Start Sound</string>
+    <string name="sound_match_end">Match End Sound</string>
+    <string name="sound_reminder">Match Reminder Sound</string>
+    <string name="sound_play">Play</string>
+    <string name="sound_change">Change</string>
+    <string name="sound_reset">Reset to Default</string>
+    <string name="sound_select_file">Select from Files</string>
+    <string name="sound_default">Default</string>
+    <string name="sound_custom">Custom</string>
+    <string name="sound_changed">Notification sound updated</string>
+    <string name="sound_reset_done">Reset to default sound</string>
+    <string name="sound_too_long">Selected audio must be 5 seconds or shorter</string>
+    <string name="sound_invalid_format">Please select a valid audio file</string>
+    <string name="sound_info">You can set a different sound for each notification type. Audio file must be at most 5 seconds.</string>
 </resources>
