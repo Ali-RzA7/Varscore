@@ -2,8 +2,11 @@ package com.example.var.ui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,6 +95,32 @@ public class LoginFragment extends Fragment {
 
         setupGoogleSignIn();
         setupClickListeners();
+        setupRealTimeValidation();
+    }
+
+    /**
+     * E-posta alanına anlık doğrulama ekler.
+     */
+    private void setupRealTimeValidation() {
+        binding.etEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String email = s.toString().trim();
+                if (email.isEmpty()) {
+                    binding.emailLayout.setError(null);
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    binding.emailLayout.setError(getString(R.string.email_invalid));
+                } else {
+                    binding.emailLayout.setError(null);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     /**
@@ -138,12 +167,14 @@ public class LoginFragment extends Fragment {
         // Form validasyonu
         if (TextUtils.isEmpty(email)) {
             binding.emailLayout.setError(getString(R.string.email_required));
+            showSnackbar(getString(R.string.email_required));
             return;
         }
         binding.emailLayout.setError(null);
 
         if (TextUtils.isEmpty(password)) {
             binding.passwordLayout.setError(getString(R.string.password_required));
+            showSnackbar(getString(R.string.password_required));
             return;
         }
         binding.passwordLayout.setError(null);
@@ -172,12 +203,12 @@ public class LoginFragment extends Fragment {
                     Log.e(TAG, "Giriş hatası: " + e.getMessage(), e);
                     if (e instanceof FirebaseAuthException) {
                         String code = ((FirebaseAuthException) e).getErrorCode();
-                        Log.e(TAG, "Firebase hata kodu: " + code);
-                        if ("ERROR_OPERATION_NOT_ALLOWED".equals(code)) {
+                        if ("ERROR_USER_NOT_FOUND".equals(code) || "ERROR_WRONG_PASSWORD".equals(code) || "ERROR_INVALID_EMAIL".equals(code)) {
+                            showSnackbar(getString(R.string.login_failed));
+                        } else if ("ERROR_OPERATION_NOT_ALLOWED".equals(code)) {
                             showSnackbar(getString(R.string.error_operation_not_allowed));
-
                         } else {
-                            showSnackbar(getString(R.string.login_failed) + " (" + code + ")");
+                            showSnackbar(getString(R.string.login_failed));
                         }
                     } else {
                         showSnackbar(getString(R.string.login_failed));
@@ -325,7 +356,13 @@ public class LoginFragment extends Fragment {
 
     private void showSnackbar(String message) {
         if (getView() != null) {
-            Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+            Snackbar snackbar = Snackbar.make(getView(), message, Snackbar.LENGTH_LONG);
+            // Alt menünün (BottomNavigationView) ID'sini bul ve onun üzerine sabitle
+            View bottomNav = requireActivity().findViewById(R.id.bottomNav);
+            if (bottomNav != null) {
+                snackbar.setAnchorView(bottomNav);
+            }
+            snackbar.show();
         }
     }
 

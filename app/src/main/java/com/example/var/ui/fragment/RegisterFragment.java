@@ -1,8 +1,11 @@
 package com.example.var.ui.fragment;
 
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +75,57 @@ public class RegisterFragment extends Fragment {
         binding.tvLogin.setOnClickListener(v ->
                 requireActivity().getSupportFragmentManager().popBackStack()
         );
+
+        setupRealTimeValidation();
+    }
+
+    /**
+     * Alanlara anlık doğrulama ekler.
+     */
+    private void setupRealTimeValidation() {
+        // E-posta anlık kontrolü
+        binding.etEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String email = s.toString().trim();
+                if (email.isEmpty()) {
+                    binding.emailLayout.setError(null);
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    binding.emailLayout.setError(getString(R.string.email_invalid));
+                } else {
+                    binding.emailLayout.setError(null);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        // Ad Soyad anlık kontrolü
+        binding.etName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String name = s.toString().trim();
+                if (name.isEmpty()) {
+                    binding.nameLayout.setError(null);
+                } else if (name.length() < 3) {
+                    binding.nameLayout.setError(getString(R.string.name_too_short));
+                } else if (name.matches(".*\\d.*")) {
+                    binding.nameLayout.setError(getString(R.string.name_invalid));
+                } else {
+                    binding.nameLayout.setError(null);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     /**
@@ -96,6 +150,18 @@ public class RegisterFragment extends Fragment {
         // Ad validasyonu
         if (TextUtils.isEmpty(name)) {
             binding.nameLayout.setError(getString(R.string.name_required));
+            showSnackbar(getString(R.string.name_required));
+            return;
+        }
+        if (name.length() < 3) {
+            binding.nameLayout.setError(getString(R.string.name_too_short));
+            showSnackbar(getString(R.string.name_too_short));
+            return;
+        }
+        // Sayı içerip içermediğini kontrol et (regex ile)
+        if (name.matches(".*\\d.*")) {
+            binding.nameLayout.setError(getString(R.string.name_invalid));
+            showSnackbar(getString(R.string.name_invalid));
             return;
         }
         binding.nameLayout.setError(null);
@@ -103,6 +169,7 @@ public class RegisterFragment extends Fragment {
         // E-posta validasyonu
         if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             binding.emailLayout.setError(getString(R.string.email_invalid));
+            showSnackbar(getString(R.string.email_invalid));
             return;
         }
         binding.emailLayout.setError(null);
@@ -110,6 +177,7 @@ public class RegisterFragment extends Fragment {
         // Şifre uzunluk validasyonu
         if (password.length() < 6) {
             binding.passwordLayout.setError(getString(R.string.password_too_short));
+            showSnackbar(getString(R.string.password_too_short));
             return;
         }
         binding.passwordLayout.setError(null);
@@ -117,6 +185,7 @@ public class RegisterFragment extends Fragment {
         // Şifre eşleşme validasyonu
         if (!password.equals(confirmPassword)) {
             binding.confirmPasswordLayout.setError(getString(R.string.passwords_not_match));
+            showSnackbar(getString(R.string.passwords_not_match));
             return;
         }
         binding.confirmPasswordLayout.setError(null);
@@ -138,7 +207,6 @@ public class RegisterFragment extends Fragment {
                     Log.e(TAG, "Kayıt hatası: " + errorMsg, e);
                     if (e instanceof FirebaseAuthException) {
                         String code = ((FirebaseAuthException) e).getErrorCode();
-                        Log.e(TAG, "Firebase hata kodu: " + code);
                         // Kullanıcıya anlamlı hata mesajı göster
                         switch (code) {
                             case "ERROR_EMAIL_ALREADY_IN_USE":
@@ -154,10 +222,10 @@ public class RegisterFragment extends Fragment {
                                 showSnackbar(getString(R.string.error_operation_not_allowed));
                                 break;
                             default:
-                                showSnackbar(getString(R.string.register_failed) + " (" + code + ")");
+                                showSnackbar(getString(R.string.register_failed));
                         }
                     } else {
-                        showSnackbar(getString(R.string.register_failed) + ": " + errorMsg);
+                        showSnackbar(getString(R.string.register_failed));
                     }
                 });
     }
@@ -246,7 +314,13 @@ public class RegisterFragment extends Fragment {
 
     private void showSnackbar(String message) {
         if (getView() != null) {
-            Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+            Snackbar snackbar = Snackbar.make(getView(), message, Snackbar.LENGTH_LONG);
+            // Alt menünün üzerine sabitle
+            View bottomNav = requireActivity().findViewById(R.id.bottomNav);
+            if (bottomNav != null) {
+                snackbar.setAnchorView(bottomNav);
+            }
+            snackbar.show();
         }
     }
 

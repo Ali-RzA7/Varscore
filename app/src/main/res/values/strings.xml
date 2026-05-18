@@ -165,6 +165,8 @@
     <string name="password_too_short">Şifre en az 6 karakter olmalıdır</string>
     <string name="passwords_not_match">Şifreler eşleşmiyor</string>
     <string name="name_required">Ad Soyad zorunludur</string>
+    <string name="name_too_short">Ad Soyad en az 3 karakter olmalıdır</string>
+    <string name="name_invalid">Ad Soyad sadece harflerden oluşmalıdır</string>
     <string name="login_failed">Giriş başarısız. E-posta veya şifrenizi kontrol edin.</string>
     <string name="register_failed">Kayıt başarısız. Lütfen tekrar deneyin.</string>
     <string name="google_sign_in_failed">Google ile giriş başarısız</string>

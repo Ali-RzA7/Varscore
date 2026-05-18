@@ -390,7 +390,12 @@ public class ProfileFragment extends Fragment {
 
     private void showSnackbar(String message) {
         if (getView() != null) {
-            Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT).show();
+            Snackbar snackbar = Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT);
+            View bottomNav = requireActivity().findViewById(R.id.bottomNav);
+            if (bottomNav != null) {
+                snackbar.setAnchorView(bottomNav);
+            }
+            snackbar.show();
         }
     }
 
