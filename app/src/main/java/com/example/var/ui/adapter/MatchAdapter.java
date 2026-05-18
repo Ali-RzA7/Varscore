@@ -21,9 +21,11 @@ import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * MatchAdapter - Maçları lig bazında gruplanmış olarak listeleyen adapter.
@@ -53,6 +55,12 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     /** teamId → logo URL haritası (standings'ten elde edilir, null olabilir) */
     private Map<String, String> teamLogoMap = new HashMap<>();
+
+    /** Favori takım ID seti */
+    private Set<String> favoriteTeamIds = new HashSet<>();
+
+    /** Favori lig ID seti */
+    private Set<String> favoriteLeagueIds = new HashSet<>();
 
     /**
      * Maç tıklama callback arayüzü.
@@ -86,6 +94,15 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     /**
+     * Favori takım ve lig ID setlerini günceller.
+     * Yeni setMatches() çağrısında favoriler yansıtılır.
+     */
+    public void setFavorites(Set<String> teamIds, Set<String> leagueIds) {
+        this.favoriteTeamIds = teamIds != null ? teamIds : new HashSet<>();
+        this.favoriteLeagueIds = leagueIds != null ? leagueIds : new HashSet<>();
+    }
+
+    /**
      * Maç listesini lig bazında gruplar ve adapter'a yükler.
      * Aynı lig altındaki maçlar bir başlık altında toplanır.
      *
@@ -113,11 +130,15 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         // Gruplanmış verileri listeye ekle (başlık + maçlar)
         for (Map.Entry<String, List<MatchModel>> entry : grouped.entrySet()) {
-            // Lig başlığı ekle
+            MatchModel firstMatch = entry.getValue().get(0);
+            String leagueId = firstMatch.getLeagueId();
+            boolean isLeagueFav = leagueId != null && favoriteLeagueIds.contains(leagueId);
             items.add(new LeagueHeader(
+                    leagueId,
                     entry.getKey(),
-                    entry.getValue().get(0).getLeagueColor(),
-                    entry.getValue().get(0).getLeagueType()
+                    firstMatch.getLeagueColor(),
+                    firstMatch.getLeagueType(),
+                    isLeagueFav
             ));
             // Lig altındaki maçları ekle
             items.addAll(entry.getValue());
@@ -167,14 +188,18 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
      * Bu sınıf sadece adapter içinde kullanılır.
      */
     static class LeagueHeader {
+        final String leagueId;
         final String leagueName;
         final String leagueColor;
         final int leagueType;
+        final boolean isFavorite;
 
-        LeagueHeader(String leagueName, String leagueColor, int leagueType) {
+        LeagueHeader(String leagueId, String leagueName, String leagueColor, int leagueType, boolean isFavorite) {
+            this.leagueId = leagueId;
             this.leagueName = leagueName;
             this.leagueColor = leagueColor;
             this.leagueType = leagueType;
+            this.isFavorite = isFavorite;
         }
     }
 
@@ -190,18 +215,16 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         private final View viewLeagueColor;
         private final TextView tvLeagueName;
         private final TextView tvLeagueType;
+        private final TextView tvFavoriteStar;
 
         LeagueHeaderViewHolder(@NonNull View itemView) {
             super(itemView);
             viewLeagueColor = itemView.findViewById(R.id.viewLeagueColor);
             tvLeagueName = itemView.findViewById(R.id.tvLeagueName);
             tvLeagueType = itemView.findViewById(R.id.tvLeagueType);
+            tvFavoriteStar = itemView.findViewById(R.id.tvFavoriteStar);
         }
 
-        /**
-         * Lig başlık verilerini görünüme bağlar.
-         * @param header Lig başlık modeli
-         */
         void bind(LeagueHeader header) {
             tvLeagueName.setText(header.leagueName);
 
@@ -211,12 +234,14 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     viewLeagueColor.setBackgroundColor(Color.parseColor(header.leagueColor));
                 }
             } catch (IllegalArgumentException e) {
-                // Geçersiz renk kodu - varsayılan rengi kullan
                 viewLeagueColor.setBackgroundColor(context.getColor(R.color.primary));
             }
 
             // Lig tipi göstergesi (Lig veya Kupa)
             tvLeagueType.setText(header.leagueType == 2 ? "🏆" : "⚽");
+
+            // Favori lig yıldızı
+            tvFavoriteStar.setVisibility(header.isFavorite ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -242,6 +267,7 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         private final TextView tvAwayName;
         private final TextView tvHomeScore;
         private final TextView tvAwayScore;
+        private final TextView tvTeamFavoriteStar;
 
         MatchViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -257,6 +283,7 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             tvAwayName = itemView.findViewById(R.id.tvAwayName);
             tvHomeScore = itemView.findViewById(R.id.tvHomeScore);
             tvAwayScore = itemView.findViewById(R.id.tvAwayScore);
+            tvTeamFavoriteStar = itemView.findViewById(R.id.tvTeamFavoriteStar);
         }
 
         void bind(MatchModel match) {
@@ -336,6 +363,11 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             // Kırmızı kart göstergesi
             viewHomeRedCard.setVisibility(match.getHomeRed() > 0 ? View.VISIBLE : View.GONE);
             viewAwayRedCard.setVisibility(match.getAwayRed() > 0 ? View.VISIBLE : View.GONE);
+
+            // Favori takım yıldızı (ev sahibi veya deplasman favori takımdaysa göster)
+            boolean isTeamFav = (match.getHomeId() != null && favoriteTeamIds.contains(match.getHomeId()))
+                    || (match.getAwayId() != null && favoriteTeamIds.contains(match.getAwayId()));
+            tvTeamFavoriteStar.setVisibility(isTeamFav ? View.VISIBLE : View.GONE);
 
             // Maç kartına tıklama
             cardMatch.setOnClickListener(v -> {

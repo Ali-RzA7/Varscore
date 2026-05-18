@@ -24,12 +24,17 @@ import com.example.var.ui.dialog.SearchDialogFragment;
 import com.example.var.ui.dialog.SettingsDialogFragment;
 import com.example.var.ui.fragment.MatchDetailFragment;
 import com.example.var.util.DateUtils;
+import com.example.var.util.FirebaseManager;
 import com.example.var.util.MatchCache;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -77,6 +82,15 @@ public class HomeFragment extends Fragment implements
     /** Polling aralığı: 15 saniye */
     private static final long POLLING_INTERVAL = 15000;
 
+    /** Favori takım ID seti (giriş yapmış kullanıcı için) */
+    private Set<String> favoriteTeamIds = new HashSet<>();
+
+    /** Favori lig ID seti (giriş yapmış kullanıcı için) */
+    private Set<String> favoriteLeagueIds = new HashSet<>();
+
+    /** Son yüklenen maç listesi (favoriler yüklenince yeniden sıralamak için) */
+    private List<MatchModel> currentMatches = null;
+
     private static final String API_KEY = BuildConfig.API_KEY;
 
     @Nullable
@@ -102,6 +116,9 @@ public class HomeFragment extends Fragment implements
         setupDatePicker();
         setupMatchList();
         setupSwipeRefresh();
+
+        // Favorileri yükle (giriş yapmışsa), maçlarla eş zamanlı
+        loadUserFavorites();
 
         // İlk veri yüklemesi (bugünün maçları)
         loadMatchesForDate(selectedDate);
@@ -289,7 +306,8 @@ public class HomeFragment extends Fragment implements
         // Cache kontrolü
         List<MatchModel> cached = MatchCache.load(requireContext(), dateStr);
         if (cached != null) {
-            matchAdapter.setMatches(cached);
+            currentMatches = cached;
+            matchAdapter.setMatches(sortMatchesByFavorites(cached));
             showContent();
             return;
         }
@@ -308,11 +326,10 @@ public class HomeFragment extends Fragment implements
                         && response.body().isSuccess()) {
                     List<MatchModel> matches = response.body().getData();
                     if (matches != null && !matches.isEmpty()) {
-                        // Cache'e kaydet
                         MatchCache.save(requireContext(), dateStr, matches);
-                        
+                        currentMatches = matches;
                         showContent();
-                        matchAdapter.setMatches(matches);
+                        matchAdapter.setMatches(sortMatchesByFavorites(matches));
                     } else {
                         showEmpty(getString(R.string.no_matches));
                     }
@@ -358,8 +375,9 @@ public class HomeFragment extends Fragment implements
                         }
                     }
                     if (!liveMatches.isEmpty()) {
+                        currentMatches = liveMatches;
                         showContent();
-                        matchAdapter.setMatches(liveMatches);
+                        matchAdapter.setMatches(sortMatchesByFavorites(liveMatches));
                     } else {
                         showEmpty(getString(R.string.no_live_matches));
                     }
@@ -377,6 +395,78 @@ public class HomeFragment extends Fragment implements
                 showError(getString(R.string.error_loading));
             }
         });
+    }
+
+    // ================================================================
+    // Favori Yükleme ve Sıralama
+    // ================================================================
+
+    /**
+     * Giriş yapmış kullanıcının favori takım ve liglerini Firebase'den yükler.
+     * Favoriler yüklendikten sonra mevcut maç listesi yeniden sıralanır.
+     */
+    private void loadUserFavorites() {
+        if (!FirebaseManager.isLoggedIn()) return;
+
+        String userId = FirebaseManager.getCurrentUser().getUid();
+        FirebaseManager.getUserProfile(userId,
+                user -> {
+                    if (!isAdded()) return;
+                    favoriteTeamIds = new HashSet<>(user.getFavoriteTeams());
+                    favoriteLeagueIds = new HashSet<>(user.getFavoriteLeagues());
+                    matchAdapter.setFavorites(favoriteTeamIds, favoriteLeagueIds);
+                    // Maçlar zaten yüklendiyse favori sırasıyla yeniden göster
+                    if (currentMatches != null) {
+                        matchAdapter.setMatches(sortMatchesByFavorites(currentMatches));
+                    }
+                },
+                error -> { /* Sessizce devam et */ }
+        );
+    }
+
+    /**
+     * Maç listesini favori ligler/takımlar en üstte olacak şekilde sıralar.
+     * Lig grupları korunur: favori maç içeren tüm lig grubu öne alınır.
+     */
+    private List<MatchModel> sortMatchesByFavorites(List<MatchModel> matches) {
+        if ((favoriteTeamIds.isEmpty() && favoriteLeagueIds.isEmpty()) || matches == null) {
+            return matches;
+        }
+
+        // leagueId'ye göre grupla (ekleme sırası korunur)
+        LinkedHashMap<String, List<MatchModel>> byLeague = new LinkedHashMap<>();
+        for (MatchModel match : matches) {
+            String lid = match.getLeagueId() != null ? match.getLeagueId() : "__none__";
+            byLeague.computeIfAbsent(lid, k -> new ArrayList<>()).add(match);
+        }
+
+        List<MatchModel> favGroup = new ArrayList<>();
+        List<MatchModel> normalGroup = new ArrayList<>();
+
+        for (Map.Entry<String, List<MatchModel>> entry : byLeague.entrySet()) {
+            if (isLeagueGroupFavorite(entry.getKey(), entry.getValue())) {
+                favGroup.addAll(entry.getValue());
+            } else {
+                normalGroup.addAll(entry.getValue());
+            }
+        }
+
+        List<MatchModel> sorted = new ArrayList<>(favGroup.size() + normalGroup.size());
+        sorted.addAll(favGroup);
+        sorted.addAll(normalGroup);
+        return sorted;
+    }
+
+    /** Lig grubunun favori olup olmadığını kontrol eder (lig favorisi veya takım favorisi). */
+    private boolean isLeagueGroupFavorite(String leagueId, List<MatchModel> leagueMatches) {
+        if (!"__none__".equals(leagueId) && favoriteLeagueIds.contains(leagueId)) {
+            return true;
+        }
+        for (MatchModel match : leagueMatches) {
+            if (match.getHomeId() != null && favoriteTeamIds.contains(match.getHomeId())) return true;
+            if (match.getAwayId() != null && favoriteTeamIds.contains(match.getAwayId())) return true;
+        }
+        return false;
     }
 
     // ================================================================
@@ -493,6 +583,8 @@ public class HomeFragment extends Fragment implements
         super.onResume();
         if (isLiveMode)
             startPolling();
+        // Kullanıcı profil/favori ekranından dönmüş olabilir, favorileri yenile
+        loadUserFavorites();
     }
 
     @Override

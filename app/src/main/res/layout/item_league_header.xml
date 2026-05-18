@@ -37,6 +37,17 @@
         android:maxLines="1"
         android:ellipsize="end" />
 
+    <!-- Favori lig yıldızı -->
+    <TextView
+        android:id="@+id/tvFavoriteStar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:text="★"
+        android:textSize="14sp"
+        android:textColor="?attr/colorSecondary"
+        android:visibility="gone" />
+
     <!-- Lig tipi ikonu (Lig/Kupa) -->
     <TextView
         android:id="@+id/tvLeagueType"

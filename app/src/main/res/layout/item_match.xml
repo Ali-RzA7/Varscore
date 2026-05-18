@@ -183,8 +183,20 @@
         </LinearLayout>
 
         <!-- ====================================== -->
-        <!-- Sağ: İleri ok ikonu                    -->
+        <!-- Sağ: Favori takım yıldızı + İleri ok  -->
         <!-- ====================================== -->
+
+        <!-- Favori takım göstergesi -->
+        <TextView
+            android:id="@+id/tvTeamFavoriteStar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="★"
+            android:textSize="12sp"
+            android:textColor="?attr/colorSecondary"
+            android:visibility="gone" />
+
         <ImageView
             android:layout_width="@dimen/icon_sm"
             android:layout_height="@dimen/icon_sm"
