@@ -15,7 +15,10 @@
     android:paddingEnd="@dimen/padding_lg"
     android:paddingTop="@dimen/padding_md"
     android:paddingBottom="@dimen/padding_sm"
-    android:background="?android:attr/colorBackground">
+    android:background="?android:attr/colorBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <!-- Lig renk göstergesi (dikey çizgi) -->
     <View

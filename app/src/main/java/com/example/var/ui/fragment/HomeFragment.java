@@ -22,6 +22,7 @@ import com.example.var.ui.adapter.DatePickerAdapter;
 import com.example.var.ui.adapter.MatchAdapter;
 import com.example.var.ui.dialog.SearchDialogFragment;
 import com.example.var.ui.dialog.SettingsDialogFragment;
+import com.example.var.ui.fragment.LeagueStandingsFragment;
 import com.example.var.ui.fragment.MatchDetailFragment;
 import com.example.var.util.DateUtils;
 import com.example.var.util.FirebaseManager;
@@ -268,6 +269,7 @@ public class HomeFragment extends Fragment implements
      */
     private void setupMatchList() {
         matchAdapter = new MatchAdapter(requireContext(), this);
+        matchAdapter.setOnLeagueHeaderClickListener(this::onLeagueHeaderClick);
         binding.rvMatches.setLayoutManager(
                 new LinearLayoutManager(requireContext()));
         binding.rvMatches.setAdapter(matchAdapter);
@@ -564,6 +566,22 @@ public class HomeFragment extends Fragment implements
                         R.anim.slide_out_right
                 )
                 .replace(R.id.fragmentContainer, detailFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    /** MatchAdapter callback: Lig başlığına tıklandığında puan durumunu aç */
+    private void onLeagueHeaderClick(String leagueId, String leagueName) {
+        LeagueStandingsFragment standingsFragment =
+                LeagueStandingsFragment.newInstance(leagueId, leagueName);
+        getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                )
+                .replace(R.id.fragmentContainer, standingsFragment)
                 .addToBackStack(null)
                 .commit();
     }

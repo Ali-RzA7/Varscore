@@ -34,6 +34,7 @@ Ana ekran. Canlı/Tüm Maçlar toggle, tarih seçici, lig bazlı maç listesi.
 - `loadLiveMatches()` — canlı maçları yükler, 15 sn polling
 - `loadUserFavorites()` — giriş yapmış kullanıcının favorilerini Firebase'den çeker
 - `sortMatchesByFavorites(matches)` — favori lig/takım gruplarını listenin başına taşır
+- `onLeagueHeaderClick(leagueId, leagueName)` — lig başlığına tıklanınca `LeagueStandingsFragment` açar
 - `onResume()` — favorileri yeniler (kullanıcı profil ekranından dönünce)
 
 ### MatchAdapter
@@ -41,7 +42,9 @@ RecyclerView adapter. `TYPE_LEAGUE_HEADER` + `TYPE_MATCH` ViewHolder'ı var.
 - `setMatches(list)` — leagueName'e göre gruplar, `isFavorite` flag'i hesaplar
 - `setFavorites(teamIds, leagueIds)` — favori setleri günceller
 - `setTeamLogoMap(map)` — standings'ten gelen takım logoları
+- `setOnLeagueHeaderClickListener(listener)` — lig başlığı tıklama callback'i
 - LeagueHeader: `leagueId`, `leagueName`, `leagueColor`, `leagueType`, `isFavorite`
+- `OnLeagueHeaderClickListener` arayüzü: `onLeagueHeaderClick(leagueId, leagueName)`
 
 ### FirebaseManager
 Tüm Firebase işlemleri buradan. Static metodlar.
@@ -82,9 +85,9 @@ Lig grubu favori sayılır eğer:
 ### Değiştirilen Dosyalar
 | Dosya | Değişiklik |
 |-------|-----------|
-| `HomeFragment.java` | `loadUserFavorites()`, `sortMatchesByFavorites()`, `isLeagueGroupFavorite()` metodları eklendi; `loadMatchesForDate/loadLiveMatches` güncellendi; `onResume` güncellendi |
-| `MatchAdapter.java` | `setFavorites()` metodu, `favoriteTeamIds/LeagueIds` alanları, `LeagueHeader.isFavorite+leagueId`, `tvFavoriteStar` ve `tvTeamFavoriteStar` ViewHolder alanları eklendi |
-| `item_league_header.xml` | `tvFavoriteStar` TextView eklendi |
+| `HomeFragment.java` | `loadUserFavorites()`, `sortMatchesByFavorites()`, `isLeagueGroupFavorite()`, `onLeagueHeaderClick()` metodları eklendi; `loadMatchesForDate/loadLiveMatches` güncellendi; `onResume` güncellendi |
+| `MatchAdapter.java` | `setFavorites()`, `setOnLeagueHeaderClickListener()` metodları; `OnLeagueHeaderClickListener` arayüzü; `LeagueHeader.isFavorite+leagueId`; `tvFavoriteStar`, `tvTeamFavoriteStar` ViewHolder alanları eklendi |
+| `item_league_header.xml` | `tvFavoriteStar` TextView + ripple tıklama efekti eklendi |
 | `item_match.xml` | `tvTeamFavoriteStar` TextView eklendi |
 
 ---

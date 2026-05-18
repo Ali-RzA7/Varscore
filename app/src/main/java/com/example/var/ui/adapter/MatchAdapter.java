@@ -50,6 +50,9 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     /** Maç tıklama callback'i */
     private final OnMatchClickListener listener;
 
+    /** Lig başlığı tıklama callback'i */
+    private OnLeagueHeaderClickListener leagueHeaderListener;
+
     /** Context referansı */
     private final Context context;
 
@@ -66,11 +69,14 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
      * Maç tıklama callback arayüzü.
      */
     public interface OnMatchClickListener {
-        /**
-         * Bir maç satırına tıklandığında çağrılır.
-         * @param match Tıklanan maç modeli
-         */
         void onMatchClick(MatchModel match);
+    }
+
+    /**
+     * Lig başlığı tıklama callback arayüzü.
+     */
+    public interface OnLeagueHeaderClickListener {
+        void onLeagueHeaderClick(String leagueId, String leagueName);
     }
 
     /**
@@ -91,6 +97,13 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void setTeamLogoMap(Map<String, String> logoMap) {
         this.teamLogoMap = logoMap != null ? logoMap : new HashMap<>();
         notifyDataSetChanged();
+    }
+
+    /**
+     * Lig başlığı tıklama listener'ını set eder.
+     */
+    public void setOnLeagueHeaderClickListener(OnLeagueHeaderClickListener l) {
+        this.leagueHeaderListener = l;
     }
 
     /**
@@ -242,6 +255,13 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
             // Favori lig yıldızı
             tvFavoriteStar.setVisibility(header.isFavorite ? View.VISIBLE : View.GONE);
+
+            // Lig başlığına tıklama → puan durumu aç
+            itemView.setOnClickListener(v -> {
+                if (leagueHeaderListener != null && header.leagueId != null && !header.leagueId.isEmpty()) {
+                    leagueHeaderListener.onLeagueHeaderClick(header.leagueId, header.leagueName);
+                }
+            });
         }
     }
 
