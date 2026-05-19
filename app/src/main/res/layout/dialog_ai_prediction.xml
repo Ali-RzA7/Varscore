@@ -1,123 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- dialog_ai_prediction.xml - Yapay Zeka Tahmin Dialog'u -->
-<!-- Groq LLM'den gelen tahmin sonucunu gösterir -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="@dimen/padding_lg">
+    android:padding="0dp">
 
-    <!-- Başlık: AI ikonu + Tahmin Al -->
+    <!-- Header: Koyu yeşil gradyan arka plan -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:layout_marginBottom="@dimen/margin_md">
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="@color/primary">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp"
-                android:src="@drawable/ic_ai"
-                android:contentDescription="AI" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="@dimen/margin_md"
-            android:text="@string/ai_prediction"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="@dimen/text_title"
-            android:textStyle="bold" />
-
-    </LinearLayout>
-
-    <!-- Ince ayırıcı -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?attr/colorOutline"
-        android:layout_marginBottom="@dimen/margin_md" />
-
-    <!-- Yükleniyor durumu (API isteği devam ederken) -->
-    <LinearLayout
-        android:id="@+id/loadingContainer"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:background="@color/primary"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="16dp">
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            app:indicatorColor="@color/primary" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_md"
-            android:text="@string/ai_analyzing"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="@dimen/text_body" />
-
-    </LinearLayout>
-
-    <!-- Tahmin sonucu metni (ScrollView ile uzun içerikler desteklenir) -->
-    <ScrollView
-        android:id="@+id/resultContainer"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/tvPrediction"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lineSpacingExtra="4dp"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="@dimen/text_body" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    </ScrollView>
+            <!-- AI ikon: amber container, yuvarlak -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="22dp"
+                app:cardBackgroundColor="@color/secondary"
+                app:cardElevation="0dp">
 
-    <!-- Hata durumu -->
-    <LinearLayout
-        android:id="@+id/errorContainer"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_ai"
+                    android:contentDescription="AI"
+                    app:tint="@color/primary_dark" />
 
-        <TextView
-            android:id="@+id/tvError"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/live_red"
-            android:textSize="@dimen/text_body" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ai_prediction"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Groq Llama · Yapay Zeka Analizi"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    android:alpha="0.7"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <!-- Kapat butonu -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnClose"
+    <!-- İçerik alanı -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_md"
-        android:text="@string/close"
-        app:cornerRadius="@dimen/radius_md" />
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="16dp">
+
+        <!-- Yükleniyor durumu -->
+        <LinearLayout
+            android:id="@+id/loadingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:indeterminate="true"
+                app:indicatorColor="@color/primary"
+                app:trackColor="@color/surface_variant_light"
+                app:indicatorSize="48dp"
+                app:trackThickness="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/ai_analyzing"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Bu birkaç saniye sürebilir..."
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Tahmin sonucu -->
+        <ScrollView
+            android:id="@+id/resultContainer"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Sonuç metni kartı -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="@color/surface_variant_light"
+                    app:cardElevation="0dp">
+
+                    <TextView
+                        android:id="@+id/tvPrediction"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="14dp"
+                        android:lineSpacingExtra="5dp"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="14sp" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <!-- Hata durumu -->
+        <LinearLayout
+            android:id="@+id/errorContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingVertical="24dp"
+            android:visibility="gone">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                app:cardCornerRadius="28dp"
+                app:cardBackgroundColor="#FFFEECEC"
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="14dp"
+                    android:src="@android:drawable/ic_dialog_alert"
+                    app:tint="@color/live_red" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:textColor="?attr/colorError"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+        <!-- Kapat butonu -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/close"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="@dimen/radius_md" />
+
+    </LinearLayout>
 
 </LinearLayout>

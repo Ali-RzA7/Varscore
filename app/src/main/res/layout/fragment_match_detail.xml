@@ -151,14 +151,16 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/primary"
+            android:layout_height="48dp"
+            android:background="@color/primary_dark"
             app:tabGravity="fill"
             app:tabMode="scrollable"
             app:tabIndicatorColor="@color/secondary"
             app:tabIndicatorHeight="3dp"
+            app:tabIndicatorGravity="bottom"
             app:tabSelectedTextColor="@color/secondary"
-            app:tabTextColor="@color/white" />
+            app:tabTextColor="#99FFFFFF"
+            app:tabTextAppearance="@style/TextAppearance.Material3.LabelLarge" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -176,13 +178,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
         android:text="@string/ai_prediction"
+        android:textColor="@color/white"
+        android:textStyle="bold"
         android:visibility="gone"
         app:icon="@drawable/ic_ai"
-        app:iconTint="@color/white"
+        app:iconTint="@color/secondary"
         app:backgroundTint="@color/primary"
-        app:elevation="@dimen/elevation_lg"
+        app:elevation="6dp"
+        app:cornerRadius="28dp"
         tools:visibility="visible" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

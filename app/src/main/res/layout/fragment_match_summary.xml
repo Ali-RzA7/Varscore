@@ -31,9 +31,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Maç Bilgileri"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@color/primary"
                     android:textStyle="bold"
-                    android:textSize="14sp"
+                    android:textSize="13sp"
+                    android:letterSpacing="0.04"
+                    android:textAllCaps="true"
                     android:layout_marginBottom="12dp" />
 
                 <!-- Hakem -->
@@ -129,9 +131,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Olaylar"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textColor="@color/primary"
             android:textStyle="bold"
-            android:textSize="14sp"
+            android:textSize="13sp"
+            android:letterSpacing="0.04"
+            android:textAllCaps="true"
             android:layout_marginBottom="12dp"
             android:layout_marginStart="4dp" />
 

@@ -14,7 +14,7 @@
         android:layout_alignTop="@+id/tvTime"
         android:layout_alignBottom="@+id/tvTime"
         android:layout_centerHorizontal="true"
-        android:background="@color/divider_dark" />
+        android:background="?attr/colorOutlineVariant" />
 
     <!-- Dakika -->
     <TextView

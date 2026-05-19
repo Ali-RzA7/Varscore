@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingVertical="12dp">
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="7dp">
 
         <TextView
             android:id="@+id/tvHomeValue"
@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:text="60%"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textColor="@color/primary"
             android:textSize="13sp"
             android:textStyle="bold" />
 
@@ -28,8 +28,9 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Topla Oynama"
-            android:textColor="?android:attr/textColorSecondary"
-            android:textSize="12sp" />
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="11.5sp"
+            android:letterSpacing="0.01" />
 
         <TextView
             android:id="@+id/tvAwayValue"
@@ -37,37 +38,41 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:text="40%"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textColor="@color/secondary_dark"
             android:textSize="13sp"
             android:textStyle="bold" />
 
     </RelativeLayout>
 
-    <LinearLayout
+    <!-- Track container clips bars to rounded corners -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="6dp"
-        android:orientation="horizontal"
-        android:weightSum="100">
+        android:layout_height="8dp"
+        android:background="@drawable/bg_stat_track"
+        android:clipToOutline="true">
 
-        <View
-            android:id="@+id/viewHomeBar"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="60"
-            android:background="@drawable/bg_stat_bar_home" />
+            android:orientation="horizontal"
+            android:weightSum="100">
 
-        <View
-            android:layout_width="2dp"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent" />
+            <View
+                android:id="@+id/viewHomeBar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="60"
+                android:background="@drawable/bg_stat_bar_home" />
 
-        <View
-            android:id="@+id/viewAwayBar"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="40"
-            android:background="@drawable/bg_stat_bar_away" />
+            <View
+                android:id="@+id/viewAwayBar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="40"
+                android:background="@drawable/bg_stat_bar_away" />
 
-    </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>
