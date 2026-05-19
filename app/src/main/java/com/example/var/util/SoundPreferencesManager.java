@@ -70,9 +70,18 @@ public class SoundPreferencesManager {
         prefs.edit().remove(key).apply();
     }
 
-    /** Özel seslerin saklanacağı iç depolama klasörü. */
+    /**
+     * Özel seslerin saklandığı klasör.
+     * Harici uygulama depolaması kullanılır; sistem bildirim servisi
+     * (NotificationManagerService) bu dizindeki dosyaları file:// URI
+     * üzerinden okuyabilir. getFilesDir() (private) ile bu mümkün değildir.
+     */
     public File getCustomSoundsDir() {
-        File dir = new File(ctx.getFilesDir(), "custom_sounds");
+        File dir = ctx.getExternalFilesDir("custom_sounds");
+        if (dir == null) {
+            // Harici depolama yoksa iç depoya geri dön
+            dir = new File(ctx.getFilesDir(), "custom_sounds");
+        }
         if (!dir.exists()) dir.mkdirs();
         return dir;
     }
