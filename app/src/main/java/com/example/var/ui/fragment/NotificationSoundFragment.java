@@ -1,6 +1,6 @@
 package com.example.var.ui.fragment;
 
-import android.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -126,7 +126,7 @@ public class NotificationSoundFragment extends Fragment {
                 ? new String[]{getString(R.string.sound_select_file), getString(R.string.sound_reset)}
                 : new String[]{getString(R.string.sound_select_file)};
 
-        new AlertDialog.Builder(requireContext())
+        new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(itemBinding.tvSoundName.getText())
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {

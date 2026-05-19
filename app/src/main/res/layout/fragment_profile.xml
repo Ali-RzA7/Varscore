@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- fragment_profile.xml - Giriş yapmış kullanıcının profil ekranı -->
-<!-- Profil fotoğrafı, kullanıcı bilgileri, favori takımlar/ligler, ayarlar, çıkış -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface">
+    android:background="?android:attr/colorBackground">
 
-    <!-- Üst appbar -->
+    <!-- AppBar: koyu yeşil başlık -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -21,7 +19,8 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"
             app:title="@string/profile"
-            app:titleTextColor="@android:color/white" />
+            app:titleTextColor="@android:color/white"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,120 +34,156 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/padding_xl">
+            android:paddingBottom="32dp">
 
-            <!-- Profil başlık kartı: fotoğraf + ad + e-posta -->
+            <!-- ── Profil Hero Kartı ── -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_md"
-                app:cardCornerRadius="@dimen/radius_lg"
-                app:cardElevation="@dimen/elevation_sm">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="@dimen/padding_xl">
-
-                    <!-- Profil fotoğrafı (tıklanınca değiştirilebilir) -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/cardPhoto"
-                        android:layout_width="96dp"
-                        android:layout_height="96dp"
-                        app:cardCornerRadius="48dp"
-                        app:cardElevation="@dimen/elevation_md"
-                        app:strokeColor="@color/primary"
-                        app:strokeWidth="2dp">
-
-                        <ImageView
-                            android:id="@+id/ivProfilePhoto"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="@string/profile"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_person" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Fotoğraf değiştir linki -->
-                    <TextView
-                        android:id="@+id/tvChangePhoto"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_sm"
-                        android:padding="@dimen/padding_xs"
-                        android:text="@string/change_photo"
-                        android:textColor="@color/primary"
-                        android:textSize="@dimen/text_body_small" />
-
-                    <!-- Kullanıcı adı -->
-                    <TextView
-                        android:id="@+id/tvDisplayName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_md"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="@dimen/text_title"
-                        android:textStyle="bold" />
-
-                    <!-- E-posta -->
-                    <TextView
-                        android:id="@+id/tvEmail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_xs"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="@dimen/text_body" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Ayarlar bölümü -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_lg"
-                android:layout_marginTop="@dimen/margin_md"
-                android:layout_marginBottom="@dimen/margin_xs"
-                android:text="@string/settings"
-                android:textColor="@color/primary"
-                android:textSize="@dimen/text_body_small"
-                android:textStyle="bold" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_md"
-                app:cardCornerRadius="@dimen/radius_md"
-                app:cardElevation="@dimen/elevation_sm">
+                android:layout_margin="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Tema ayarı -->
+                    <!-- Yeşil banner -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="88dp"
+                        android:background="@color/primary"
+                        android:orientation="vertical" />
+
+                    <!-- Avatar: banner'ın üzerine taşar -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:layout_marginTop="-44dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardPhoto"
+                            android:layout_width="88dp"
+                            android:layout_height="88dp"
+                            app:cardCornerRadius="44dp"
+                            app:cardElevation="4dp"
+                            app:strokeColor="@color/secondary"
+                            app:strokeWidth="3dp"
+                            app:cardBackgroundColor="?attr/colorSurface">
+
+                            <ImageView
+                                android:id="@+id/ivProfilePhoto"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="@string/profile"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/ic_person" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Fotoğraf değiştir -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/tvChangePhoto"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/change_photo"
+                            android:textColor="@color/primary"
+                            android:textSize="12sp"
+                            app:rippleColor="@color/primary_container" />
+
+                        <!-- Kullanıcı adı -->
+                        <TextView
+                            android:id="@+id/tvDisplayName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:gravity="center" />
+
+                        <!-- E-posta -->
+                        <TextView
+                            android:id="@+id/tvEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="20dp"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp"
+                            android:gravity="center" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ── Ayarlar Bölümü ── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/settings"
+                android:textColor="@color/primary"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.06"
+                android:textAllCaps="true" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Koyu Tema satırı -->
                     <LinearLayout
                         android:id="@+id/layoutTheme"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="60dp"
                         android:background="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingHorizontal="@dimen/padding_md">
+                        android:paddingHorizontal="16dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            app:cardCornerRadius="18dp"
+                            app:cardBackgroundColor="@color/primary_container"
+                            app:cardElevation="0dp">
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="8dp"
+                                android:src="@drawable/ic_dark_mode"
+                                app:tint="@color/on_primary_container" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:drawableStart="@drawable/ic_back"
-                            android:drawablePadding="@dimen/padding_md"
+                            android:layout_marginStart="14dp"
                             android:text="@string/dark_mode"
                             android:textColor="?attr/colorOnSurface"
-                            android:textSize="@dimen/text_body" />
+                            android:textSize="15sp" />
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/switchDarkMode"
@@ -157,33 +192,58 @@
 
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp"
-                        android:background="?attr/colorOutline" android:layout_marginHorizontal="@dimen/margin_md"/>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/colorOutlineVariant" />
 
-                    <!-- Dil ayarı -->
+                    <!-- Dil satırı -->
                     <LinearLayout
                         android:id="@+id/layoutLanguage"
                         android:layout_width="match_parent"
-                        android:layout_height="56dp"
+                        android:layout_height="60dp"
                         android:background="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingHorizontal="@dimen/padding_md">
+                        android:paddingHorizontal="16dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            app:cardCornerRadius="18dp"
+                            app:cardBackgroundColor="@color/primary_container"
+                            app:cardElevation="0dp">
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="8dp"
+                                android:src="@drawable/ic_language"
+                                app:tint="@color/on_primary_container" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginStart="14dp"
                             android:text="@string/language"
                             android:textColor="?attr/colorOnSurface"
-                            android:textSize="@dimen/text_body" />
+                            android:textSize="15sp" />
 
                         <TextView
                             android:id="@+id/tvCurrentLanguage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginEnd="4dp"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="@dimen/text_body" />
+                            android:textSize="14sp" />
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
 
                     </LinearLayout>
 
@@ -191,113 +251,139 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Favoriler bölümü başlığı -->
+            <!-- ── Favoriler Bölümü ── -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_lg"
-                android:layout_marginTop="@dimen/margin_lg"
-                android:layout_marginBottom="@dimen/margin_xs"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="6dp"
                 android:text="@string/favorites"
                 android:textColor="@color/primary"
-                android:textSize="@dimen/text_body_small"
-                android:textStyle="bold" />
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.06"
+                android:textAllCaps="true" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/margin_md"
-                app:cardCornerRadius="@dimen/radius_md"
-                app:cardElevation="@dimen/elevation_sm">
+                android:layout_marginHorizontal="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="?attr/colorSurface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/padding_md">
+                    android:paddingVertical="8dp">
 
-                    <!-- Favori takımlar başlığı -->
+                    <!-- Favori Takımlar başlığı -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp"
                         android:text="@string/favorite_teams"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="@dimen/text_body"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="@dimen/margin_xs" />
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:id="@+id/llFavoriteTeams"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" />
+                        android:orientation="vertical"
+                        android:paddingHorizontal="4dp" />
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp"
-                        android:background="?attr/colorOutline" android:layout_marginVertical="@dimen/margin_md"/>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginVertical="8dp"
+                        android:background="?attr/colorOutlineVariant" />
 
-                    <!-- Favori ligler başlığı -->
+                    <!-- Favori Ligler başlığı -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginBottom="4dp"
                         android:text="@string/favorite_leagues"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="@dimen/text_body"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="@dimen/margin_xs" />
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
 
                     <LinearLayout
                         android:id="@+id/llFavoriteLeagues"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" />
+                        android:orientation="vertical"
+                        android:paddingHorizontal="4dp" />
 
-                    <!-- Favoriler lig açıklaması -->
-                    <com.google.android.material.card.MaterialCardView
+                    <!-- Bilgi banner: M3 primary container (yeşil ton) -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin_sm"
-                        app:cardBackgroundColor="@color/live_red_bg"
-                        app:cardCornerRadius="@dimen/radius_sm"
-                        app:strokeWidth="0dp">
+                        android:layout_marginHorizontal="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/bg_info_banner"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="10dp">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:src="@drawable/ic_notification"
+                            app:tint="@color/on_primary_container" />
 
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:padding="@dimen/padding_sm"
+                            android:layout_weight="1"
                             android:text="@string/league_favorite_info"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="@dimen/text_caption" />
+                            android:textColor="@color/on_primary_container"
+                            android:textSize="11sp"
+                            android:lineSpacingExtra="2dp" />
 
-                    </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Ses Bildirimleri butonu -->
+            <!-- ── Ses Bildirimleri Butonu ── -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnNotificationSounds"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginHorizontal="@dimen/margin_md"
-                android:layout_marginTop="@dimen/margin_lg"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="20dp"
                 android:text="@string/notification_sound_settings"
                 android:textColor="@color/primary"
-                app:cornerRadius="@dimen/radius_lg"
-                app:strokeColor="@color/primary" />
+                app:cornerRadius="14dp"
+                app:strokeColor="@color/primary"
+                app:icon="@drawable/ic_notification"
+                app:iconTint="@color/primary"
+                app:iconGravity="textStart" />
 
-            <!-- Çıkış Yap butonu -->
+            <!-- ── Çıkış Yap Butonu ── -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSignOut"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginHorizontal="@dimen/margin_md"
-                android:layout_marginTop="@dimen/margin_sm"
+                android:layout_height="52dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="10dp"
                 android:text="@string/logout"
                 android:textColor="@color/live_red"
-                app:cornerRadius="@dimen/radius_lg"
+                app:cornerRadius="14dp"
                 app:strokeColor="@color/live_red" />
 
         </LinearLayout>

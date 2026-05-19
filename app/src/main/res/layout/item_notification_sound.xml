@@ -4,31 +4,50 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/margin_md"
-    android:layout_marginBottom="@dimen/margin_sm"
-    app:cardCornerRadius="@dimen/radius_md"
-    app:cardElevation="@dimen/elevation_sm">
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp"
+    app:cardBackgroundColor="?attr/colorSurface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="@dimen/padding_md">
+        android:paddingVertical="14dp"
+        android:paddingHorizontal="16dp">
 
-        <!-- Sol: İsim + durum -->
+        <!-- Sol: ikon container -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            app:cardCornerRadius="21dp"
+            app:cardBackgroundColor="@color/primary_container"
+            app:cardElevation="0dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:src="@drawable/ic_notification"
+                app:tint="@color/on_primary_container" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Orta: İsim + durum -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginHorizontal="14dp">
 
             <TextView
                 android:id="@+id/tvSoundName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="@dimen/text_body"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -36,32 +55,36 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textSize="@dimen/text_caption" />
+                android:textSize="11sp" />
 
         </LinearLayout>
 
-        <!-- Oynat butonu -->
+        <!-- Oynat butonu: text only -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPlay"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_xs"
             android:minWidth="0dp"
-            android:paddingHorizontal="@dimen/padding_sm"
+            android:paddingHorizontal="10dp"
             android:text="@string/sound_play"
-            app:cornerRadius="@dimen/radius_sm"
-            app:iconSize="@dimen/icon_sm" />
+            android:textColor="@color/primary"
+            android:textSize="12sp"
+            app:rippleColor="@color/primary_container" />
 
-        <!-- Değiştir butonu -->
+        <!-- Değiştir butonu: tonal -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnChange"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:minWidth="0dp"
-            android:paddingHorizontal="@dimen/padding_sm"
+            android:paddingHorizontal="12dp"
             android:text="@string/sound_change"
-            app:cornerRadius="@dimen/radius_sm" />
+            android:textSize="12sp"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="10dp" />
 
     </LinearLayout>
 
