@@ -84,33 +84,31 @@
         <LinearLayout
             android:id="@+id/loadingContainer"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
+            android:layout_height="160dp"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="visible">
 
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:indeterminate="true"
-                app:indicatorColor="@color/primary"
-                app:trackColor="@color/surface_variant_light"
-                app:indicatorSize="48dp"
-                app:trackThickness="4dp" />
+            <com.google.android.material.loadingindicator.LoadingIndicator
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.LoadingIndicator"
+                app:indicatorColor="@color/primary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:text="@string/ai_analyzing"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.01" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 android:text="Bu birkaç saniye sürebilir..."
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="12sp" />

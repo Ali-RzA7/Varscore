@@ -154,7 +154,7 @@
             android:layout_height="48dp"
             android:background="@color/primary_dark"
             app:tabGravity="fill"
-            app:tabMode="scrollable"
+            app:tabMode="fixed"
             app:tabIndicatorColor="@color/secondary"
             app:tabIndicatorHeight="3dp"
             app:tabIndicatorGravity="bottom"
