@@ -189,13 +189,11 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progressIndicator"
+            <com.google.android.material.loadingindicator.LoadingIndicator
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:indeterminate="true"
-                app:indicatorColor="?attr/colorPrimary"
-                app:trackThickness="4dp" />
+                style="@style/Widget.Material3.LoadingIndicator"
+                app:indicatorColor="@color/primary" />
 
             <TextView
                 android:layout_width="wrap_content"

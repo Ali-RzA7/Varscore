@@ -13,11 +13,13 @@
         android:padding="16dp">
 
         <!-- Yükleniyor -->
-        <ProgressBar
+        <com.google.android.material.loadingindicator.LoadingIndicator
             android:id="@+id/pbKadro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            style="@style/Widget.Material3.LoadingIndicator"
+            app:indicatorColor="@color/primary"
             android:visibility="visible" />
 
         <!-- Formasyon Başlığı -->
