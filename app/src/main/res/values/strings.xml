@@ -46,6 +46,7 @@
 
     <!-- Ayarlar -->
     <string name="settings">Ayarlar</string>
+    <string name="appearance">Görünüm</string>
     <string name="dark_mode">Koyu Tema</string>
     <string name="language">Dil</string>
     <string name="language_turkish">Türkçe</string>

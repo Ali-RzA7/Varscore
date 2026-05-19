@@ -5,15 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorSurface"
-    android:padding="@dimen/padding_lg">
+    android:background="?attr/colorSurface">
 
-    <!-- Arama satırı: input alanı + kapsam butonu -->
+    <!-- Arama alanı + Kapsam butonu -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="8dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilSearch"
@@ -21,13 +24,16 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             app:hintEnabled="false"
-            app:boxCornerRadiusTopStart="@dimen/radius_xl"
-            app:boxCornerRadiusTopEnd="@dimen/radius_xl"
-            app:boxCornerRadiusBottomStart="@dimen/radius_xl"
-            app:boxCornerRadiusBottomEnd="@dimen/radius_xl"
+            app:boxCornerRadiusTopStart="28dp"
+            app:boxCornerRadiusTopEnd="28dp"
+            app:boxCornerRadiusBottomStart="28dp"
+            app:boxCornerRadiusBottomEnd="28dp"
             app:boxBackgroundMode="outline"
+            app:boxStrokeColor="?attr/colorOutline"
+            app:boxStrokeWidthFocused="2dp"
             app:startIconDrawable="@android:drawable/ic_menu_search"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:startIconTint="?attr/colorPrimary"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etSearch"
@@ -36,7 +42,8 @@
                 android:hint="@string/search_hint"
                 android:inputType="text"
                 android:imeOptions="actionSearch"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:textSize="15sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -45,12 +52,15 @@
             android:id="@+id/btnSearchScope"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="10dp"
             android:text="@string/search_scope_daily"
             android:textSize="12sp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:cornerRadius="20dp"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             app:strokeColor="?attr/colorPrimary" />
 
     </LinearLayout>
@@ -60,32 +70,42 @@
         android:id="@+id/tvSearchScopeHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/search_scope_daily_hint"
-        android:textSize="11sp"
+        android:textSize="12sp"
         android:textColor="?android:attr/textColorSecondary"
         android:gravity="end" />
 
-    <!-- Yükleme göstergesi -->
+    <!-- Yükleme çubuğu -->
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/progressBarSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:indeterminate="true"
+        app:indicatorColor="?attr/colorPrimary"
+        app:trackThickness="3dp"
         android:visibility="gone" />
 
-    <!-- Arama Sonuçları Listesi -->
+    <!-- Ince ayraç -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="?attr/colorOutlineVariant" />
+
+    <!-- Arama Sonuçları -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSearchResults"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="@dimen/margin_md"
         android:clipToPadding="false"
+        android:paddingVertical="8dp"
         android:visibility="gone" />
 
-    <!-- Sonuç Bulunamadı Mesajı -->
+    <!-- Sonuç Bulunamadı -->
     <TextView
         android:id="@+id/tvNoResults"
         android:layout_width="match_parent"

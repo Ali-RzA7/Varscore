@@ -9,6 +9,7 @@
     <string name="search_scope_global">Global</string>
     <string name="search_scope_daily_hint">Only selected day\'s matches</string>
     <string name="search_scope_global_hint">All leagues and teams</string>
+    <string name="appearance">Appearance</string>
     <string name="notification_sound_settings">Customize Notification Sounds</string>
     <string name="notification_sounds_title">Notification Sounds</string>
     <string name="sound_goal">Goal Sound</string>

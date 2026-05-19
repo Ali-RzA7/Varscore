@@ -1,34 +1,29 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- ========================================= -->
-    <!-- Koyu Tema (Dark Theme)                     -->
-    <!-- ========================================= -->
-    <style name="Theme.Var" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color -->
+<resources>
+    <!-- Material 3 Dark Theme -->
+    <style name="Theme.Var" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary -->
         <item name="colorPrimary">@color/primary_light</item>
-        <item name="colorPrimaryVariant">@color/primary</item>
         <item name="colorOnPrimary">@color/on_primary</item>
-        <!-- Secondary brand color -->
+        <item name="colorPrimaryContainer">@color/primary</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary</item>
+        <!-- Secondary -->
         <item name="colorSecondary">@color/secondary_light</item>
-        <item name="colorSecondaryVariant">@color/secondary</item>
         <item name="colorOnSecondary">@color/on_secondary</item>
-        <!-- Arka plan -->
+        <item name="colorSecondaryContainer">@color/secondary_dark</item>
+        <item name="colorOnSecondaryContainer">@color/on_secondary</item>
+        <!-- Surface & Background -->
         <item name="android:colorBackground">@color/background_dark</item>
         <item name="colorSurface">@color/surface_dark</item>
-        <!-- Status bar -->
-        <item name="android:statusBarColor">@color/background_dark</item>
-        <item name="android:navigationBarColor">@color/surface_dark</item>
-        <!-- Metin -->
-        <item name="android:textColorPrimary">@color/text_primary_dark</item>
-        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
-        <item name="android:textColorHint">@color/text_hint_dark</item>
-        <!-- Material3 uyumluluğu: BottomNavigationView ve diğer bileşenler için -->
         <item name="colorOnSurface">@color/text_primary_dark</item>
         <item name="colorSurfaceVariant">@color/surface_elevated_dark</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary_dark</item>
+        <!-- Outline -->
         <item name="colorOutline">@color/divider_dark</item>
-        <item name="colorPrimaryContainer">@color/primary</item>
-        <item name="colorOnPrimaryContainer">@color/on_primary</item>
-        <item name="colorSecondaryContainer">@color/secondary_dark</item>
-        <item name="colorOnSecondaryContainer">@color/on_secondary</item>
+        <!-- System bars -->
+        <item name="android:statusBarColor">@color/background_dark</item>
+        <item name="android:navigationBarColor">@color/surface_dark</item>
+        <!-- M3 uyumluluk -->
+        <item name="colorPrimaryVariant">@color/primary</item>
+        <item name="colorSecondaryVariant">@color/secondary</item>
     </style>
 </resources>

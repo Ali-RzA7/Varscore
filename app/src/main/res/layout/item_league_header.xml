@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ===================================================================== -->
-<!-- item_league_header.xml - Lig başlık öğesi                             -->
-<!-- Maç listesinde ligleri gruplamak için kullanılır                       -->
-<!-- Lig renk çizgisi + Lig adı gösterilir                                 -->
-<!-- ===================================================================== -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/leagueHeaderContainer"
@@ -11,21 +6,22 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingStart="@dimen/padding_lg"
-    android:paddingEnd="@dimen/padding_lg"
-    android:paddingTop="@dimen/padding_md"
-    android:paddingBottom="@dimen/padding_sm"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="8dp"
     android:background="?android:attr/colorBackground"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
-    <!-- Lig renk göstergesi (dikey çizgi) -->
+    <!-- Lig renk göstergesi (dikey çizgi, yuvarlatılmış) -->
     <View
         android:id="@+id/viewLeagueColor"
         android:layout_width="4dp"
-        android:layout_height="20dp"
-        android:background="?attr/colorPrimary" />
+        android:layout_height="22dp"
+        android:background="@drawable/shape_league_indicator"
+        android:layout_marginEnd="10dp" />
 
     <!-- Lig adı -->
     <TextView
@@ -33,10 +29,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="@dimen/margin_sm"
-        android:textSize="@dimen/text_body"
+        android:textSize="13.5sp"
         android:textColor="?android:attr/textColorPrimary"
         android:textStyle="bold"
+        android:letterSpacing="0.01"
         android:maxLines="1"
         android:ellipsize="end" />
 
@@ -45,7 +41,7 @@
         android:id="@+id/tvFavoriteStar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
+        android:layout_marginEnd="6dp"
         android:text="★"
         android:textSize="14sp"
         android:textColor="?attr/colorSecondary"
@@ -56,7 +52,7 @@
         android:id="@+id/tvLeagueType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/text_caption"
+        android:textSize="14sp"
         android:textColor="?android:attr/textColorSecondary" />
 
 </LinearLayout>

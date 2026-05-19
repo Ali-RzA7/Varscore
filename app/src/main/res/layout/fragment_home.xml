@@ -1,173 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ===================================================================== -->
-<!-- fragment_home.xml - Ana sayfa fragment layout'u                        -->
-<!-- Yapı (yukarıdan aşağıya):                                             -->
-<!--   1. Custom Toolbar (app adı + search + ayarlar)                      -->
-<!--   2. Carousel Toggle (Canlı / Tüm Maçlar geçiş butonları)            -->
-<!--   3. Horizontal Date Picker (yatay kaydırılabilir takvim)             -->
-<!--   4. SwipeRefreshLayout > RecyclerView (maç listesi)                  -->
-<!--   5. Loading/Error/Empty durumları                                    -->
-<!-- ===================================================================== -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?android:attr/colorBackground">
 
     <!-- ============================================================= -->
-    <!-- BÖLÜM 1: Özel Toolbar - Uygulama adı, arama ve ayarlar       -->
-    <!-- ============================================================= -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbar_height"
-        android:background="?attr/colorPrimary"
-        android:elevation="@dimen/elevation_md"
-        app:title="@string/app_name"
-        app:titleTextColor="@color/white"
-        app:titleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6">
-
-        <!-- Arama Butonu -->
-        <ImageButton
-            android:id="@+id/btnSearch"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_search"
-            android:contentDescription="@string/search_hint"
-            app:tint="@color/white" />
-
-        <!-- Ayarlar Butonu -->
-        <ImageButton
-            android:id="@+id/btnSettings"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="12dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_preferences"
-            android:contentDescription="@string/settings"
-            app:tint="@color/white" />
-
-    </com.google.android.material.appbar.MaterialToolbar>
-
-    <!-- ============================================================= -->
-    <!-- BÖLÜM 2: Carousel Toggle - Canlı / Tüm Maçlar slider buton  -->
-    <!-- Tasarım: İki segment buton (pill shape) - aktif olan vurgulanır -->
+    <!-- HEADER ALANI: Toolbar + Toggle + Tarih Seçici                 -->
     <!-- ============================================================= -->
     <LinearLayout
-        android:id="@+id/carouselToggleContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingTop="@dimen/padding_md"
-        android:paddingBottom="@dimen/padding_sm"
-        android:background="?attr/colorPrimary">
+        android:orientation="vertical"
+        android:background="@color/primary">
 
-        <!-- Segment butonlar için kapsayıcı (pill shape) -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/carousel_toggle_height"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp"
-            app:cardBackgroundColor="@color/primary_dark">
+        <!-- Toolbar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@android:color/transparent"
+            app:title="@string/app_name"
+            app:titleTextColor="@color/white"
+            app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall">
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
                 android:orientation="horizontal"
-                android:padding="3dp">
+                android:layout_marginEnd="4dp">
 
-                <!-- Canlı Maçlar Butonu -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnLiveMatches"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="@string/live_matches"
-                    android:textSize="@dimen/text_body_small"
-                    android:textAllCaps="false"
-                    android:minWidth="130dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:cornerRadius="18dp"
-                    app:backgroundTint="@android:color/transparent"
-                    android:textColor="@color/white"
-                    style="@style/Widget.MaterialComponents.Button.TextButton" />
+                <!-- Arama Butonu -->
+                <ImageButton
+                    android:id="@+id/btnSearch"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_menu_search"
+                    android:contentDescription="@string/search_hint"
+                    app:tint="@color/white" />
 
-                <!-- Tüm Maçlar Butonu (varsayılan aktif) -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAllMatches"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="@string/all_matches"
-                    android:textSize="@dimen/text_body_small"
-                    android:textAllCaps="false"
-                    android:minWidth="130dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:cornerRadius="18dp"
-                    app:backgroundTint="@color/secondary"
-                    android:textColor="@color/on_secondary"
-                    style="@style/Widget.MaterialComponents.Button" />
+                <!-- Ayarlar Butonu -->
+                <ImageButton
+                    android:id="@+id/btnSettings"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_menu_preferences"
+                    android:contentDescription="@string/settings"
+                    app:tint="@color/white" />
 
             </LinearLayout>
 
-        </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.appbar.MaterialToolbar>
+
+        <!-- ============================================================= -->
+        <!-- Toggle: Canlı / Tüm Maçlar                                     -->
+        <!-- ============================================================= -->
+        <LinearLayout
+            android:id="@+id/carouselToggleContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="16dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1.5dp"
+                app:strokeColor="#40FFFFFF"
+                app:cardBackgroundColor="#1A000000">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="3dp">
+
+                    <!-- Canlı Maçlar Butonu -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnLiveMatches"
+                        android:layout_width="140dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/live_matches"
+                        android:textSize="13sp"
+                        android:textAllCaps="false"
+                        android:letterSpacing="0.01"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:cornerRadius="20dp"
+                        app:backgroundTint="@android:color/transparent"
+                        android:textColor="@color/white"
+                        style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+                    <!-- Tüm Maçlar Butonu (varsayılan aktif) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAllMatches"
+                        android:layout_width="140dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/all_matches"
+                        android:textSize="13sp"
+                        android:textAllCaps="false"
+                        android:letterSpacing="0.01"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        app:cornerRadius="20dp"
+                        app:backgroundTint="@color/secondary"
+                        android:textColor="@color/on_secondary"
+                        style="@style/Widget.MaterialComponents.Button" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- ============================================================= -->
+        <!-- Tarih Seçici                                                    -->
+        <!-- ============================================================= -->
+        <RelativeLayout
+            android:id="@+id/datePickerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDatePicker"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/date_picker_height"
+                android:layout_toStartOf="@+id/btnOpenCalendar"
+                android:clipToPadding="false"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:overScrollMode="never" />
+
+            <ImageButton
+                android:id="@+id/btnOpenCalendar"
+                android:layout_width="48dp"
+                android:layout_height="@dimen/date_picker_height"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_today"
+                android:contentDescription="@string/select_date"
+                app:tint="@color/white" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
     <!-- ============================================================= -->
-    <!-- BÖLÜM 3: Horizontal Date Picker - Yatay kaydırılabilir takvim -->
-    <!-- RecyclerView ile sonsuz scroll benzeri tarih seçici            -->
-    <!-- ============================================================= -->
-    <RelativeLayout
-        android:id="@+id/datePickerContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:paddingBottom="@dimen/padding_sm">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvDatePicker"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/date_picker_height"
-            android:layout_toStartOf="@+id/btnOpenCalendar"
-            android:clipToPadding="false"
-            android:paddingStart="@dimen/padding_sm"
-            android:paddingEnd="@dimen/padding_sm"
-            android:overScrollMode="never" />
-
-        <ImageButton
-            android:id="@+id/btnOpenCalendar"
-            android:layout_width="48dp"
-            android:layout_height="@dimen/date_picker_height"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/padding_sm"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_today"
-            android:contentDescription="@string/select_date"
-            app:tint="@color/white" />
-
-    </RelativeLayout>
-
-    <!-- ============================================================= -->
-    <!-- BÖLÜM 4: Maç Listesi - SwipeRefreshLayout ile yenileme       -->
-    <!-- Lig bazında gruplu RecyclerView                                -->
+    <!-- İÇERİK: Maç Listesi + Durum Göstergeleri                      -->
     <!-- ============================================================= -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- Pull-to-refresh ile maç listesi yenileme -->
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
@@ -178,14 +175,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingTop="@dimen/padding_sm"
-                android:paddingBottom="@dimen/padding_sm" />
+                android:paddingTop="6dp"
+                android:paddingBottom="16dp" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        <!-- ===================================================== -->
-        <!-- Loading Durumu - Veriler yüklenirken gösterilir        -->
-        <!-- ===================================================== -->
+        <!-- Yükleniyor -->
         <LinearLayout
             android:id="@+id/loadingContainer"
             android:layout_width="match_parent"
@@ -212,9 +207,7 @@
 
         </LinearLayout>
 
-        <!-- ===================================================== -->
-        <!-- Boş Durum - Maç bulunamadığında gösterilir             -->
-        <!-- ===================================================== -->
+        <!-- Boş Durum -->
         <LinearLayout
             android:id="@+id/emptyContainer"
             android:layout_width="match_parent"
@@ -228,7 +221,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="⚽"
-                android:textSize="48sp" />
+                android:textSize="52sp" />
 
             <TextView
                 android:id="@+id/tvEmptyMessage"
@@ -242,9 +235,7 @@
 
         </LinearLayout>
 
-        <!-- ===================================================== -->
-        <!-- Hata Durumu - API hatası olduğunda gösterilir          -->
-        <!-- ===================================================== -->
+        <!-- Hata Durumu -->
         <LinearLayout
             android:id="@+id/errorContainer"
             android:layout_width="match_parent"
@@ -258,7 +249,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="😕"
-                android:textSize="48sp" />
+                android:textSize="52sp" />
 
             <TextView
                 android:id="@+id/tvErrorMessage"
@@ -276,7 +267,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_md"
                 android:text="@string/retry"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+                style="@style/Widget.Material3.Button.OutlinedButton" />
 
         </LinearLayout>
 

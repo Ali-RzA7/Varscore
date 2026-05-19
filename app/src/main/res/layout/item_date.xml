@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ===================================================================== -->
-<!-- item_date.xml - Yatay tarih seçicideki her bir gün öğesi               -->
-<!-- Yapı: Gün adı (üst) + Gün numarası (orta) + Ay adı (alt)             -->
-<!-- Seçili gün yeşil arka planla vurgulanır                                -->
-<!-- ===================================================================== -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardDate"
-    android:layout_width="@dimen/date_item_width"
-    android:layout_height="@dimen/date_item_height"
+    android:layout_width="60dp"
+    android:layout_height="80dp"
     android:layout_margin="@dimen/margin_xs"
-    app:cardCornerRadius="@dimen/radius_md"
+    app:cardCornerRadius="14dp"
     app:cardElevation="0dp"
     app:strokeWidth="0dp"
     app:cardBackgroundColor="@android:color/transparent"
@@ -24,34 +19,36 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="@dimen/padding_xs">
+        android:padding="4dp">
 
         <!-- Gün adı (Pzt, Sal, ...) -->
         <TextView
             android:id="@+id/tvDayName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/text_caption"
+            android:textSize="11sp"
             android:textColor="@color/white"
-            android:alpha="0.7" />
+            android:alpha="0.75"
+            android:letterSpacing="0.03" />
 
-        <!-- Gün numarası (01, 02, ..., 31) -->
+        <!-- Gün numarası -->
         <TextView
             android:id="@+id/tvDayNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/text_title"
+            android:textSize="22sp"
             android:textColor="@color/white"
             android:textStyle="bold" />
 
-        <!-- Ay adı (Oca, Şub, ...) -->
+        <!-- Ay adı -->
         <TextView
             android:id="@+id/tvMonthName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/text_caption"
+            android:textSize="11sp"
             android:textColor="@color/white"
-            android:alpha="0.7" />
+            android:alpha="0.75"
+            android:letterSpacing="0.02" />
 
     </LinearLayout>
 

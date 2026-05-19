@@ -62,6 +62,15 @@
     <color name="shimmer_light">#FFEEEEEE</color>
     <color name="shimmer_dark">#FF333333</color>
 
+    <!-- Material 3 Container renkleri -->
+    <color name="primary_container">#C8E6C9</color>
+    <color name="on_primary_container">#002204</color>
+    <color name="secondary_container">#FFECB3</color>
+    <color name="on_secondary_container">#3E2900</color>
+    <color name="surface_variant_light">#E8F5E9</color>
+    <color name="outline_light">#787774</color>
+    <color name="outline_variant_light">#C9C6C3</color>
+
     <!-- Eski renkler (uyumluluk) -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
