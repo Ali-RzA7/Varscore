@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- M3 NavigationBar renk durumu — light/dark otomatik uyumlu -->
+<!-- Aktif: primary rengi (amber indicator üzerinde koyu yeşil = okunur) -->
+<!-- Pasif: yüzey üzerindeki muted renk -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorPrimary" android:state_checked="true" />
+    <item android:color="?attr/colorOnSurfaceVariant" />
+</selector>
