@@ -390,7 +390,7 @@ public class HomeFragment extends Fragment implements
             @Override
             public void onResponse(@NonNull Call<ApiResponse<MatchModel>> call,
                     @NonNull Response<ApiResponse<MatchModel>> response) {
-                if (!isAdded())
+                if (!isAdded() || binding == null)
                     return;
                 binding.swipeRefreshLayout.setRefreshing(false);
 
@@ -414,7 +414,7 @@ public class HomeFragment extends Fragment implements
             @Override
             public void onFailure(@NonNull Call<ApiResponse<MatchModel>> call,
                     @NonNull Throwable t) {
-                if (!isAdded())
+                if (!isAdded() || binding == null)
                     return;
                 binding.swipeRefreshLayout.setRefreshing(false);
                 showError(getString(R.string.error_loading));
@@ -432,7 +432,7 @@ public class HomeFragment extends Fragment implements
             @Override
             public void onResponse(@NonNull Call<ApiResponse<MatchModel>> call,
                     @NonNull Response<ApiResponse<MatchModel>> response) {
-                if (!isAdded())
+                if (!isAdded() || binding == null)
                     return;
                 binding.swipeRefreshLayout.setRefreshing(false);
 
@@ -463,7 +463,7 @@ public class HomeFragment extends Fragment implements
             @Override
             public void onFailure(@NonNull Call<ApiResponse<MatchModel>> call,
                     @NonNull Throwable t) {
-                if (!isAdded())
+                if (!isAdded() || binding == null)
                     return;
                 binding.swipeRefreshLayout.setRefreshing(false);
                 showError(getString(R.string.error_loading));
@@ -485,7 +485,7 @@ public class HomeFragment extends Fragment implements
         String userId = FirebaseManager.getCurrentUser().getUid();
         FirebaseManager.getUserProfile(userId,
                 user -> {
-                    if (!isAdded()) return;
+                    if (!isAdded() || binding == null) return;
                     favoriteTeamIds = new HashSet<>(user.getFavoriteTeams());
                     favoriteLeagueIds = new HashSet<>(user.getFavoriteLeagues());
                     favoriteTeamNames = new HashMap<>(user.getFavoriteTeamNames());
