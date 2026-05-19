@@ -1,8 +1,9 @@
 package com.example.var.ui.fragment;
 
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +29,10 @@ import com.example.var.util.FirebaseManager;
 import com.example.var.util.PreferencesManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ import retrofit2.Response;
  */
 public class ProfileFragment extends Fragment {
 
-    private static final String TAG = "ProfileFragment";
+    private static final int MAX_PHOTO_BYTES = 800 * 1024; // 800 KB
 
     /** ViewBinding referansı */
     private FragmentProfileBinding binding;
@@ -126,10 +127,22 @@ public class ProfileFragment extends Fragment {
 
         updateLanguageDisplay();
 
-        // Önce Auth'daki fotoğrafı dene (hızlı yükleme)
-        if (firebaseUser.getPhotoUrl() != null) {
-            loadProfilePhoto(firebaseUser.getPhotoUrl().toString());
-        }
+        // Firestore blob fotoğrafını yükle; yoksa Auth URL'ye geri dön
+        FirebaseManager.loadPhotoBlob(firebaseUser.getUid(),
+                bytes -> {
+                    if (!isAdded()) return;
+                    if (bytes != null) {
+                        loadProfilePhotoFromBytes(bytes);
+                    } else if (firebaseUser.getPhotoUrl() != null) {
+                        loadProfilePhoto(firebaseUser.getPhotoUrl().toString());
+                    }
+                },
+                e -> {
+                    if (!isAdded()) return;
+                    if (firebaseUser.getPhotoUrl() != null) {
+                        loadProfilePhoto(firebaseUser.getPhotoUrl().toString());
+                    }
+                });
 
         // Firestore'dan detaylı profil yükle
         FirebaseManager.getUserProfile(firebaseUser.getUid(),
@@ -137,15 +150,10 @@ public class ProfileFragment extends Fragment {
                     if (!isAdded())
                         return;
                     currentUser = user;
-                    // Firestore'daki fotoğraf URL'si daha güncel olabilir
-                    if (user.getPhotoUrl() != null && !user.getPhotoUrl().isEmpty()) {
-                        loadProfilePhoto(user.getPhotoUrl());
-                    }
                     displayFavorites(user.getFavoriteTeams(), user.getFavoriteLeagues(),
                             user.getFavoriteTeamNames());
                 },
-                e -> {
-                    /* Sessizce başarısız ol */ });
+                e -> { /* Sessizce başarısız ol */ });
     }
 
     private void loadProfilePhoto(String photoUrl) {
@@ -323,73 +331,71 @@ public class ProfileFragment extends Fragment {
                 : getString(R.string.language_english));
     }
 
-    /**
-     * Seçilen fotoğrafı Firebase Storage'a yükler ve download URL'sini alır.
-     * "Object does not exist" hatasını önlemek için modern task chaining kullanır.
-     */
     private void uploadProfilePhoto(Uri imageUri) {
         FirebaseUser user = FirebaseManager.getCurrentUser();
-        if (user == null)
+        if (user == null) return;
+
+        // Boyut kontrolü (max 800 KB)
+        long fileSize = getUriFileSize(imageUri);
+        if (fileSize > MAX_PHOTO_BYTES) {
+            showSnackbar(getString(R.string.photo_file_too_large, MAX_PHOTO_BYTES / 1024));
             return;
+        }
 
         showSnackbar(getString(R.string.uploading_photo));
 
-        final StorageReference photoRef = FirebaseStorage.getInstance().getReference()
-                .child("profile_photos")
-                .child(user.getUid() + ".jpg");
-
-        // Yükleme işlemini başlat
-        UploadTask uploadTask = photoRef.putFile(imageUri);
-
-        // Task zincirleme: Yükleme bitince URL almayı dene
-        uploadTask.continueWithTask(task -> {
-            if (!task.isSuccessful()) {
-                if (task.getException() != null)
-                    throw task.getException();
-            }
-            // Yükleme bitti, şimdi URL'yi iste
-            return photoRef.getDownloadUrl();
-        }).addOnSuccessListener(uri -> {
-            if (!isAdded())
+        try {
+            byte[] imageBytes = readBytesFromUri(imageUri);
+            // Cursor boyutu bilinmiyorsa gerçek boyutu kontrol et
+            if (imageBytes.length > MAX_PHOTO_BYTES) {
+                showSnackbar(getString(R.string.photo_file_too_large, MAX_PHOTO_BYTES / 1024));
                 return;
-            String downloadUrl = uri.toString();
-
-            // Firestore'da güncelle
-            updatePhotoUrlInFirestore(downloadUrl);
-
-            // UI'da göster
-            loadProfilePhoto(downloadUrl);
-
-        }).addOnFailureListener(e -> {
-            if (!isAdded())
-                return;
-            Log.e(TAG, "Yükleme hatası: " + e.getMessage(), e);
-
-            // "Object does not exist" hatası genelde bucket veya kurallar kaynaklıdır
-            String errorMsg = e.getMessage();
-            if (errorMsg != null && errorMsg.contains("does not exist")) {
-                showSnackbar(
-                        getString(R.string.upload_failed) + ": Depolama alanı (Bucket) bulunamadı veya yetki yok.");
-            } else {
-                showSnackbar(
-                        getString(R.string.upload_failed) + ": " + (errorMsg != null ? errorMsg : "Bilinmeyen hata"));
             }
-        });
+
+            FirebaseManager.savePhotoBlob(user.getUid(), imageBytes,
+                    unused -> {
+                        if (!isAdded()) return;
+                        loadProfilePhotoFromBytes(imageBytes);
+                        showSnackbar(getString(R.string.photo_updated));
+                    },
+                    e -> {
+                        if (!isAdded()) return;
+                        showSnackbar(getString(R.string.upload_failed));
+                    });
+        } catch (IOException e) {
+            showSnackbar(getString(R.string.upload_failed));
+        }
     }
 
-    private void updatePhotoUrlInFirestore(String photoUrl) {
-        FirebaseUser user = FirebaseManager.getCurrentUser();
-        if (user == null)
-            return;
+    private void loadProfilePhotoFromBytes(byte[] bytes) {
+        Glide.with(this)
+                .load(bytes)
+                .placeholder(R.drawable.ic_person)
+                .error(R.drawable.ic_person)
+                .circleCrop()
+                .into(binding.ivProfilePhoto);
+    }
 
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(user.getUid())
-                .update("photoUrl", photoUrl)
-                .addOnSuccessListener(unused -> showSnackbar(getString(R.string.photo_updated)))
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Firestore güncellenemedi", e);
-                });
+    private long getUriFileSize(Uri uri) {
+        try (Cursor cursor = requireContext().getContentResolver()
+                .query(uri, new String[]{OpenableColumns.SIZE}, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idx = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (idx >= 0) return cursor.getLong(idx);
+            }
+        } catch (Exception ignored) {}
+        return -1;
+    }
+
+    private byte[] readBytesFromUri(Uri uri) throws IOException {
+        try (InputStream in = requireContext().getContentResolver().openInputStream(uri);
+             ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+            if (in == null) throw new IOException("Cannot open input stream");
+            byte[] chunk = new byte[8192];
+            int n;
+            while ((n = in.read(chunk)) != -1) buf.write(chunk, 0, n);
+            return buf.toByteArray();
+        }
     }
 
     private void signOut() {

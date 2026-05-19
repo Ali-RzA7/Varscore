@@ -1,10 +1,12 @@
 package com.example.var.ui.fragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.example.var.R;
 import com.example.var.databinding.FragmentNotificationSoundBinding;
 import com.example.var.databinding.ItemNotificationSoundBinding;
+import com.example.var.util.FirebaseManager;
 import com.example.var.util.NotificationHelper;
 import com.example.var.util.SoundPreferencesManager;
 import com.google.android.material.snackbar.Snackbar;
@@ -26,8 +29,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 public class NotificationSoundFragment extends Fragment {
+
+    private static final int MAX_SOUND_BYTES = 500 * 1024; // 500 KB
 
     private FragmentNotificationSoundBinding binding;
     private SoundPreferencesManager soundPrefs;
@@ -176,6 +182,13 @@ public class NotificationSoundFragment extends Fragment {
             return;
         }
 
+        // Dosya boyutu kontrolü (max 500 KB)
+        long fileSize = getUriFileSize(uri);
+        if (fileSize > MAX_SOUND_BYTES) {
+            showSnackbar(getString(R.string.sound_file_too_large, MAX_SOUND_BYTES / 1024));
+            return;
+        }
+
         // Süre kontrolü (max 5 saniye)
         long durationMs = getAudioDurationMs(uri);
         if (durationMs < 0 || durationMs > 5000) {
@@ -186,7 +199,18 @@ public class NotificationSoundFragment extends Fragment {
         // İç depolamaya kopyala
         try {
             File dest = copyAudioToInternal(uri, currentEditingKey);
+
+            // Boyut bilinmiyorsa kopyalanan dosyayı kontrol et
+            if (fileSize < 0 && dest.length() > MAX_SOUND_BYTES) {
+                dest.delete();
+                showSnackbar(getString(R.string.sound_file_too_large, MAX_SOUND_BYTES / 1024));
+                return;
+            }
+
             soundPrefs.setCustomSoundPath(currentEditingKey, dest.getAbsolutePath());
+
+            // Firestore'a blob olarak kaydet (giriş yapmışsa)
+            uploadSoundToFirestore(dest, currentEditingKey);
 
             // Bildirim kanalını sıfırla
             String channelId = SoundPreferencesManager.channelId(currentEditingKey);
@@ -197,6 +221,26 @@ public class NotificationSoundFragment extends Fragment {
         } catch (IOException e) {
             showSnackbar(getString(R.string.error_loading));
         }
+    }
+
+    private void uploadSoundToFirestore(File audioFile, String key) {
+        if (!FirebaseManager.isLoggedIn()) return;
+        try {
+            byte[] bytes = Files.readAllBytes(audioFile.toPath());
+            String userId = FirebaseManager.getCurrentUser().getUid();
+            FirebaseManager.saveSoundBlob(userId, key, bytes, unused -> {}, e -> {});
+        } catch (Exception ignored) {}
+    }
+
+    private long getUriFileSize(Uri uri) {
+        try (Cursor cursor = requireContext().getContentResolver()
+                .query(uri, new String[]{OpenableColumns.SIZE}, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idx = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (idx >= 0) return cursor.getLong(idx);
+            }
+        } catch (Exception ignored) {}
+        return -1;
     }
 
     private long getAudioDurationMs(Uri uri) {
@@ -227,6 +271,9 @@ public class NotificationSoundFragment extends Fragment {
 
     private void resetSound(String key, ItemNotificationSoundBinding itemBinding) {
         soundPrefs.resetToDefault(key);
+        if (FirebaseManager.isLoggedIn()) {
+            FirebaseManager.deleteSoundBlob(FirebaseManager.getCurrentUser().getUid(), key);
+        }
         String channelId = SoundPreferencesManager.channelId(key);
         NotificationHelper.updateChannelSound(requireContext(), channelId);
         updateStatusLabel(itemBinding, key);

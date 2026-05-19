@@ -295,6 +295,8 @@
     <string name="sound_reset_done">Varsayılan sese sıfırlandı</string>
     <string name="sound_too_long">Seçilen ses 5 saniyeden uzun olmamalıdır</string>
     <string name="sound_invalid_format">Lütfen geçerli bir ses dosyası seçin</string>
+    <string name="sound_file_too_large">Dosya çok büyük. Maksimum %d KB yükleyebilirsiniz.</string>
+    <string name="photo_file_too_large">Fotoğraf çok büyük. Maksimum %d KB yükleyebilirsiniz.</string>
     <string name="sound_info">Her bildirim türü için farklı ses belirleyebilirsiniz. Ses dosyası en fazla 5 saniye olmalıdır.</string>
 
 </resources>

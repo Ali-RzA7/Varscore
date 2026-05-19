@@ -7,6 +7,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.Blob;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -62,6 +63,9 @@ public class FirebaseManager {
 
     /** Firestore'daki favori takım ligleri haritası alanı */
     private static final String FIELD_FAVORITE_TEAM_LEAGUES = "favoriteTeamLeagues";
+
+    /** Profil fotoğrafı blob'larının saklandığı koleksiyon */
+    private static final String USER_PHOTOS_COLLECTION = "user_photos";
 
     // ===== Auth İşlemleri =====
 
@@ -328,6 +332,66 @@ public class FirebaseManager {
         db.collection(USERS_COLLECTION).document(user.getUid())
                 .update(removeData)
                 .addOnSuccessListener(onSuccess)
+                .addOnFailureListener(onFailure);
+    }
+
+    // ===== Blob İşlemleri (Ses & Fotoğraf) =====
+
+    public static void saveSoundBlob(String userId, String key, byte[] audioData,
+            OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("audioData", Blob.fromBytes(audioData));
+        db.collection(USERS_COLLECTION).document(userId)
+                .collection("sounds").document(key)
+                .set(data)
+                .addOnSuccessListener(onSuccess)
+                .addOnFailureListener(onFailure);
+    }
+
+    public static void loadSoundBlob(String userId, String key,
+            OnSuccessListener<byte[]> onSuccess, OnFailureListener onFailure) {
+        db.collection(USERS_COLLECTION).document(userId)
+                .collection("sounds").document(key)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.exists()) {
+                        Blob blob = snapshot.getBlob("audioData");
+                        onSuccess.onSuccess(blob != null ? blob.toBytes() : null);
+                    } else {
+                        onSuccess.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(onFailure);
+    }
+
+    public static void deleteSoundBlob(String userId, String key) {
+        db.collection(USERS_COLLECTION).document(userId)
+                .collection("sounds").document(key)
+                .delete();
+    }
+
+    public static void savePhotoBlob(String userId, byte[] imageData,
+            OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("imageData", Blob.fromBytes(imageData));
+        db.collection(USER_PHOTOS_COLLECTION).document(userId)
+                .set(data)
+                .addOnSuccessListener(onSuccess)
+                .addOnFailureListener(onFailure);
+    }
+
+    public static void loadPhotoBlob(String userId,
+            OnSuccessListener<byte[]> onSuccess, OnFailureListener onFailure) {
+        db.collection(USER_PHOTOS_COLLECTION).document(userId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.exists()) {
+                        Blob blob = snapshot.getBlob("imageData");
+                        onSuccess.onSuccess(blob != null ? blob.toBytes() : null);
+                    } else {
+                        onSuccess.onSuccess(null);
+                    }
+                })
                 .addOnFailureListener(onFailure);
     }
 
