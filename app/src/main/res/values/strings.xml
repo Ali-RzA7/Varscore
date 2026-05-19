@@ -202,6 +202,8 @@
     <!-- ========================================= -->
     <string name="favorites">Favoriler</string>
     <string name="favorite_teams">Favori Takımlar</string>
+    <string name="my_teams">Benim Takımlarım</string>
+    <string name="my_teams_short">Takımlarım</string>
     <string name="favorite_leagues">Favori Ligler</string>
     <string name="no_favorites">Henüz favori eklemediniz</string>
     <string name="favorite_count">%d favori</string>

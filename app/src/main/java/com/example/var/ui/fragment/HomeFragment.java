@@ -25,6 +25,8 @@ import com.example.var.ui.dialog.SearchDialogFragment;
 import com.example.var.ui.dialog.SettingsDialogFragment;
 import com.example.var.ui.fragment.LeagueStandingsFragment;
 import com.example.var.ui.fragment.MatchDetailFragment;
+import com.example.var.ui.fragment.TeamMatchesFragment;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.example.var.util.DateUtils;
 import com.example.var.util.FirebaseManager;
 import com.example.var.util.GlobalTeamCache;
@@ -33,6 +35,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -90,6 +93,12 @@ public class HomeFragment extends Fragment implements
 
     /** Favori lig ID seti (giriş yapmış kullanıcı için) */
     private Set<String> favoriteLeagueIds = new HashSet<>();
+
+    /** Favori takım adları (teamId → name) */
+    private Map<String, String> favoriteTeamNames = new HashMap<>();
+
+    /** Favori takımların lig ID'leri (teamId → leagueId) */
+    private Map<String, String> favoriteTeamLeagues = new HashMap<>();
 
     /** Son yüklenen maç listesi (favoriler yüklenince yeniden sıralamak için) */
     private List<MatchModel> currentMatches = null;
@@ -156,6 +165,9 @@ public class HomeFragment extends Fragment implements
             SettingsDialogFragment settingsDialog = new SettingsDialogFragment();
             settingsDialog.show(getParentFragmentManager(), "settings_dialog");
         });
+
+        // Benim Takımlarım butonu - favori takımlar dialogu açar
+        binding.btnMyTeams.setOnClickListener(v -> showMyTeamsDialog());
     }
 
     // ================================================================
@@ -476,6 +488,8 @@ public class HomeFragment extends Fragment implements
                     if (!isAdded()) return;
                     favoriteTeamIds = new HashSet<>(user.getFavoriteTeams());
                     favoriteLeagueIds = new HashSet<>(user.getFavoriteLeagues());
+                    favoriteTeamNames = new HashMap<>(user.getFavoriteTeamNames());
+                    favoriteTeamLeagues = new HashMap<>(user.getFavoriteTeamLeagues());
                     matchAdapter.setFavorites(favoriteTeamIds, favoriteLeagueIds);
                     // Maçlar zaten yüklendiyse favori sırasıyla yeniden göster
                     if (currentMatches != null) {
@@ -529,6 +543,60 @@ public class HomeFragment extends Fragment implements
             if (match.getAwayId() != null && favoriteTeamIds.contains(match.getAwayId())) return true;
         }
         return false;
+    }
+
+    // ================================================================
+    // Benim Takımlarım Dialog
+    // ================================================================
+
+    private void showMyTeamsDialog() {
+        if (!FirebaseManager.isLoggedIn()) {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.my_teams)
+                    .setMessage(R.string.login_to_favorite)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+            return;
+        }
+
+        List<String> teamIds = new ArrayList<>(favoriteTeamIds);
+        if (teamIds.isEmpty()) {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.my_teams)
+                    .setMessage(R.string.no_favorites)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+            return;
+        }
+
+        String[] names = new String[teamIds.size()];
+        for (int i = 0; i < teamIds.size(); i++) {
+            String id = teamIds.get(i);
+            String name = favoriteTeamNames.get(id);
+            names[i] = (name != null && !name.isEmpty()) ? name : id;
+        }
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.my_teams)
+                .setItems(names, (dialog, which) -> {
+                    String teamId = teamIds.get(which);
+                    String teamName = names[which];
+                    String leagueId = favoriteTeamLeagues.get(teamId);
+                    openTeam(teamId, teamName, leagueId);
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void openTeam(String teamId, String teamName, String leagueId) {
+        TeamMatchesFragment fragment = TeamMatchesFragment.newInstance(teamId, teamName, leagueId);
+        getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(
+                        R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right)
+                .replace(R.id.fragmentContainer, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     // ================================================================

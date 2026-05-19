@@ -58,16 +58,22 @@
         </com.google.android.material.appbar.MaterialToolbar>
 
         <!-- ============================================================= -->
-        <!-- Toggle: Canlı / Tüm Maçlar                                     -->
+        <!-- Toggle: Canlı / Tüm Maçlar  +  Benim Takımlarım             -->
         <!-- ============================================================= -->
         <LinearLayout
             android:id="@+id/carouselToggleContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:paddingTop="4dp"
             android:paddingBottom="16dp">
+
+            <!-- Sol boşluk (sağ butonla simetri, toggle'ı ortalar) -->
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="wrap_content"
@@ -87,7 +93,7 @@
                     <!-- Canlı Maçlar Butonu -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnLiveMatches"
-                        android:layout_width="140dp"
+                        android:layout_width="120dp"
                         android:layout_height="match_parent"
                         android:text="@string/live_matches"
                         android:textSize="13sp"
@@ -103,7 +109,7 @@
                     <!-- Tüm Maçlar Butonu (varsayılan aktif) -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnAllMatches"
-                        android:layout_width="140dp"
+                        android:layout_width="120dp"
                         android:layout_height="match_parent"
                         android:text="@string/all_matches"
                         android:textSize="13sp"
@@ -119,6 +125,46 @@
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
+            <!-- Sağ: Benim Takımlarım butonu -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                android:paddingEnd="12dp">
+
+                <LinearLayout
+                    android:id="@+id/btnMyTeams"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_star_filled"
+                        android:contentDescription="@string/my_teams" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/my_teams_short"
+                        android:textColor="@color/secondary"
+                        android:textSize="9sp"
+                        android:layout_marginTop="2dp"
+                        android:textAlignment="center"
+                        android:maxLines="1" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
