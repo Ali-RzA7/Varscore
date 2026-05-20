@@ -129,19 +129,40 @@ public class MatchEventAdapter extends RecyclerView.Adapter<MatchEventAdapter.Ev
         private void bindRegular(EventModel e,
                 TextView tvPlayer, TextView tvSubtitle, ImageView ivIcon) {
 
-            tvPlayer.setText(safeStr(e.getPlayerName()));
-            tvPlayer.setTextColor(Color.parseColor("#212121")); // varsayılan renk sıfırla
+            tvPlayer.setTextColor(Color.parseColor("#212121"));
 
-            String sub = regularSubtitle(e);
-            if (!sub.isEmpty()) {
-                tvSubtitle.setText(sub);
-                tvSubtitle.setTextColor(subtitleColor(e.getType()));
-                tvSubtitle.setVisibility(View.VISIBLE);
+            boolean isGoal = (e.getType() == TYPE_GOAL
+                    || e.getType() == TYPE_PENALTY_GOAL
+                    || e.getType() == TYPE_OWN_GOAL);
+
+            if (isGoal) {
+                GoalPair pair = parseGoal(e);
+                tvPlayer.setText(pair.scorer);
+                if (!pair.assist.isEmpty()) {
+                    tvSubtitle.setText("Asist: " + pair.assist);
+                    tvSubtitle.setTextColor(COLOR_GREEN);
+                    tvSubtitle.setVisibility(View.VISIBLE);
+                } else {
+                    String extra = regularSubtitle(e);
+                    applySubtitleOrHide(tvSubtitle, extra, subtitleColor(e.getType()));
+                }
             } else {
-                tvSubtitle.setVisibility(View.GONE);
+                tvPlayer.setText(safeStr(e.getPlayerName()));
+                String sub = regularSubtitle(e);
+                applySubtitleOrHide(tvSubtitle, sub, subtitleColor(e.getType()));
             }
 
             applyIcon(ivIcon, e.getType());
+        }
+
+        private void applySubtitleOrHide(TextView tv, String text, int color) {
+            if (!text.isEmpty()) {
+                tv.setText(text);
+                tv.setTextColor(color);
+                tv.setVisibility(View.VISIBLE);
+            } else {
+                tv.setVisibility(View.GONE);
+            }
         }
 
         private String regularSubtitle(EventModel e) {
@@ -153,6 +174,26 @@ public class MatchEventAdapter extends RecyclerView.Adapter<MatchEventAdapter.Ev
                 case TYPE_SECOND_YELLOW: return "2. Sarı → Kırmızı";
                 default:                 return "";
             }
+        }
+
+        /**
+         * API gol olaylarında oyuncu adını iki şekilde gönderir:
+         *  1. playerName = "Ali Sowe (Assist:Modibo Sagnan)"  — birleşik string
+         *  2. playerName = "Ali Sowe", assistPlayerId ayrı alan (isim yok)
+         */
+        private static GoalPair parseGoal(EventModel e) {
+            String raw = safeStr(e.getPlayerName());
+
+            int idx = raw.indexOf("(Assist:");
+            if (idx != -1) {
+                String scorer = raw.substring(0, idx).trim();
+                String assist = raw.substring(idx + "(Assist:".length()).trim();
+                if (assist.endsWith(")")) assist = assist.substring(0, assist.length() - 1).trim();
+                return new GoalPair(scorer, assist);
+            }
+
+            // Birleşik format yoksa yalnızca gol atan bilinir
+            return new GoalPair(raw, "");
         }
 
         private int subtitleColor(int type) {
@@ -236,6 +277,11 @@ public class MatchEventAdapter extends RecyclerView.Adapter<MatchEventAdapter.Ev
         private static class SubPair {
             final String out, in;
             SubPair(String out, String in) { this.out = out; this.in = in; }
+        }
+
+        private static class GoalPair {
+            final String scorer, assist;
+            GoalPair(String scorer, String assist) { this.scorer = scorer; this.assist = assist; }
         }
     }
 }
