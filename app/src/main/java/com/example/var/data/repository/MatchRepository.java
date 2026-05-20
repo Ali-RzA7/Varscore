@@ -4,6 +4,7 @@ import com.example.var.data.model.AnalysisResponse;
 import com.example.var.data.model.AnalysisModel;
 import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.EventModel;
+import com.example.var.data.model.EventsResponse;
 import com.example.var.data.model.LeagueModel;
 import com.example.var.data.model.LineupModel;
 import com.example.var.data.model.MatchStatsResponse;
@@ -108,9 +109,9 @@ public class MatchRepository {
 
     // ===== Maç Detay Verileri =====
 
-    /** Maç olay listesini getirir: gol, kart, değişiklik (/analysis/event) */
-    public Call<ApiResponse<EventModel>> getEvents(String matchId) {
-        return apiService.getEvents(apiKey, matchId);
+    /** Tarihe göre tüm maç olaylarını getirir (/events — docs id=16). Client'ta matchId filtresi uygulanır. */
+    public Call<ApiResponse<EventsResponse>> getEvents(String date) {
+        return apiService.getEvents(apiKey, date);
     }
 
     /** Maç istatistiklerini getirir: şut, topla oynama vb. (/analysis/statistics) */

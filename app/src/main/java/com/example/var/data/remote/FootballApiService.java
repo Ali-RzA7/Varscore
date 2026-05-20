@@ -2,6 +2,7 @@ package com.example.var.data.remote;
 
 import com.example.var.data.model.ApiResponse;
 import com.example.var.data.model.EventModel;
+import com.example.var.data.model.EventsResponse;
 import com.example.var.data.model.LeagueModel;
 import com.example.var.data.model.LineupModel;
 import com.example.var.data.model.MatchModel;
@@ -107,16 +108,19 @@ public interface FootballApiService {
     );
 
     /**
-     * Maç olaylarını (gol, kart, oyuncu değişikliği) getirir.
+     * Belirli bir tarihteki tüm maçların olay listesini getirir (gol, kart, değişiklik).
+     * docs.html?id=16 — Live Data planı gerektirir.
+     * Yanıtta her item: { matchId, events: [{eventId, minute, overtime, type, playerId,
+     * playerName, assistPlayerId, homeEvent}] }
+     * Client tarafında matchId ile filtrelenir.
      *
-     * @param apiKey  API anahtarı
-     * @param matchId Maç kimliği
-     * @return Olay listesi
+     * @param apiKey API anahtarı
+     * @param date   Tarih: yyyy-MM-dd
      */
-    @GET("analysis/event")
-    Call<ApiResponse<EventModel>> getEvents(
+    @GET("events")
+    Call<ApiResponse<EventsResponse>> getEvents(
             @Query("api_key") String apiKey,
-            @Query("matchId") String matchId
+            @Query("date") String date
     );
 
     /**

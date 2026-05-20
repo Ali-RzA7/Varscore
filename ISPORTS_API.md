@@ -236,7 +236,7 @@ data: {
 | getLeagues | /league/basic | ✅ |
 | getLeagueTable | /standing/league | ✅ |
 | getTeamMatches | /schedule/basic?leagueId → client filtre | ✅ leagueId ile alınır, homeId/awayId==teamId filtrelenir |
-| getEvents | /analysis/event | ❓ Doğrulanmadı |
+| getEvents | /events?date | ✅ Tarih bazlı, client tarafında matchId filtresi |
 | getStatistics | /analysis/statistics | ❓ Doğrulanmadı |
 | getAnalysis | /analysis | ✅ H2H + form karşılaştırması (docs id=109) |
 | getLineup | /analysis/lineup | ⚠️ Eski endpoint — yedek |
@@ -294,6 +294,56 @@ data: [{
 ```
 - `homeDataVs` / `awayDataVs`: İki takımın birbirine karşı W/D/L ve gol istatistikleri.
 - `headToHead`: Son karşılaşmaların metin listesi.
+
+---
+
+## 17. Events (Maç Olayları) ✅
+**Path:** `GET /sport/football/events`
+**Docs ID:** 16
+**Limit:** 10 sn/call | Tavsiye: Dakikada 1
+**Plan:** Live Data
+
+### Parametreler
+| Parametre | Zorunlu | Açıklama |
+|---|---|---|
+| date | Hayır | yyyy-MM-dd — son 1 ay sorgulanabilir |
+| cmd | Hayır | `new` — son 3 dakikadaki değişiklikleri döner |
+
+> **ÖNEMLİ:** `matchId` parametresi yoktur. Tarih bazlı tüm maç olayları döner; client tarafında `matchId` ile filtrelenir.
+
+### Yanıt Yapısı
+```
+data: [
+  {
+    matchId: "xxx",
+    events: [
+      {
+        eventId, minute, overtime, type, playerId, playerName,
+        assistPlayerId, homeEvent (boolean)
+      }
+    ]
+  }
+]
+```
+
+### Olay Tipleri (type)
+| Kod | Açıklama |
+|---|---|
+| 1 | Gol |
+| 2 | Kırmızı Kart |
+| 3 | Sarı Kart |
+| 7 | Penaltı Golü |
+| 8 | Kendi Kalesine |
+| 9 | Çift Sarı (→ Kırmızı) |
+| 11 | Oyuncu Değişikliği |
+| 13 | Kaçırılan Penaltı |
+| 14 | VAR İncelemesi |
+
+### Notlar
+- `minute` + `overtime` birlikte okunur: "45+3'" → minute=45, overtime=3
+- `homeEvent: true` → ev sahibi takım olayı
+- `assistPlayerId` yalnızca gol olaylarında dolu gelir (oyuncu adı değil, ID)
+- Değişiklik olaylarında `playerName` = çıkan oyuncu; `playerNameIn` ile giren oyuncu gelebilir (API bağımlı)
 
 ---
 

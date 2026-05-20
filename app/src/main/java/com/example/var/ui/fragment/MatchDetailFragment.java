@@ -283,7 +283,7 @@ public class MatchDetailFragment extends Fragment {
         public Fragment createFragment(int position) {
             switch (position) {
                 case 0:
-                    return MatchSummaryFragment.newInstance(match.getMatchId());
+                    return MatchSummaryFragment.newInstance(match);
                 case 1:
                     return MatchStatsFragment.newInstance(match);
                 case 2:
