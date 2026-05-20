@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/no_matches"
+            android:text="Kadro verisi bulunamadı"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="14sp" />
 

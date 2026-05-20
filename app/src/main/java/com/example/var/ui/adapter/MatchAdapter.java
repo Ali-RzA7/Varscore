@@ -65,6 +65,9 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     /** Favori lig ID seti */
     private Set<String> favoriteLeagueIds = new HashSet<>();
 
+    /** Aktif takım ID'si — takım maçları sekmesinde sonuç renklendirmesi için */
+    private String currentTeamId = null;
+
     /**
      * Maç tıklama callback arayüzü.
      */
@@ -113,6 +116,13 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void setFavorites(Set<String> teamIds, Set<String> leagueIds) {
         this.favoriteTeamIds = teamIds != null ? teamIds : new HashSet<>();
         this.favoriteLeagueIds = leagueIds != null ? leagueIds : new HashSet<>();
+    }
+
+    /**
+     * Takım maçları sekmesinde sonuç renklendirmesi için takım ID'sini set eder.
+     */
+    public void setCurrentTeamId(String teamId) {
+        this.currentTeamId = teamId;
     }
 
     /**
@@ -359,10 +369,26 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             else if (match.isFinished()) {
                 viewLiveIndicator.setVisibility(View.GONE);
                 tvMatchStatus.setVisibility(View.VISIBLE);
-                tvMatchStatus.setText(DateUtils.getStatusText(context, match.getStatus()));
-                tvMatchStatus.setTextColor(context.getColor(R.color.match_finished));
-
                 tvMatchTime.setText(DateUtils.formatMatchTime(match.getMatchTime()));
+
+                if (currentTeamId != null) {
+                    boolean isHome = currentTeamId.equals(match.getHomeId());
+                    int teamScore = isHome ? match.getHomeScore() : match.getAwayScore();
+                    int oppScore  = isHome ? match.getAwayScore() : match.getHomeScore();
+                    if (teamScore > oppScore) {
+                        tvMatchStatus.setText("G");
+                        tvMatchStatus.setTextColor(0xFF388E3C);
+                    } else if (teamScore == oppScore) {
+                        tvMatchStatus.setText("B");
+                        tvMatchStatus.setTextColor(0xFFF57F17);
+                    } else {
+                        tvMatchStatus.setText("M");
+                        tvMatchStatus.setTextColor(0xFFC62828);
+                    }
+                } else {
+                    tvMatchStatus.setText(DateUtils.getStatusText(context, match.getStatus()));
+                    tvMatchStatus.setTextColor(context.getColor(R.color.match_finished));
+                }
 
                 // Skorları göster (bitmiş - normal renk)
                 tvHomeScore.setText(String.valueOf(match.getHomeScore()));

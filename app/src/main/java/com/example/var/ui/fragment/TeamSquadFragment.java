@@ -96,8 +96,7 @@ public class TeamSquadFragment extends Fragment {
             public void onResponse(@NonNull Call<ApiResponse<PlayerModel>> call,
                     @NonNull Response<ApiResponse<PlayerModel>> response) {
                 if (!isAdded()) return;
-                if (response.isSuccessful() && response.body() != null
-                        && response.body().isSuccess()) {
+                if (response.isSuccessful() && response.body() != null) {
                     List<PlayerModel> players = response.body().getData();
                     if (players != null && !players.isEmpty()) {
                         playerAdapter.setPlayers(players);

@@ -106,12 +106,29 @@ public class TeamMatchesFragment extends Fragment {
 
         setupToolbar();
         setupViewPager();
+        applyTeamTheme();
         checkFavoriteStatus();
         loadTeamProfile();
         loadRecentForm();
     }
 
     // ===== Kurulum =====
+
+    /**
+     * Sadece Beşiktaş için siyah/beyaz tema uygular.
+     */
+    private void applyTeamTheme() {
+        if (teamName == null) return;
+        String lower = teamName.toLowerCase();
+        if (lower.contains("beşiktaş") || lower.contains("besiktas") || lower.contains("bjk")) {
+            int darkBg = 0xFF1A1A1A;
+            binding.appBarLayout.setBackgroundColor(darkBg);
+            binding.collapsingToolbar.setContentScrimColor(darkBg);
+            binding.tabLayout.setBackgroundColor(darkBg);
+            binding.tabLayout.setSelectedTabIndicatorColor(Color.WHITE);
+            binding.tabLayout.setTabTextColors(0xB3FFFFFF, Color.WHITE);
+        }
+    }
 
     /**
      * Toolbar'ı yapılandırır: başlık, geri butonu, favori butonu.

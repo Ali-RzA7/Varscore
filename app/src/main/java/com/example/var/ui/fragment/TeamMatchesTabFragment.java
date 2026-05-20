@@ -82,6 +82,9 @@ public class TeamMatchesTabFragment extends Fragment
         repository = new MatchRepository(BuildConfig.API_KEY);
 
         matchAdapter = new MatchAdapter(requireContext(), this);
+        if (teamId != null && !teamId.isEmpty()) {
+            matchAdapter.setCurrentTeamId(teamId);
+        }
         binding.rvMatches.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvMatches.setAdapter(matchAdapter);
 
