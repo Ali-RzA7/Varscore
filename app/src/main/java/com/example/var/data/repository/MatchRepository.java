@@ -9,9 +9,11 @@ import com.example.var.data.model.LeagueModel;
 import com.example.var.data.model.LineupModel;
 import com.example.var.data.model.MatchStatsResponse;
 import com.example.var.data.model.MatchModel;
+import com.example.var.data.model.PlayerModel;
 import com.example.var.data.model.StatModel;
 import com.example.var.data.model.StandingLeagueResponse;
 import com.example.var.data.model.StandingModel;
+import com.example.var.data.model.TeamProfileModel;
 import com.example.var.data.remote.FootballApiService;
 import com.example.var.data.remote.RetrofitClient;
 
@@ -105,6 +107,24 @@ public class MatchRepository {
      */
     public Call<ApiResponse<MatchModel>> getTeamMatches(String teamId) {
         return apiService.getTeamMatches(apiKey, teamId);
+    }
+
+    /**
+     * Belirli bir takımın profil bilgilerini getirir (/team?teamId).
+     *
+     * @param teamId Profili istenilen takımın ID'si
+     */
+    public Call<ApiResponse<TeamProfileModel>> getTeamProfile(String teamId) {
+        return apiService.getTeamProfile(apiKey, teamId);
+    }
+
+    /**
+     * Belirli bir takımın oyuncu kadrosunu getirir (/player?teamId).
+     *
+     * @param teamId Kadrosu istenilen takımın ID'si
+     */
+    public Call<ApiResponse<PlayerModel>> getTeamPlayers(String teamId) {
+        return apiService.getTeamPlayers(apiKey, teamId);
     }
 
     // ===== Maç Detay Verileri =====

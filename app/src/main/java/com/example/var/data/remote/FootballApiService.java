@@ -6,8 +6,10 @@ import com.example.var.data.model.EventsResponse;
 import com.example.var.data.model.LeagueModel;
 import com.example.var.data.model.LineupModel;
 import com.example.var.data.model.MatchModel;
+import com.example.var.data.model.PlayerModel;
 import com.example.var.data.model.StandingLeagueResponse;
 import com.example.var.data.model.StatModel;
+import com.example.var.data.model.TeamProfileModel;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -218,6 +220,32 @@ public interface FootballApiService {
      */
     @GET("schedule/basic")
     Call<ApiResponse<MatchModel>> getTeamMatches(
+            @Query("api_key") String apiKey,
+            @Query("teamId") String teamId
+    );
+
+    /**
+     * Belirli bir takımın profil bilgilerini getirir.
+     *
+     * @param apiKey API anahtarı (zorunlu)
+     * @param teamId Takım kimliği (zorunlu)
+     * @return Takım profil bilgisi
+     */
+    @GET("team")
+    Call<ApiResponse<TeamProfileModel>> getTeamProfile(
+            @Query("api_key") String apiKey,
+            @Query("teamId") String teamId
+    );
+
+    /**
+     * Belirli bir takımın oyuncu kadrosunu getirir.
+     *
+     * @param apiKey API anahtarı (zorunlu)
+     * @param teamId Takım kimliği (zorunlu)
+     * @return Oyuncu listesi
+     */
+    @GET("player")
+    Call<ApiResponse<PlayerModel>> getTeamPlayers(
             @Query("api_key") String apiKey,
             @Query("teamId") String teamId
     );

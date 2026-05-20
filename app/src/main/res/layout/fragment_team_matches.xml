@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- fragment_team_matches.xml - Bir takımın geçmiş/gelecek maçları ekranı -->
-<!-- Arama'da takıma veya Puan Durumu'nda takıma tıklandığında açılır -->
+<!-- fragment_team_matches.xml - Takım detay sayfası: collapsing header + tab maçlar/kadro -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,106 +7,172 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
-    <!-- AppBar: Geri butonu + Takım adı + Favori yıldızı -->
+    <!-- AppBar: Collapsing hero + TabLayout -->
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/primary"
         android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-        app:elevation="@dimen/elevation_sm">
+        app:elevation="0dp">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <!-- Collapsing toolbar: hero alanı + toolbar -->
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="200dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="@color/primary"
+            app:expandedTitleMarginStart="200dp"
+            app:expandedTitleTextAppearance="@android:style/TextAppearance.DeviceDefault.Small">
+
+            <!-- Hero içeriği: takım logosu, adı, mekan, antrenör, kuruluş yılı, form -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/primary"
+                app:layout_collapseMode="parallax">
+
+                <!-- Takım logosu -->
+                <ImageView
+                    android:id="@+id/ivTeamLogo"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_team_logo_circle"
+                    android:padding="4dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp" />
+
+                <!-- Takım adı -->
+                <TextView
+                    android:id="@+id/tvTeamName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:layout_constraintStart_toEndOf="@id/ivTeamLogo"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/ivTeamLogo"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Stadyum -->
+                <TextView
+                    android:id="@+id/tvTeamVenue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:layout_constraintStart_toStartOf="@id/tvTeamName"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvTeamName"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Antrenör -->
+                <TextView
+                    android:id="@+id/tvTeamCoach"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:layout_constraintStart_toStartOf="@id/tvTeamName"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvTeamVenue"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Kuruluş yılı -->
+                <TextView
+                    android:id="@+id/tvTeamFounded"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/secondary"
+                    android:textSize="11sp"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="@id/tvTeamName"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvTeamCoach"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Form göstergesi (son 5 maç) -->
+                <LinearLayout
+                    android:id="@+id/llForm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="start|center_vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="12dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Collapse olduğunda görünen toolbar -->
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/ic_back"
+                app:navigationIconTint="@android:color/white"
+                app:titleTextColor="@android:color/white">
+
+                <!-- Favori butonu -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFavorite"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="4dp"
+                    android:minWidth="0dp"
+                    android:padding="0dp"
+                    app:icon="@drawable/ic_star"
+                    app:iconSize="24dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="@color/secondary" />
+
+            </com.google.android.material.appbar.MaterialToolbar>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <!-- Tab bar: Maçlar / Kadro -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:background="@color/primary"
-            app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="@android:color/white"
-            app:titleTextColor="@android:color/white">
-
-            <!-- Favori takım butonu (toolbar'ın sağında) -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnFavorite"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="@dimen/margin_sm"
-                android:minWidth="0dp"
-                android:padding="0dp"
-                app:icon="@drawable/ic_star"
-                app:iconSize="@dimen/icon_md"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="@color/secondary" />
-
-        </com.google.android.material.appbar.MaterialToolbar>
+            app:tabIndicatorColor="@color/secondary"
+            app:tabSelectedTextColor="@android:color/white"
+            app:tabTextColor="#B3FFFFFF"
+            app:tabIndicatorHeight="3dp"
+            app:tabRippleColor="#33FFC107"
+            android:paddingBottom="0dp" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- İçerik -->
-    <FrameLayout
+    <!-- ViewPager2: Tab içerikleri -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <!-- Maç listesi -->
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvMatches"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingVertical="@dimen/padding_sm" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <!-- Yükleniyor -->
-        <LinearLayout
-            android:id="@+id/loadingContainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <com.google.android.material.loadingindicator.LoadingIndicator
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.Material3.LoadingIndicator"
-                app:indicatorColor="@color/primary" />
-
-        </LinearLayout>
-
-        <!-- Boş / Hata -->
-        <LinearLayout
-            android:id="@+id/emptyContainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⚽"
-                android:textSize="48sp" />
-
-            <TextView
-                android:id="@+id/tvEmptyMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_md"
-                android:text="@string/no_matches"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="@dimen/text_subtitle" />
-
-        </LinearLayout>
-
-    </FrameLayout>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
