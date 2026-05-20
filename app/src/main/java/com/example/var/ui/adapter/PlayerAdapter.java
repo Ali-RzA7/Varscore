@@ -98,6 +98,33 @@ public class PlayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
+    private static String translatePosition(String pos) {
+        if (pos == null || pos.isEmpty()) return "";
+        switch (pos.trim()) {
+            case "Goalkeeper":          return "Kaleci";
+            case "Centre Back":         return "Stoper";
+            case "Right-Back":
+            case "Right Back":          return "Sağ Bek";
+            case "Left-Back":
+            case "Left Back":           return "Sol Bek";
+            case "Wing Back":
+            case "Right Wing Back":     return "Sağ Kanat Bek";
+            case "Left Wing Back":      return "Sol Kanat Bek";
+            case "Defensive Midfield":  return "Defansif Orta Saha";
+            case "Central Midfield":    return "Orta Saha";
+            case "Attacking Midfield":  return "Ofansif Orta Saha";
+            case "Right Winger":        return "Sağ Kanat";
+            case "Left Winger":         return "Sol Kanat";
+            case "Centre Forward":      return "Santrafor";
+            case "Second Striker":      return "İkinci Forvet";
+            case "Forward":             return "Forvet";
+            case "Striker":             return "Golcü";
+            case "Midfielder":          return "Orta Saha";
+            case "Defender":            return "Defans";
+            default:                    return pos;
+        }
+    }
+
     /**
      * Pozisyon string'ini normalize eder: GK, DF, MF, FW veya ham değer.
      */
@@ -217,9 +244,8 @@ public class PlayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             // İsim
             tvPlayerName.setText(player.getName() != null ? player.getName() : "");
 
-            // Pozisyon
-            String pos = player.getPosition();
-            tvPlayerPosition.setText(pos != null ? pos : "");
+            // Pozisyon (Türkçe)
+            tvPlayerPosition.setText(translatePosition(player.getPosition()));
 
             // Detay: ülke · yaş · boy
             StringBuilder details = new StringBuilder();
