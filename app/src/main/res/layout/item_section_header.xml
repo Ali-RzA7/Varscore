@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="4dp">
+
+    <!-- Renkli dikey vurgu çizgisi -->
+    <View
+        android:layout_width="3dp"
+        android:layout_height="14dp"
+        android:background="?attr/colorSecondary"
+        android:layout_marginEnd="8dp" />
+
+    <!-- Bölüm başlığı -->
+    <TextView
+        android:id="@+id/tvSectionTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.08"
+        android:textColor="?attr/colorSecondary" />
+
+</LinearLayout>

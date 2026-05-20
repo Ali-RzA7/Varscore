@@ -36,6 +36,20 @@
         android:maxLines="1"
         android:ellipsize="end" />
 
+    <!-- Popüler lig etiketi -->
+    <TextView
+        android:id="@+id/tvPopularBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Popüler Lig"
+        android:textSize="9sp"
+        android:textColor="#FFC107"
+        android:paddingHorizontal="5dp"
+        android:paddingVertical="2dp"
+        android:background="@drawable/bg_popular_badge"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone" />
+
     <!-- Favori lig yıldızı -->
     <TextView
         android:id="@+id/tvFavoriteStar"

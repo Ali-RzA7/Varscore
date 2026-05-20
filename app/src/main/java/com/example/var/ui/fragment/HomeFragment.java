@@ -34,6 +34,7 @@ import com.example.var.util.MatchCache;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,6 +107,30 @@ public class HomeFragment extends Fragment implements
     private static final String API_KEY = BuildConfig.API_KEY;
     /** Uygulama süresi boyunca yalnızca bir kez build tetiklenmesi için statik kilit */
     private static boolean isBuildingTeamCache = false;
+
+    /** Popüler liglerin adları — bu ligler "POPÜLER LİGLER" bölümünde gösterilir */
+    private static final Set<String> POPULAR_LEAGUE_NAMES = new HashSet<>(Arrays.asList(
+            "Premier League",
+            "La Liga",
+            "Serie A",
+            "Bundesliga",
+            "Ligue 1",
+            "Süper Lig",
+            "Eredivisie",
+            "Primeira Liga",
+            "Major League Soccer",
+            "Saudi Pro League",
+            "Campeonato Brasileiro Série A",
+            "Argentine Primera División",
+            "Belgian Pro League",
+            "Swiss Super League",
+            "Scottish Premiership",
+            "Liga MX",
+            "J1 League",
+            "K League 1",
+            "Chinese Super League",
+            "Ukrainian Premier League"
+    ));
 
     @Nullable
     @Override
@@ -379,7 +404,7 @@ public class HomeFragment extends Fragment implements
         if (cached != null) {
             GlobalTeamCache.merge(requireContext(), cached);
             currentMatches = cached;
-            matchAdapter.setMatches(sortMatchesByFavorites(cached));
+            applyMatchesToAdapter(cached);
             showContent();
             return;
         }
@@ -402,7 +427,7 @@ public class HomeFragment extends Fragment implements
                         GlobalTeamCache.merge(requireContext(), matches);
                         currentMatches = matches;
                         showContent();
-                        matchAdapter.setMatches(sortMatchesByFavorites(matches));
+                        applyMatchesToAdapter(matches);
                     } else {
                         showEmpty(getString(R.string.no_matches));
                     }
@@ -451,7 +476,7 @@ public class HomeFragment extends Fragment implements
                     if (!liveMatches.isEmpty()) {
                         currentMatches = liveMatches;
                         showContent();
-                        matchAdapter.setMatches(sortMatchesByFavorites(liveMatches));
+                        applyMatchesToAdapter(liveMatches);
                     } else {
                         showEmpty(getString(R.string.no_live_matches));
                     }
@@ -493,7 +518,7 @@ public class HomeFragment extends Fragment implements
                     matchAdapter.setFavorites(favoriteTeamIds, favoriteLeagueIds);
                     // Maçlar zaten yüklendiyse favori sırasıyla yeniden göster
                     if (currentMatches != null) {
-                        matchAdapter.setMatches(sortMatchesByFavorites(currentMatches));
+                        applyMatchesToAdapter(currentMatches);
                     }
                 },
                 error -> { /* Sessizce devam et */ }
@@ -501,36 +526,40 @@ public class HomeFragment extends Fragment implements
     }
 
     /**
-     * Maç listesini favori ligler/takımlar en üstte olacak şekilde sıralar.
-     * Lig grupları korunur: favori maç içeren tüm lig grubu öne alınır.
+     * Maç listesini favori / popüler / diğer olarak üç gruba ayırıp adapter'a iletir.
+     * Favoriler en üstte (yıldız işaretli, başlıksız), ardından "POPÜLER LİGLER" bölümü,
+     * ardından kalan ligler gösterilir.
      */
-    private List<MatchModel> sortMatchesByFavorites(List<MatchModel> matches) {
-        if ((favoriteTeamIds.isEmpty() && favoriteLeagueIds.isEmpty()) || matches == null) {
-            return matches;
-        }
+    private void applyMatchesToAdapter(List<MatchModel> matches) {
+        if (matches == null) return;
 
-        // leagueId'ye göre grupla (ekleme sırası korunur)
         LinkedHashMap<String, List<MatchModel>> byLeague = new LinkedHashMap<>();
         for (MatchModel match : matches) {
             String lid = match.getLeagueId() != null ? match.getLeagueId() : "__none__";
             byLeague.computeIfAbsent(lid, k -> new ArrayList<>()).add(match);
         }
 
-        List<MatchModel> favGroup = new ArrayList<>();
-        List<MatchModel> normalGroup = new ArrayList<>();
+        List<MatchModel> favList     = new ArrayList<>();
+        List<MatchModel> popularList = new ArrayList<>();
+        List<MatchModel> otherList   = new ArrayList<>();
 
         for (Map.Entry<String, List<MatchModel>> entry : byLeague.entrySet()) {
-            if (isLeagueGroupFavorite(entry.getKey(), entry.getValue())) {
-                favGroup.addAll(entry.getValue());
+            List<MatchModel> group = entry.getValue();
+            if (isLeagueGroupFavorite(entry.getKey(), group)) {
+                favList.addAll(group);
+            } else if (isPopularLeague(group.get(0).getLeagueName())) {
+                popularList.addAll(group);
             } else {
-                normalGroup.addAll(entry.getValue());
+                otherList.addAll(group);
             }
         }
 
-        List<MatchModel> sorted = new ArrayList<>(favGroup.size() + normalGroup.size());
-        sorted.addAll(favGroup);
-        sorted.addAll(normalGroup);
-        return sorted;
+        matchAdapter.setMatchesWithSections(favList, popularList, otherList);
+    }
+
+    /** Lig adının popüler ligler arasında olup olmadığını kontrol eder. */
+    private boolean isPopularLeague(String leagueName) {
+        return leagueName != null && POPULAR_LEAGUE_NAMES.contains(leagueName);
     }
 
     /** Lig grubunun favori olup olmadığını kontrol eder (lig favorisi veya takım favorisi). */

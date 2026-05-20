@@ -119,21 +119,38 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
      * Maç listesini lig bazında gruplar ve adapter'a yükler.
      * Aynı lig altındaki maçlar bir başlık altında toplanır.
      *
-     * Gruplama algoritması:
-     * 1. Maçlar leagueName'e göre LinkedHashMap'e gruplandırılır
-     * 2. Her grup için önce başlık, sonra maçlar eklenir
-     *
      * @param matches API'den gelen maç listesi
      */
     public void setMatches(List<MatchModel> matches) {
+        setMatchesWithSections(new ArrayList<>(), new ArrayList<>(), matches);
+    }
+
+    /**
+     * Maçları üç gruba ayırarak adapter'a yükler:
+     *   1. Favoriler (yıldız işaretli, en üstte, bölüm başlığı yok)
+     *   2. Popüler ligler ("POPÜLER LİGLER" bölüm başlığıyla)
+     *   3. Diğer ligler (bölüm başlığı yok)
+     *
+     * Her grup içinde maçlar leagueName'e göre kendi içinde gruplandırılır.
+     *
+     * @param favorites  Favori lig/takım içeren maçlar
+     * @param popular    Popüler lig maçları
+     * @param others     Diğer liglerin maçları
+     */
+    public void setMatchesWithSections(List<MatchModel> favorites,
+                                       List<MatchModel> popular,
+                                       List<MatchModel> others) {
         items.clear();
+        addLeagueGroupToItems(favorites, false);
+        addLeagueGroupToItems(popular, true);
+        addLeagueGroupToItems(others, false);
+        notifyDataSetChanged();
+    }
 
-        if (matches == null || matches.isEmpty()) {
-            notifyDataSetChanged();
-            return;
-        }
+    /** Maç listesini lig başlığı + maç satırları olarak items'a ekler. */
+    private void addLeagueGroupToItems(List<MatchModel> matches, boolean isPopular) {
+        if (matches == null || matches.isEmpty()) return;
 
-        // Maçları lig adına göre grupla (ekleme sırası korunur)
         LinkedHashMap<String, List<MatchModel>> grouped = new LinkedHashMap<>();
         for (MatchModel match : matches) {
             String leagueName = match.getLeagueName() != null
@@ -141,7 +158,6 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             grouped.computeIfAbsent(leagueName, k -> new ArrayList<>()).add(match);
         }
 
-        // Gruplanmış verileri listeye ekle (başlık + maçlar)
         for (Map.Entry<String, List<MatchModel>> entry : grouped.entrySet()) {
             MatchModel firstMatch = entry.getValue().get(0);
             String leagueId = firstMatch.getLeagueId();
@@ -151,13 +167,11 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     entry.getKey(),
                     firstMatch.getLeagueColor(),
                     firstMatch.getLeagueType(),
-                    isLeagueFav
+                    isLeagueFav,
+                    isPopular
             ));
-            // Lig altındaki maçları ekle
             items.addAll(entry.getValue());
         }
-
-        notifyDataSetChanged();
     }
 
     @Override
@@ -196,23 +210,22 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     // İç Sınıf: LeagueHeader - Lig başlık veri modeli
     // ================================================================
 
-    /**
-     * LeagueHeader - Adapter'da lig başlığı olarak gösterilecek veri modeli.
-     * Bu sınıf sadece adapter içinde kullanılır.
-     */
     static class LeagueHeader {
         final String leagueId;
         final String leagueName;
         final String leagueColor;
         final int leagueType;
         final boolean isFavorite;
+        final boolean isPopular;
 
-        LeagueHeader(String leagueId, String leagueName, String leagueColor, int leagueType, boolean isFavorite) {
+        LeagueHeader(String leagueId, String leagueName, String leagueColor,
+                     int leagueType, boolean isFavorite, boolean isPopular) {
             this.leagueId = leagueId;
             this.leagueName = leagueName;
             this.leagueColor = leagueColor;
             this.leagueType = leagueType;
             this.isFavorite = isFavorite;
+            this.isPopular = isPopular;
         }
     }
 
@@ -229,6 +242,7 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         private final TextView tvLeagueName;
         private final TextView tvLeagueType;
         private final TextView tvFavoriteStar;
+        private final TextView tvPopularBadge;
 
         LeagueHeaderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -236,6 +250,7 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             tvLeagueName = itemView.findViewById(R.id.tvLeagueName);
             tvLeagueType = itemView.findViewById(R.id.tvLeagueType);
             tvFavoriteStar = itemView.findViewById(R.id.tvFavoriteStar);
+            tvPopularBadge = itemView.findViewById(R.id.tvPopularBadge);
         }
 
         void bind(LeagueHeader header) {
@@ -255,6 +270,9 @@ public class MatchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
             // Favori lig yıldızı
             tvFavoriteStar.setVisibility(header.isFavorite ? View.VISIBLE : View.GONE);
+
+            // Popüler lig etiketi
+            tvPopularBadge.setVisibility(header.isPopular ? View.VISIBLE : View.GONE);
 
             // Lig başlığına tıklama → puan durumu aç
             itemView.setOnClickListener(v -> {
