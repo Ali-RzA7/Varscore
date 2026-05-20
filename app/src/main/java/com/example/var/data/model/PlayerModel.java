@@ -94,6 +94,14 @@ public class PlayerModel {
 
     public String getPlayerId() { return playerId; }
     public String getName() { return name; }
+
+    // ===== Setters (lineup fallback için) =====
+
+    public void setPlayerId(String v) { this.playerId = v; }
+    public void setName(String v) { this.name = v; }
+    public void setNumber(int v) { this.number = v; }
+    public void setPosition(String v) { this.position = v; }
+    public void setPhoto(String v) { this.photo = v; }
     public String getBirthday() { return birthday; }
     public String getHeight() { return height; }
     public String getCountry() { return country; }

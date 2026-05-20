@@ -48,6 +48,7 @@ public class LineupModel {
         @SerializedName("rating")
         private String rating;
 
+        public String getPlayerId() { return playerId; }
         public String getPlayerName() { return playerName; }
         public int getNumber() { return number; }
         public String getPosition() { return position; }

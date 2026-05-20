@@ -61,7 +61,9 @@ public class PlayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         List<PlayerModel> others = new ArrayList<>();
 
         for (PlayerModel player : players) {
-            String norm = normalizePosition(player.getPosition());
+            String pos = player.getPosition();
+            if (pos != null && pos.equalsIgnoreCase("Coach")) continue;
+            String norm = normalizePosition(pos);
             if (groups.containsKey(norm)) {
                 groups.get(norm).add(player);
             } else {
@@ -229,9 +231,10 @@ public class PlayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 if (details.length() > 0) details.append(" · ");
                 details.append(age).append(" yıl");
             }
-            if (player.getHeight() != null && !player.getHeight().isEmpty()) {
+            String h = player.getHeight();
+            if (h != null && !h.isEmpty() && !h.equals("0")) {
                 if (details.length() > 0) details.append(" · ");
-                details.append(player.getHeight()).append(" cm");
+                details.append(h).append(" cm");
             }
             tvPlayerDetails.setText(details.toString());
         }

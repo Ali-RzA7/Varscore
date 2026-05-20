@@ -1,5 +1,13 @@
 package com.example.var.data.remote;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
+
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -48,11 +56,17 @@ public class RetrofitClient {
                         .build()))
                 .build();
 
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .registerTypeAdapter(int.class, new SafeIntAdapter())
+                .registerTypeAdapter(Integer.class, new SafeIntAdapter())
+                .create();
+
         // Retrofit yapılandırması
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
     }
 
@@ -81,5 +95,26 @@ public class RetrofitClient {
      */
     public FootballApiService getApiService() {
         return retrofit.create(FootballApiService.class);
+    }
+
+    /** Boş string veya string olarak gelen sayıları güvenli int'e çevirir. */
+    private static class SafeIntAdapter extends TypeAdapter<Integer> {
+        @Override
+        public void write(JsonWriter out, Integer value) throws IOException {
+            if (value == null) out.nullValue(); else out.value(value);
+        }
+
+        @Override
+        public Integer read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) { in.nextNull(); return 0; }
+            if (in.peek() == JsonToken.STRING) {
+                String s = in.nextString().trim();
+                if (s.isEmpty()) return 0;
+                try { return (int) Double.parseDouble(s); }
+                catch (NumberFormatException e) { return 0; }
+            }
+            if (in.peek() == JsonToken.BOOLEAN) { return in.nextBoolean() ? 1 : 0; }
+            return (int) in.nextDouble();
+        }
     }
 }
