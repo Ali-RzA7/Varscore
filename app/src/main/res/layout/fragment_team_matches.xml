@@ -20,7 +20,7 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="230dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="@color/primary"
             app:expandedTitleMarginStart="200dp"
@@ -119,6 +119,115 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     android:layout_marginStart="16dp"
                     android:layout_marginBottom="12dp" />
+
+                <!-- Gol Sesi Özelleştirme Kartı -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardGoalSound"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#55000000"
+                    app:cardCornerRadius="12dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#55FFFFFF"
+                    app:cardElevation="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="7dp"
+                        android:paddingBottom="7dp">
+
+                        <!-- Başlık satırı: ikon + etiket + durum -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔊"
+                                android:textSize="13sp"
+                                android:layout_marginEnd="5dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Gol Sesi"
+                                android:textColor="@android:color/white"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:layout_marginEnd="8dp" />
+
+                            <TextView
+                                android:id="@+id/tvGoalSoundStatus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Varsayılan"
+                                android:textColor="#FFC107"
+                                android:textSize="9sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                        <!-- Buton satırı -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center_vertical">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnPlayGoalSound"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="▶ Dinle"
+                                android:textSize="10sp"
+                                android:textColor="@android:color/white"
+                                android:minWidth="0dp"
+                                android:minHeight="0dp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="10dp"
+                                android:paddingEnd="10dp"
+                                app:strokeColor="#88FFFFFF"
+                                app:cornerRadius="6dp" />
+
+                            <View
+                                android:layout_width="6dp"
+                                android:layout_height="1dp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnChangeGoalSound"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="30dp"
+                                android:text="Değiştir"
+                                android:textSize="10sp"
+                                android:textColor="#FFC107"
+                                android:minWidth="0dp"
+                                android:minHeight="0dp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                app:cornerRadius="6dp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

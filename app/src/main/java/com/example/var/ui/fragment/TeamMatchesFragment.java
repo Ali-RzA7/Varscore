@@ -1,14 +1,21 @@
 package com.example.var.ui.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -27,6 +34,11 @@ import com.example.var.util.FirebaseManager;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -53,6 +65,9 @@ public class TeamMatchesFragment extends Fragment {
     private static final String ARG_LEAGUE_ID  = "league_id";
     private static final String ARG_LOGO_MAP   = "logo_map";
 
+    private static final String TAG = "TeamMatchesFragment";
+    private static final long MAX_SOUND_BYTES = 512 * 1024; // 500 KB
+
     private FragmentTeamMatchesBinding binding;
     private MatchRepository repository;
 
@@ -60,6 +75,21 @@ public class TeamMatchesFragment extends Fragment {
     private String teamName;
     private String leagueId;
     private boolean isFavorite = false;
+
+    // Ses verileri
+    private byte[] teamGoalSoundBytes  = null; // takıma özel ses
+    private byte[] globalGoalSoundBytes = null; // genel özel ses
+    private MediaPlayer mediaPlayer;
+
+    private final ActivityResultLauncher<Intent> audioPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK
+                                && result.getData() != null
+                                && result.getData().getData() != null) {
+                            handleAudioPickResult(result.getData().getData());
+                        }
+                    });
 
     // ===== Fabrika Metodları =====
 
@@ -107,9 +137,11 @@ public class TeamMatchesFragment extends Fragment {
         setupToolbar();
         setupViewPager();
         applyTeamTheme();
+        setupGoalSoundSection();
         checkFavoriteStatus();
         loadTeamProfile();
         loadRecentForm();
+        loadTeamGoalSound();
     }
 
     // ===== Kurulum =====
@@ -377,6 +409,134 @@ public class TeamMatchesFragment extends Fragment {
         }
     }
 
+    // ===== Gol Sesi =====
+
+    private void setupGoalSoundSection() {
+        binding.btnPlayGoalSound.setOnClickListener(v -> playGoalSoundPreview());
+        binding.btnChangeGoalSound.setOnClickListener(v -> {
+            if (!FirebaseManager.isLoggedIn()) {
+                showSnackbar(getString(R.string.login_required));
+                return;
+            }
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("audio/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            audioPickerLauncher.launch(intent);
+        });
+    }
+
+    private void loadTeamGoalSound() {
+        if (!FirebaseManager.isLoggedIn() || FirebaseManager.getCurrentUser() == null) return;
+        String userId = FirebaseManager.getCurrentUser().getUid();
+
+        // Takıma özel ses
+        FirebaseManager.loadSoundBlob(userId, "team_goal_" + teamId,
+                bytes -> {
+                    if (!isAdded()) return;
+                    teamGoalSoundBytes = bytes;
+                    updateGoalSoundStatus();
+                },
+                e -> Log.d(TAG, "Takım gol sesi bulunamadı"));
+
+        // Global özel ses (fallback)
+        FirebaseManager.loadSoundBlob(userId, "sound_goal",
+                bytes -> {
+                    if (!isAdded()) return;
+                    globalGoalSoundBytes = bytes;
+                    updateGoalSoundStatus();
+                },
+                e -> Log.d(TAG, "Global gol sesi bulunamadı"));
+    }
+
+    private void updateGoalSoundStatus() {
+        if (binding == null) return;
+        if (teamGoalSoundBytes != null) {
+            binding.tvGoalSoundStatus.setText("Takım Özel");
+        } else if (globalGoalSoundBytes != null) {
+            binding.tvGoalSoundStatus.setText("Özel");
+        } else {
+            binding.tvGoalSoundStatus.setText("Varsayılan");
+        }
+    }
+
+    private void playGoalSoundPreview() {
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+        byte[] soundBytes = teamGoalSoundBytes != null ? teamGoalSoundBytes : globalGoalSoundBytes;
+        if (soundBytes != null) {
+            playFromBytes(soundBytes);
+        } else {
+            mediaPlayer = MediaPlayer.create(requireContext(), R.raw.gol);
+            if (mediaPlayer != null) {
+                mediaPlayer.setOnCompletionListener(mp -> { mp.release(); mediaPlayer = null; });
+                mediaPlayer.start();
+            }
+        }
+    }
+
+    private void playFromBytes(byte[] bytes) {
+        try {
+            File tmp = File.createTempFile("goal_preview", ".tmp", requireContext().getCacheDir());
+            try (FileOutputStream fos = new FileOutputStream(tmp)) {
+                fos.write(bytes);
+            }
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(tmp.getAbsolutePath());
+            mediaPlayer.setOnPreparedListener(MediaPlayer::start);
+            mediaPlayer.setOnCompletionListener(mp -> { mp.release(); mediaPlayer = null; });
+            mediaPlayer.prepareAsync();
+        } catch (IOException e) {
+            Log.e(TAG, "Ses oynatılamadı", e);
+        }
+    }
+
+    private void handleAudioPickResult(Uri uri) {
+        try {
+            InputStream is = requireContext().getContentResolver().openInputStream(uri);
+            if (is == null) { showSnackbar("Dosya okunamadı"); return; }
+            byte[] bytes = readAllBytes(is);
+            is.close();
+
+            if (bytes.length > MAX_SOUND_BYTES) {
+                showSnackbar("Dosya çok büyük (max 500 KB)");
+                return;
+            }
+
+            String userId = FirebaseManager.getCurrentUser().getUid();
+            binding.btnChangeGoalSound.setEnabled(false);
+            binding.btnChangeGoalSound.setText("Kaydediliyor…");
+
+            FirebaseManager.saveSoundBlob(userId, "team_goal_" + teamId, bytes,
+                    unused -> {
+                        if (!isAdded()) return;
+                        teamGoalSoundBytes = bytes;
+                        updateGoalSoundStatus();
+                        binding.btnChangeGoalSound.setEnabled(true);
+                        binding.btnChangeGoalSound.setText("Değiştir");
+                        showSnackbar("Takım gol sesi kaydedildi!");
+                    },
+                    e -> {
+                        if (!isAdded()) return;
+                        binding.btnChangeGoalSound.setEnabled(true);
+                        binding.btnChangeGoalSound.setText("Değiştir");
+                        showSnackbar(getString(R.string.error_loading));
+                    });
+        } catch (IOException e) {
+            Log.e(TAG, "Ses dosyası işlenemedi", e);
+            showSnackbar(getString(R.string.error_loading));
+        }
+    }
+
+    private byte[] readAllBytes(InputStream is) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buf = new byte[4096];
+        int n;
+        while ((n = is.read(buf)) != -1) baos.write(buf, 0, n);
+        return baos.toByteArray();
+    }
+
     private void showSnackbar(String message) {
         if (getView() != null) {
             Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT).show();
@@ -386,6 +546,10 @@ public class TeamMatchesFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
         binding = null;
     }
 

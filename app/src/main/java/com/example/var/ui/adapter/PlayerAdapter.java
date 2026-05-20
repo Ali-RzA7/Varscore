@@ -223,12 +223,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         void bind(PlayerModel player) {
-            // Forma numarası
-            if (player.getNumber() > 0) {
-                tvNumber.setText("#" + player.getNumber());
-            } else {
-                tvNumber.setText("-");
-            }
+            tvNumber.setVisibility(View.GONE);
 
             // Fotoğraf
             if (player.getPhoto() != null && !player.getPhoto().isEmpty()) {
