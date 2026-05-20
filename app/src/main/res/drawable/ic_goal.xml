@@ -3,7 +3,30 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:fillColor="#FF000000"
-      android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8zM13,7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"/>
+    <!-- Beyaz top gövdesi -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,2C6.477,2 2,6.477 2,12C2,17.523 6.477,22 12,22C17.523,22 22,17.523 22,12C22,6.477 17.523,2 12,2Z"/>
+    <!-- Dış çizgi -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#BDBDBD"
+        android:strokeWidth="0.8"
+        android:pathData="M12,2C6.477,2 2,6.477 2,12C2,17.523 6.477,22 12,22C17.523,22 22,17.523 22,12C22,6.477 17.523,2 12,2Z"/>
+    <!-- Üst beşgen (siyah yama) -->
+    <path
+        android:fillColor="#212121"
+        android:pathData="M12,4.8L14.8,6.9L13.8,10.2L10.2,10.2L9.2,6.9L12,4.8Z"/>
+    <!-- Sol-alt yama -->
+    <path
+        android:fillColor="#212121"
+        android:pathData="M6.1,10.8L8.6,9.0L9.6,12.2L7.4,14.1L5.1,13.2L6.1,10.8Z"/>
+    <!-- Sağ-alt yama -->
+    <path
+        android:fillColor="#212121"
+        android:pathData="M17.9,10.8L18.9,13.2L16.6,14.1L14.4,12.2L15.4,9.0L17.9,10.8Z"/>
+    <!-- Alt yama -->
+    <path
+        android:fillColor="#212121"
+        android:pathData="M9.0,15.5L10.3,12.6L13.7,12.6L15.0,15.5L12,17.4L9.0,15.5Z"/>
 </vector>

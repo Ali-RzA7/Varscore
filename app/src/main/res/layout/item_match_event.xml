@@ -1,49 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="6dp">
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="4dp">
 
-    <!-- Orta: Dakika Rozeti -->
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/bg_event_time"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="11sp"
-        android:textStyle="bold" />
-
-    <!-- Dikey zaman çizgisi -->
-    <View
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:background="?attr/colorOutlineVariant" />
-
-    <!-- Ev Sahibi Olayı (sol) -->
+    <!-- SOL: Ev sahibi olayı (ağırlık 1, sağa hizalı) -->
     <LinearLayout
         android:id="@+id/llHomeEvent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@id/tvTime"
-        android:layout_centerVertical="true"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:gravity="end|center_vertical"
-        android:paddingEnd="10dp"
+        android:paddingEnd="8dp"
         android:visibility="visible">
 
-        <!-- Oyuncu adı + alt bilgi (gol tipi, değişiklik) -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="vertical"
-            android:gravity="end">
+            android:gravity="end"
+            android:layout_marginEnd="6dp">
 
             <TextView
                 android:id="@+id/tvHomePlayer"
@@ -53,49 +34,62 @@
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:ellipsize="end"
+                android:maxWidth="140dp" />
 
             <TextView
                 android:id="@+id/tvHomeSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?android:attr/textColorSecondary"
-                android:textSize="11sp"
-                android:visibility="gone" />
+                android:textSize="10sp"
+                android:visibility="gone"
+                android:maxLines="1" />
+
         </LinearLayout>
 
+        <!-- Olay ikonu -->
         <ImageView
             android:id="@+id/ivHomeEventType"
             android:layout_width="22dp"
             android:layout_height="22dp"
-            android:layout_marginStart="8dp" />
+            android:scaleType="fitCenter" />
 
     </LinearLayout>
 
-    <!-- Deplasman Olayı (sağ) -->
+    <!-- ORTA: Dakika chip -->
+    <TextView
+        android:id="@+id/tvTime"
+        android:layout_width="52dp"
+        android:layout_height="26dp"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:textColor="#2E7D32"
+        android:background="@drawable/bg_minute_chip" />
+
+    <!-- SAĞ: Deplasman olayı (ağırlık 1, sola hizalı) -->
     <LinearLayout
         android:id="@+id/llAwayEvent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@id/tvTime"
-        android:layout_centerVertical="true"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:gravity="start|center_vertical"
-        android:paddingStart="10dp"
+        android:paddingStart="8dp"
         android:visibility="gone">
 
+        <!-- Olay ikonu -->
         <ImageView
             android:id="@+id/ivAwayEventType"
             android:layout_width="22dp"
             android:layout_height="22dp"
-            android:layout_marginEnd="8dp" />
+            android:scaleType="fitCenter"
+            android:layout_marginEnd="6dp" />
 
-        <!-- Oyuncu adı + alt bilgi -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -106,17 +100,20 @@
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:ellipsize="end"
+                android:maxWidth="140dp" />
 
             <TextView
                 android:id="@+id/tvAwaySubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?android:attr/textColorSecondary"
-                android:textSize="11sp"
-                android:visibility="gone" />
+                android:textSize="10sp"
+                android:visibility="gone"
+                android:maxLines="1" />
+
         </LinearLayout>
 
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
