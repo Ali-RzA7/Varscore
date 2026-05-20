@@ -162,7 +162,10 @@ public class MatchDetailFragment extends Fragment {
                         && !response.body().getData().isEmpty()) {
                     match = response.body().getData().get(0);
                     if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> bindMatchData());
+                        getActivity().runOnUiThread(() -> {
+                            bindMatchData();
+                            setupAiFab();
+                        });
                     }
                 }
             }
@@ -241,12 +244,14 @@ public class MatchDetailFragment extends Fragment {
      * tıklama olayı da bağlanmaz (FAB zaten GONE).
      */
     private void setupAiFab() {
+        if (match != null && match.isFinished()) {
+            binding.fabAiPrediction.setVisibility(View.GONE);
+            return;
+        }
         if (FirebaseManager.isLoggedIn()) {
-            // Kullanıcı giriş yapmış → FAB'ı göster
             binding.fabAiPrediction.setVisibility(View.VISIBLE);
             binding.fabAiPrediction.setOnClickListener(v -> openAiPrediction());
         } else {
-            // Kullanıcı giriş yapmamış → FAB gizli kalır
             binding.fabAiPrediction.setVisibility(View.GONE);
         }
     }
